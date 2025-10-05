@@ -25,8 +25,11 @@ export class AuthGuard implements CanActivate {
       // Verify JWT token
       const payload = await this.supabaseService.verifyToken(token);
 
-      // Extract Supabase user ID
-      const supabaseId = await this.supabaseService.getUserIdFromToken(token);
+      // Extract Supabase user ID from payload (no need to re-verify token)
+      if (!payload.sub) {
+        throw new UnauthorizedException('Token missing sub claim (user ID)');
+      }
+      const supabaseId = payload.sub;
 
       // Attach user information to request object
       request.user = {

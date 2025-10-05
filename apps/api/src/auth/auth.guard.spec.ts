@@ -15,7 +15,6 @@ describe('AuthGuard', () => {
   const mockSupabaseService = {
     extractTokenFromHeader: jest.fn(),
     verifyToken: jest.fn(),
-    getUserIdFromToken: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -57,7 +56,6 @@ describe('AuthGuard', () => {
 
       mockSupabaseService.extractTokenFromHeader.mockReturnValue('valid.token');
       mockSupabaseService.verifyToken.mockResolvedValue(mockPayload);
-      mockSupabaseService.getUserIdFromToken.mockResolvedValue('user-123');
 
       const context = createMockExecutionContext('Bearer valid.token');
       const result = await guard.canActivate(context);
@@ -126,6 +124,26 @@ describe('AuthGuard', () => {
       );
     });
 
+    it('should throw UnauthorizedException when token is missing sub claim', async () => {
+      const mockPayloadWithoutSub = {
+        email: 'test@example.com',
+        role: 'authenticated',
+        // Missing 'sub' claim
+      };
+
+      mockSupabaseService.extractTokenFromHeader.mockReturnValue('valid.token');
+      mockSupabaseService.verifyToken.mockResolvedValue(mockPayloadWithoutSub);
+
+      const context = createMockExecutionContext('Bearer valid.token');
+
+      await expect(guard.canActivate(context)).rejects.toThrow(
+        UnauthorizedException,
+      );
+      await expect(guard.canActivate(context)).rejects.toThrow(
+        'Token missing sub claim (user ID)',
+      );
+    });
+
     it('should attach user payload to request object', async () => {
       const mockPayload = {
         sub: 'user-456',
@@ -141,7 +159,6 @@ describe('AuthGuard', () => {
 
       mockSupabaseService.extractTokenFromHeader.mockReturnValue('valid.token');
       mockSupabaseService.verifyToken.mockResolvedValue(mockPayload);
-      mockSupabaseService.getUserIdFromToken.mockResolvedValue('user-456');
 
       const context = {
         switchToHttp: () => ({
