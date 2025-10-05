@@ -50,7 +50,7 @@ export class SupabaseService {
     }
 
     const parts = authHeader.trim().split(/\s+/);
-    if (parts.length < 2 || parts[0] !== 'Bearer') {
+    if (parts.length < 2 || parts[0].toLowerCase() !== 'bearer') {
       return null;
     }
 
