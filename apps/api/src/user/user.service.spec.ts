@@ -11,6 +11,7 @@ describe('UserService', () => {
       findUnique: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+      upsert: jest.fn(),
     },
   };
 
@@ -92,14 +93,19 @@ describe('UserService', () => {
         updatedAt: new Date(),
       };
 
-      mockPrismaClient.user.findUnique.mockResolvedValue(null);
-      mockPrismaClient.user.create.mockResolvedValue(expectedUser);
+      mockPrismaClient.user.upsert.mockResolvedValue(expectedUser);
 
       const result = await service.syncUserFromSupabase(mockSupabaseUser);
 
       expect(result).toEqual(expectedUser);
-      expect(mockPrismaClient.user.create).toHaveBeenCalledWith({
-        data: {
+      expect(mockPrismaClient.user.upsert).toHaveBeenCalledWith({
+        where: { supabaseId: 'supabase-uuid-789' },
+        update: {
+          name: 'New User',
+          profilePicture: 'https://example.com/avatar.jpg',
+          lastLoginAt: expect.any(Date),
+        },
+        create: {
           supabaseId: 'supabase-uuid-789',
           email: 'newuser@example.com',
           name: 'New User',
@@ -111,37 +117,37 @@ describe('UserService', () => {
     });
 
     it('should update existing user on subsequent login', async () => {
-      const existingUser = {
+      const updatedUser = {
         id: 'existing-user-id',
         supabaseId: 'supabase-uuid-789',
         email: 'newuser@example.com',
-        name: 'Old Name',
-        profilePicture: null,
+        name: 'New User',
+        profilePicture: 'https://example.com/avatar.jpg',
         provider: 'google',
         settings: null,
-        lastLoginAt: new Date('2025-01-01'),
+        lastLoginAt: expect.any(Date),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      const updatedUser = {
-        ...existingUser,
-        name: 'New User',
-        profilePicture: 'https://example.com/avatar.jpg',
-        lastLoginAt: expect.any(Date),
-      };
-
-      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
-      mockPrismaClient.user.update.mockResolvedValue(updatedUser);
+      mockPrismaClient.user.upsert.mockResolvedValue(updatedUser);
 
       const result = await service.syncUserFromSupabase(mockSupabaseUser);
 
       expect(result).toEqual(updatedUser);
-      expect(mockPrismaClient.user.update).toHaveBeenCalledWith({
+      expect(mockPrismaClient.user.upsert).toHaveBeenCalledWith({
         where: { supabaseId: 'supabase-uuid-789' },
-        data: {
+        update: {
           name: 'New User',
           profilePicture: 'https://example.com/avatar.jpg',
+          lastLoginAt: expect.any(Date),
+        },
+        create: {
+          supabaseId: 'supabase-uuid-789',
+          email: 'newuser@example.com',
+          name: 'New User',
+          profilePicture: 'https://example.com/avatar.jpg',
+          provider: 'google',
           lastLoginAt: expect.any(Date),
         },
       });
@@ -157,8 +163,7 @@ describe('UserService', () => {
         },
       };
 
-      mockPrismaClient.user.findUnique.mockResolvedValue(null);
-      mockPrismaClient.user.create.mockResolvedValue({
+      const expectedUser = {
         id: 'new-id',
         supabaseId: 'supabase-uuid-123',
         email: 'minimal@example.com',
@@ -169,12 +174,20 @@ describe('UserService', () => {
         lastLoginAt: expect.any(Date),
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      };
+
+      mockPrismaClient.user.upsert.mockResolvedValue(expectedUser);
 
       await service.syncUserFromSupabase(userWithoutName);
 
-      expect(mockPrismaClient.user.create).toHaveBeenCalledWith({
-        data: {
+      expect(mockPrismaClient.user.upsert).toHaveBeenCalledWith({
+        where: { supabaseId: 'supabase-uuid-123' },
+        update: {
+          name: null,
+          profilePicture: null,
+          lastLoginAt: expect.any(Date),
+        },
+        create: {
           supabaseId: 'supabase-uuid-123',
           email: 'minimal@example.com',
           name: null,

@@ -36,34 +36,26 @@ export class UserService {
   /**
    * Sync user from Supabase Auth to local database
    * Creates user if doesn't exist, updates lastLoginAt if exists
+   * Uses atomic upsert to prevent duplicate creation under concurrent requests
    * @param supabaseUser - Supabase user object
    * @returns Synced user
    */
   async syncUserFromSupabase(supabaseUser: SupabaseUser): Promise<User> {
-    const existingUser = await this.findBySupabaseId(supabaseUser.id);
-
     const userData = {
       name: supabaseUser.user_metadata?.full_name || null,
       profilePicture: supabaseUser.user_metadata?.avatar_url || null,
       lastLoginAt: new Date(),
     };
 
-    if (!existingUser) {
-      // Create new user
-      return this.prisma.user.create({
-        data: {
-          supabaseId: supabaseUser.id,
-          email: supabaseUser.email,
-          provider: supabaseUser.app_metadata?.provider || null,
-          ...userData,
-        },
-      });
-    }
-
-    // Update existing user
-    return this.prisma.user.update({
+    return this.prisma.user.upsert({
       where: { supabaseId: supabaseUser.id },
-      data: userData,
+      update: userData,
+      create: {
+        supabaseId: supabaseUser.id,
+        email: supabaseUser.email,
+        provider: supabaseUser.app_metadata?.provider || null,
+        ...userData,
+      },
     });
   }
 
