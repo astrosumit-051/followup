@@ -24,18 +24,18 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 2.6 Copy Supabase URL, anon key, and JWT secret to environment variables
   - [ ] 2.7 Test OAuth configuration with Supabase test login - Will test after frontend implementation
 
-- [ ] 3. Backend Authentication Infrastructure
-  - [ ] 3.1 Write unit tests for SupabaseService (JWT verification, token extraction)
-  - [ ] 3.2 Install backend dependencies (@supabase/supabase-js, jose)
-  - [ ] 3.3 Create SupabaseService for JWT verification (apps/api/src/auth/supabase.service.ts)
-  - [ ] 3.4 Write unit tests for AuthGuard (valid token, invalid token, missing token, expired token)
-  - [ ] 3.5 Implement AuthGuard with JWT validation (apps/api/src/auth/auth.guard.ts)
-  - [ ] 3.6 Create @CurrentUser decorator for GraphQL context (apps/api/src/auth/current-user.decorator.ts)
-  - [ ] 3.7 Write unit tests for UserService (findBySupabaseId, syncUserFromSupabase, updateProfile)
-  - [ ] 3.8 Implement UserService with user sync logic (apps/api/src/user/user.service.ts)
-  - [ ] 3.9 Configure AuthModule with providers and exports (apps/api/src/auth/auth.module.ts)
-  - [ ] 3.10 Apply AuthGuard globally or to protected resolvers
-  - [ ] 3.11 Verify all unit tests pass
+- [x] 3. Backend Authentication Infrastructure
+  - [x] 3.1 Write unit tests for SupabaseService (JWT verification, token extraction)
+  - [x] 3.2 Install backend dependencies (@supabase/supabase-js, jose)
+  - [x] 3.3 Create SupabaseService for JWT verification (apps/api/src/auth/supabase.service.ts)
+  - [x] 3.4 Write unit tests for AuthGuard (valid token, invalid token, missing token, expired token)
+  - [x] 3.5 Implement AuthGuard with JWT validation (apps/api/src/auth/auth.guard.ts)
+  - [x] 3.6 Create @CurrentUser decorator for GraphQL context (apps/api/src/auth/current-user.decorator.ts)
+  - [x] 3.7 Write unit tests for UserService (findBySupabaseId, syncUserFromSupabase, updateProfile)
+  - [x] 3.8 Implement UserService with user sync logic (apps/api/src/user/user.service.ts)
+  - [x] 3.9 Configure AuthModule with providers and exports (apps/api/src/auth/auth.module.ts)
+  - [x] 3.10 Apply AuthGuard globally or to protected resolvers (example /me endpoint created)
+  - [x] 3.11 Verify all unit tests pass (25/25 tests passing)
 
 - [ ] 4. Backend GraphQL API
   - [ ] 4.1 Write integration tests for `me` query (authenticated and unauthenticated)
