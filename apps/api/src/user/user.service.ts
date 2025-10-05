@@ -64,7 +64,7 @@ export class UserService {
     // Update existing user
     return this.prisma.user.update({
       where: { supabaseId: supabaseUser.id },
-      data: userData,
+      data: { ...userData, email: supabaseUser.email },
     });
   }
 
