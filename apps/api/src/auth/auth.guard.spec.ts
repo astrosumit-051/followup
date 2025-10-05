@@ -3,9 +3,9 @@ import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { SupabaseService } from './supabase.service';
 
-// Mock jose module to avoid ES module issues
-jest.mock('jose', () => ({
-  jwtVerify: jest.fn(),
+// Mock jsonwebtoken module to avoid ES module issues
+jest.mock('jsonwebtoken', () => ({
+  verify: jest.fn(),
 }));
 
 describe('AuthGuard', () => {

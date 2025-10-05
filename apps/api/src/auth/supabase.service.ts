@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import * as jose from 'jose';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class SupabaseService {
   private supabase: SupabaseClient;
-  private jwtSecret: Uint8Array;
+  private jwtSecret: string;
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
@@ -20,7 +20,7 @@ export class SupabaseService {
     }
 
     this.supabase = createClient(supabaseUrl, supabaseServiceKey);
-    this.jwtSecret = new TextEncoder().encode(jwtSecretString);
+    this.jwtSecret = jwtSecretString;
   }
 
   /**
@@ -29,9 +29,9 @@ export class SupabaseService {
    * @returns Decoded JWT payload
    * @throws Error if token is invalid or expired
    */
-  async verifyToken(token: string): Promise<jose.JWTPayload> {
+  async verifyToken(token: string): Promise<jwt.JwtPayload> {
     try {
-      const { payload } = await jose.jwtVerify(token, this.jwtSecret);
+      const payload = jwt.verify(token, this.jwtSecret) as jwt.JwtPayload;
       return payload;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Token verification failed';

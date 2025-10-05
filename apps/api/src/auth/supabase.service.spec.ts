@@ -2,12 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from './supabase.service';
 
-// Mock jose module
-jest.mock('jose', () => ({
-  jwtVerify: jest.fn(),
+// Mock jsonwebtoken module
+jest.mock('jsonwebtoken', () => ({
+  verify: jest.fn(),
 }));
 
-import * as jose from 'jose';
+import * as jwt from 'jsonwebtoken';
 
 describe('SupabaseService', () => {
   let service: SupabaseService;
@@ -51,23 +51,22 @@ describe('SupabaseService', () => {
         exp: Math.floor(Date.now() / 1000) + 3600,
       };
 
-      // Mock jose.jwtVerify to return valid payload
-      jest.spyOn(jose, 'jwtVerify').mockResolvedValue({
-        payload: mockPayload,
-        protectedHeader: { alg: 'HS256', typ: 'JWT' },
-      } as any);
+      // Mock jwt.verify to return valid payload
+      jest.spyOn(jwt, 'verify').mockReturnValue(mockPayload as any);
 
       const result = await service.verifyToken('valid.jwt.token');
 
       expect(result).toEqual(mockPayload);
-      expect(jose.jwtVerify).toHaveBeenCalledWith(
+      expect(jwt.verify).toHaveBeenCalledWith(
         'valid.jwt.token',
-        expect.any(Uint8Array),
+        'test-secret-key-at-least-32-characters-long',
       );
     });
 
     it('should throw error for invalid JWT token', async () => {
-      jest.spyOn(jose, 'jwtVerify').mockRejectedValue(new Error('Invalid token'));
+      jest.spyOn(jwt, 'verify').mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
 
       await expect(service.verifyToken('invalid.token')).rejects.toThrow(
         'Invalid token',
@@ -75,9 +74,9 @@ describe('SupabaseService', () => {
     });
 
     it('should throw error for expired JWT token', async () => {
-      jest
-        .spyOn(jose, 'jwtVerify')
-        .mockRejectedValue(new Error('Token expired'));
+      jest.spyOn(jwt, 'verify').mockImplementation(() => {
+        throw new Error('Token expired');
+      });
 
       await expect(service.verifyToken('expired.token')).rejects.toThrow(
         'Token expired',
@@ -85,9 +84,9 @@ describe('SupabaseService', () => {
     });
 
     it('should throw error for malformed JWT token', async () => {
-      jest
-        .spyOn(jose, 'jwtVerify')
-        .mockRejectedValue(new Error('Malformed token'));
+      jest.spyOn(jwt, 'verify').mockImplementation(() => {
+        throw new Error('Malformed token');
+      });
 
       await expect(service.verifyToken('malformed')).rejects.toThrow(
         'Malformed token',
@@ -139,10 +138,7 @@ describe('SupabaseService', () => {
         role: 'authenticated',
       };
 
-      jest.spyOn(jose, 'jwtVerify').mockResolvedValue({
-        payload: mockPayload,
-        protectedHeader: { alg: 'HS256', typ: 'JWT' },
-      } as any);
+      jest.spyOn(jwt, 'verify').mockReturnValue(mockPayload as any);
 
       const userId = await service.getUserIdFromToken('valid.token');
 
@@ -155,10 +151,7 @@ describe('SupabaseService', () => {
         role: 'authenticated',
       };
 
-      jest.spyOn(jose, 'jwtVerify').mockResolvedValue({
-        payload: mockPayload,
-        protectedHeader: { alg: 'HS256', typ: 'JWT' },
-      } as any);
+      jest.spyOn(jwt, 'verify').mockReturnValue(mockPayload as any);
 
       await expect(service.getUserIdFromToken('token.without.sub')).rejects.toThrow();
     });
