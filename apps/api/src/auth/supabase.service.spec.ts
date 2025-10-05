@@ -129,6 +129,20 @@ describe('SupabaseService', () => {
 
       expect(token).toBe('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token');
     });
+
+    it('should handle case-insensitive Bearer scheme per RFC 7235', () => {
+      const testCases = [
+        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token',
+        'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token',
+        'BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token',
+        'BeArEr eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token',
+      ];
+
+      testCases.forEach((authHeader) => {
+        const token = service.extractTokenFromHeader(authHeader);
+        expect(token).toBe('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token');
+      });
+    });
   });
 
   describe('getUserIdFromToken', () => {

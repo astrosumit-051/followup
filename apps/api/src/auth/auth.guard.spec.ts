@@ -170,5 +170,34 @@ describe('AuthGuard', () => {
         'Missing authorization token',
       );
     });
+
+    it('should handle case-insensitive Bearer scheme', async () => {
+      const mockPayload = {
+        sub: 'user-789',
+        email: 'test@example.com',
+        role: 'authenticated',
+      };
+
+      mockSupabaseService.extractTokenFromHeader.mockReturnValue('valid.token');
+      mockSupabaseService.verifyToken.mockResolvedValue(mockPayload);
+      mockSupabaseService.getUserIdFromToken.mockResolvedValue('user-789');
+
+      const testCases = [
+        'Bearer valid.token',
+        'bearer valid.token',
+        'BEARER valid.token',
+        'BeArEr valid.token',
+      ];
+
+      for (const authHeader of testCases) {
+        const context = createMockExecutionContext(authHeader);
+        const result = await guard.canActivate(context);
+
+        expect(result).toBe(true);
+        expect(mockSupabaseService.extractTokenFromHeader).toHaveBeenCalledWith(
+          authHeader,
+        );
+      }
+    });
   });
 });
