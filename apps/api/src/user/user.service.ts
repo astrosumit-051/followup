@@ -43,6 +43,7 @@ export class UserService {
     const existingUser = await this.findBySupabaseId(supabaseUser.id);
 
     const userData = {
+      email: supabaseUser.email,
       name: supabaseUser.user_metadata?.full_name || null,
       profilePicture: supabaseUser.user_metadata?.avatar_url || null,
       lastLoginAt: new Date(),
