@@ -140,6 +140,51 @@ describe('UserService', () => {
       expect(mockPrismaClient.user.update).toHaveBeenCalledWith({
         where: { supabaseId: 'supabase-uuid-789' },
         data: {
+          email: 'newuser@example.com',
+          name: 'New User',
+          profilePicture: 'https://example.com/avatar.jpg',
+          lastLoginAt: expect.any(Date),
+        },
+      });
+    });
+
+    it('should update email when syncing existing user with changed email', async () => {
+      const existingUser = {
+        id: 'existing-user-id',
+        supabaseId: 'supabase-uuid-789',
+        email: 'oldemail@example.com', // Old email in database
+        name: 'User Name',
+        profilePicture: null,
+        provider: 'google',
+        settings: null,
+        lastLoginAt: new Date('2025-01-01'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const supabaseUserWithNewEmail = {
+        ...mockSupabaseUser,
+        email: 'newemail@example.com', // New email from Supabase
+      };
+
+      const updatedUser = {
+        ...existingUser,
+        email: 'newemail@example.com',
+        name: 'New User',
+        profilePicture: 'https://example.com/avatar.jpg',
+        lastLoginAt: expect.any(Date),
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
+      mockPrismaClient.user.update.mockResolvedValue(updatedUser);
+
+      const result = await service.syncUserFromSupabase(supabaseUserWithNewEmail);
+
+      expect(result).toEqual(updatedUser);
+      expect(mockPrismaClient.user.update).toHaveBeenCalledWith({
+        where: { supabaseId: 'supabase-uuid-789' },
+        data: {
+          email: 'newemail@example.com',
           name: 'New User',
           profilePicture: 'https://example.com/avatar.jpg',
           lastLoginAt: expect.any(Date),
