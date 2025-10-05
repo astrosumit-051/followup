@@ -1,0 +1,23 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm@8
+
+# Copy workspace files
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml turbo.json ./
+
+# Copy all packages
+COPY packages ./packages
+COPY apps/api ./apps/api
+
+# Install dependencies
+RUN pnpm install
+
+# Generate Prisma Client
+RUN pnpm --filter @relationhub/database prisma generate
+
+EXPOSE 3001
+
+CMD ["pnpm", "--filter", "@relationhub/api", "dev"]
