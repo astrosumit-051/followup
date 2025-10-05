@@ -30,7 +30,7 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 3.3 Create SupabaseService for JWT verification (apps/api/src/auth/supabase.service.ts)
   - [x] 3.4 Write unit tests for AuthGuard (valid token, invalid token, missing token, expired token)
   - [x] 3.5 Implement AuthGuard with JWT validation (apps/api/src/auth/auth.guard.ts)
-  - [x] 3.6 Create @CurrentUser decorator for GraphQL context (apps/api/src/auth/current-user.decorator.ts)
+  - [ ] 3.6 Create @CurrentUser decorator for GraphQL context (apps/api/src/auth/current-user.decorator.ts)
   - [x] 3.7 Write unit tests for UserService (findBySupabaseId, syncUserFromSupabase, updateProfile)
   - [x] 3.8 Implement UserService with user sync logic (apps/api/src/user/user.service.ts)
   - [x] 3.9 Configure AuthModule with providers and exports (apps/api/src/auth/auth.module.ts)
