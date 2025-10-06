@@ -1,0 +1,853 @@
+{
+  "statistics": {
+    "detectionDate": "2025-10-06T20:16:25.499Z",
+    "formats": {
+      "typescript": {
+        "sources": {
+          "apps/web/lib/supabase/server.ts": {
+            "lines": 41,
+            "tokens": 325,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/web/lib/supabase/server.test.ts": {
+            "lines": 87,
+            "tokens": 680,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/web/lib/supabase/client.ts": {
+            "lines": 28,
+            "tokens": 170,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/web/lib/supabase/client.test.ts": {
+            "lines": 51,
+            "tokens": 399,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/web/app/api/auth/logout/route.ts": {
+            "lines": 48,
+            "tokens": 281,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/web/app/auth/callback/route.ts": {
+            "lines": 136,
+            "tokens": 831,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/web/app/auth/callback/route.test.ts": {
+            "lines": 257,
+            "tokens": 1955,
+            "sources": 1,
+            "clones": 10,
+            "duplicatedLines": 140,
+            "duplicatedTokens": 1028,
+            "percentage": 54.47,
+            "percentageTokens": 52.58,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/user/dto/update-profile.dto.ts": {
+            "lines": 82,
+            "tokens": 225,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/user/dto/update-profile.dto.spec.ts": {
+            "lines": 292,
+            "tokens": 2893,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/user/user.service.ts": {
+            "lines": 122,
+            "tokens": 870,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/user/user.service.spec.ts": {
+            "lines": 309,
+            "tokens": 2352,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 52,
+            "duplicatedTokens": 404,
+            "percentage": 16.83,
+            "percentageTokens": 17.18,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/user/user.resolver.ts": {
+            "lines": 90,
+            "tokens": 299,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/user/user.module.ts": {
+            "lines": 26,
+            "tokens": 124,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/supabase.service.ts": {
+            "lines": 139,
+            "tokens": 1032,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/supabase.service.spec.ts": {
+            "lines": 165,
+            "tokens": 1351,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/current-user.decorator.ts": {
+            "lines": 27,
+            "tokens": 196,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/auth.module.ts": {
+            "lines": 10,
+            "tokens": 101,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/auth.guard.ts": {
+            "lines": 55,
+            "tokens": 415,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/auth.guard.spec.ts": {
+            "lines": 233,
+            "tokens": 1828,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 15,
+            "duplicatedTokens": 104,
+            "percentage": 6.44,
+            "percentageTokens": 5.69,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/auth.guard.security.spec.ts": {
+            "lines": 327,
+            "tokens": 2912,
+            "sources": 1,
+            "clones": 5,
+            "duplicatedLines": 63,
+            "duplicatedTokens": 516,
+            "percentage": 19.27,
+            "percentageTokens": 17.72,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/auth/auth.guard.integration.spec.ts": {
+            "lines": 330,
+            "tokens": 2868,
+            "sources": 1,
+            "clones": 8,
+            "duplicatedLines": 108,
+            "duplicatedTokens": 1050,
+            "percentage": 32.73,
+            "percentageTokens": 36.61,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/main.ts": {
+            "lines": 62,
+            "tokens": 420,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/app.service.ts": {
+            "lines": 10,
+            "tokens": 84,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/app.module.ts": {
+            "lines": 48,
+            "tokens": 256,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/app.module.security.spec.ts": {
+            "lines": 77,
+            "tokens": 568,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "apps/api/src/app.controller.ts": {
+            "lines": 19,
+            "tokens": 180,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 3071,
+          "tokens": 23615,
+          "sources": 26,
+          "clones": 14,
+          "duplicatedLines": 189,
+          "duplicatedTokens": 1551,
+          "percentage": 6.15,
+          "percentageTokens": 6.57,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 3071,
+      "tokens": 23615,
+      "sources": 26,
+      "clones": 14,
+      "duplicatedLines": 189,
+      "duplicatedTokens": 1551,
+      "percentage": 6.15,
+      "percentageTokens": 6.57,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "typescript",
+      "lines": 14,
+      "fragment": ";\n      mockRequest = {\n        url: mockUrl,\n        nextUrl: new URL(mockUrl),\n      } as NextRequest;\n\n      mockExchangeCodeForSession.mockResolvedValue({\n        data: { session: { access_token: 'token-123' } },\n        error: null,\n      });\n\n      const response = await GET(mockRequest);\n\n      expect(NextResponse",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 129,
+        "end": 142,
+        "startLoc": {
+          "line": 129,
+          "column": 70,
+          "position": 972
+        },
+        "endLoc": {
+          "line": 142,
+          "column": 13,
+          "position": 1069
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 43,
+        "end": 56,
+        "startLoc": {
+          "line": 43,
+          "column": 58,
+          "position": 334
+        },
+        "endLoc": {
+          "line": 56,
+          "column": 27,
+          "position": 431
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 14,
+      "fragment": ";\n      mockRequest = {\n        url: mockUrl,\n        nextUrl: new URL(mockUrl),\n      } as NextRequest;\n\n      mockExchangeCodeForSession.mockResolvedValue({\n        data: { session: { access_token: 'token-123' } },\n        error: null,\n      });\n\n      const response = await GET(mockRequest);\n\n      // Should redirect to home page instead of external domain",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 148,
+        "end": 161,
+        "startLoc": {
+          "line": 148,
+          "column": 88,
+          "position": 1121
+        },
+        "endLoc": {
+          "line": 161,
+          "column": 59,
+          "position": 1216
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 43,
+        "end": 56,
+        "startLoc": {
+          "line": 43,
+          "column": 58,
+          "position": 334
+        },
+        "endLoc": {
+          "line": 56,
+          "column": 7,
+          "position": 429
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 14,
+      "fragment": ";\n      mockRequest = {\n        url: mockUrl,\n        nextUrl: new URL(mockUrl),\n      } as NextRequest;\n\n      mockExchangeCodeForSession.mockResolvedValue({\n        data: { session: { access_token: 'token-123' } },\n        error: null,\n      });\n\n      const response = await GET(mockRequest);\n\n      // Should redirect to home page for malformed URL",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 168,
+        "end": 181,
+        "startLoc": {
+          "line": 168,
+          "column": 79,
+          "position": 1273
+        },
+        "endLoc": {
+          "line": 181,
+          "column": 50,
+          "position": 1368
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 43,
+        "end": 56,
+        "startLoc": {
+          "line": 43,
+          "column": 58,
+          "position": 334
+        },
+        "endLoc": {
+          "line": 56,
+          "column": 7,
+          "position": 429
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 19,
+      "fragment": ";\n      mockRequest = {\n        url: mockUrl,\n        nextUrl: new URL(mockUrl),\n      } as NextRequest;\n\n      mockExchangeCodeForSession.mockResolvedValue({\n        data: { session: { access_token: 'token-123' } },\n        error: null,\n      });\n\n      const response = await GET(mockRequest);\n\n      // Should redirect to home page for malformed URL\n      expect(NextResponse.redirect).toHaveBeenCalledWith(\n        new URL('/', 'http://localhost:3000')\n      );\n    });\n  }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 188,
+        "end": 206,
+        "startLoc": {
+          "line": 188,
+          "column": 69,
+          "position": 1425
+        },
+        "endLoc": {
+          "line": 206,
+          "column": 2,
+          "position": 1554
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 43,
+        "end": 187,
+        "startLoc": {
+          "line": 43,
+          "column": 58,
+          "position": 334
+        },
+        "endLoc": {
+          "line": 187,
+          "column": 3,
+          "position": 1403
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 14,
+      "fragment": ";\n      mockRequest = {\n        url: mockUrl,\n        nextUrl: new URL(mockUrl),\n      } as NextRequest;\n\n      const response = await GET(mockRequest);\n\n      expect(mockExchangeCodeForSession).not.toHaveBeenCalled();\n      expect(NextResponse.redirect).toHaveBeenCalledWith(\n        new URL('/login', 'http://localhost:3000')\n      );\n    });\n  }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 225,
+        "end": 238,
+        "startLoc": {
+          "line": 225,
+          "column": 44,
+          "position": 1716
+        },
+        "endLoc": {
+          "line": 238,
+          "column": 2,
+          "position": 1814
+        }
+      },
+      "secondFile": {
+        "name": "apps/web/app/auth/callback/route.test.ts",
+        "start": 210,
+        "end": 224,
+        "startLoc": {
+          "line": 210,
+          "column": 38,
+          "position": 1595
+        },
+        "endLoc": {
+          "line": 224,
+          "column": 3,
+          "position": 1694
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 10,
+      "fragment": ",\n        name: 'New User',\n        profilePicture: 'https://example.com/avatar.jpg',\n        lastLoginAt: expect.any(Date),\n      };\n\n      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);\n      mockPrismaClient.user.update.mockResolvedValue(updatedUser);\n\n      const result = await service.syncUserFromSupabase(supabaseUserWithNewEmail",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/user/user.service.spec.ts",
+        "start": 172,
+        "end": 181,
+        "startLoc": {
+          "line": 172,
+          "column": 23,
+          "position": 1319
+        },
+        "endLoc": {
+          "line": 181,
+          "column": 25,
+          "position": 1392
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/user/user.service.spec.ts",
+        "start": 128,
+        "end": 137,
+        "startLoc": {
+          "line": 128,
+          "column": 13,
+          "position": 986
+        },
+        "endLoc": {
+          "line": 137,
+          "column": 17,
+          "position": 1059
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 18,
+      "fragment": ", async () => {\n      const existingUser = {\n        id: 'user-123',\n        supabaseId: 'supabase-uuid-456',\n        email: 'test@example.com',\n        name: 'Old Name',\n        profilePicture: null,\n        provider: 'google',\n        settings: null,\n        lastLoginAt: new Date(),\n        createdAt: new Date(),\n        updatedAt: new Date(),\n      };\n\n      const updatedUser = {\n        ...existingUser,\n        name: 'Updated Name',\n      }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/user/user.service.spec.ts",
+        "start": 276,
+        "end": 293,
+        "startLoc": {
+          "line": 276,
+          "column": 37,
+          "position": 2105
+        },
+        "endLoc": {
+          "line": 293,
+          "column": 2,
+          "position": 2234
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/user/user.service.spec.ts",
+        "start": 235,
+        "end": 252,
+        "startLoc": {
+          "line": 235,
+          "column": 29,
+          "position": 1788
+        },
+        "endLoc": {
+          "line": 252,
+          "column": 15,
+          "position": 1917
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 16,
+      "fragment": "();\n  });\n\n  const createMockExecutionContext = (authHeader?: string): ExecutionContext => {\n    return {\n      switchToHttp: () => ({\n        getRequest: () => ({\n          headers: {\n            authorization: authHeader,\n          },\n        }),\n      }),\n    } as any;\n  };\n\n  describe('JWT Tampering Detection'",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/auth/auth.guard.security.spec.ts",
+        "start": 51,
+        "end": 66,
+        "startLoc": {
+          "line": 51,
+          "column": 12,
+          "position": 415
+        },
+        "endLoc": {
+          "line": 66,
+          "column": 26,
+          "position": 519
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/auth/auth.guard.spec.ts",
+        "start": 49,
+        "end": 64,
+        "startLoc": {
+          "line": 49,
+          "column": 14,
+          "position": 400
+        },
+        "endLoc": {
+          "line": 64,
+          "column": 14,
+          "position": 504
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 9,
+      "fragment": ";\n\n      jest.spyOn(supabaseService, 'extractTokenFromHeader').mockReturnValue(validToken);\n      jest.spyOn(supabaseService, 'verifyToken').mockResolvedValue({\n        sub: 'user-123',\n        email: 'test@example.com',\n        role: 'authenticated',\n      });\n      jest.spyOn(supabaseService, 'getUserFromToken').mockResolvedValue",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/auth/auth.guard.security.spec.ts",
+        "start": 309,
+        "end": 317,
+        "startLoc": {
+          "line": 309,
+          "column": 2,
+          "position": 2735
+        },
+        "endLoc": {
+          "line": 317,
+          "column": 18,
+          "position": 2807
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/auth/auth.guard.security.spec.ts",
+        "start": 280,
+        "end": 288,
+        "startLoc": {
+          "line": 280,
+          "column": 14,
+          "position": 2497
+        },
+        "endLoc": {
+          "line": 288,
+          "column": 18,
+          "position": 2569
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 9,
+      "fragment": "import { Test, TestingModule } from '@nestjs/testing';\nimport { ExecutionContext, UnauthorizedException } from '@nestjs/common';\nimport { ConfigModule } from '@nestjs/config';\nimport { AuthGuard } from './auth.guard';\nimport { SupabaseService } from './supabase.service';\nimport { UserService } from '../user/user.service';\nimport { PrismaClient } from '@relationhub/database';\n\n// Mock jose module to avoid ES module issues",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 1,
+        "end": 9,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 9,
+          "column": 46,
+          "position": 98
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/auth/auth.guard.security.spec.ts",
+        "start": 1,
+        "end": 8,
+        "startLoc": {
+          "line": 1,
+          "column": 1,
+          "position": 0
+        },
+        "endLoc": {
+          "line": 8,
+          "column": 7,
+          "position": 97
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 25,
+      "fragment": ");\n  });\n\n  beforeEach(async () => {\n    const module: TestingModule = await Test.createTestingModule({\n      imports: [\n        ConfigModule.forRoot({\n          isGlobal: true,\n        }),\n      ],\n      providers: [\n        AuthGuard,\n        SupabaseService,\n        UserService,\n        {\n          provide: PrismaClient,\n          useValue: prisma,\n        },\n      ],\n    }).compile();\n\n    authGuard = module.get<AuthGuard>(AuthGuard);\n    supabaseService = module.get<SupabaseService>(SupabaseService);\n    userService = module.get<UserService>(UserService);\n  }",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 38,
+        "end": 62,
+        "startLoc": {
+          "line": 38,
+          "column": 2,
+          "position": 307
+        },
+        "endLoc": {
+          "line": 62,
+          "column": 2,
+          "position": 477
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/auth/auth.guard.security.spec.ts",
+        "start": 22,
+        "end": 47,
+        "startLoc": {
+          "line": 22,
+          "column": 2,
+          "position": 213
+        },
+        "endLoc": {
+          "line": 47,
+          "column": 5,
+          "position": 384
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 13,
+      "fragment": "const mockToken = 'valid-jwt-token';\n      const mockContext = createMockExecutionContext(mockToken);\n\n      jest.spyOn(supabaseService, 'extractTokenFromHeader').mockReturnValue(mockToken);\n      jest.spyOn(supabaseService, 'verifyToken').mockResolvedValue({\n        sub: mockSupabaseUser.id,\n        email: mockSupabaseUser.email,\n        role: 'authenticated',\n      });\n      jest.spyOn(supabaseService, 'getUserIdFromToken').mockResolvedValue(mockSupabaseUser.id);\n      jest.spyOn(supabaseService, 'getUserFromToken').mockResolvedValue(mockSupabaseUser);\n\n      // Act",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 200,
+        "end": 212,
+        "startLoc": {
+          "line": 200,
+          "column": 7,
+          "position": 1708
+        },
+        "endLoc": {
+          "line": 212,
+          "column": 7,
+          "position": 1831
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 78,
+        "end": 90,
+        "startLoc": {
+          "line": 78,
+          "column": 7,
+          "position": 595
+        },
+        "endLoc": {
+          "line": 90,
+          "column": 36,
+          "position": 718
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 15,
+      "fragment": ", async () => {\n      // Arrange\n      const mockToken = 'valid-jwt-token';\n      const mockContext = createMockExecutionContext(mockToken);\n\n      jest.spyOn(supabaseService, 'extractTokenFromHeader').mockReturnValue(mockToken);\n      jest.spyOn(supabaseService, 'verifyToken').mockResolvedValue({\n        sub: mockSupabaseUser.id,\n        email: mockSupabaseUser.email,\n        role: 'authenticated',\n      });\n      jest.spyOn(supabaseService, 'getUserIdFromToken').mockResolvedValue(mockSupabaseUser.id);\n      jest.spyOn(supabaseService, 'getUserFromToken').mockResolvedValue(mockSupabaseUser);\n\n      // Act - Login multiple times",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 270,
+        "end": 284,
+        "startLoc": {
+          "line": 270,
+          "column": 48,
+          "position": 2338
+        },
+        "endLoc": {
+          "line": 284,
+          "column": 30,
+          "position": 2476
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 76,
+        "end": 90,
+        "startLoc": {
+          "line": 76,
+          "column": 42,
+          "position": 580
+        },
+        "endLoc": {
+          "line": 90,
+          "column": 36,
+          "position": 718
+        }
+      }
+    },
+    {
+      "format": "typescript",
+      "lines": 13,
+      "fragment": ", async () => {\n      // Arrange\n      const mockToken = 'valid-jwt-token';\n      const mockContext = createMockExecutionContext(mockToken);\n\n      jest.spyOn(supabaseService, 'extractTokenFromHeader').mockReturnValue(mockToken);\n      jest.spyOn(supabaseService, 'verifyToken').mockResolvedValue({\n        sub: mockSupabaseUser.id,\n        email: mockSupabaseUser.email,\n        role: 'authenticated',\n      });\n      jest.spyOn(supabaseService, 'getUserIdFromToken').mockResolvedValue(mockSupabaseUser.id);\n      jest.spyOn(supabaseService, 'getUserFromToken').mockRejectedValue",
+      "tokens": 0,
+      "firstFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 298,
+        "end": 310,
+        "startLoc": {
+          "line": 298,
+          "column": 56,
+          "position": 2593
+        },
+        "endLoc": {
+          "line": 310,
+          "column": 18,
+          "position": 2723
+        }
+      },
+      "secondFile": {
+        "name": "apps/api/src/auth/auth.guard.integration.spec.ts",
+        "start": 76,
+        "end": 88,
+        "startLoc": {
+          "line": 76,
+          "column": 42,
+          "position": 580
+        },
+        "endLoc": {
+          "line": 88,
+          "column": 18,
+          "position": 710
+        }
+      }
+    }
+  ]
+}
