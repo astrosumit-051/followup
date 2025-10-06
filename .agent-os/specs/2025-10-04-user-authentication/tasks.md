@@ -62,7 +62,7 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 6.5 Write E2E tests for Google OAuth flow
   - [ ] 6.6 Write E2E tests for LinkedIn OAuth flow (deferred - LinkedIn OAuth deferred per Task 2.4)
   - [x] 6.7 Style authentication pages with Tailwind CSS per design-principles.md
-  - [x] 6.8 Verify all E2E tests pass (tests created, will run after environment setup)
+  - [ ] 6.8 Verify all E2E tests pass (tests created, will run after environment setup)
 
 - [ ] 7. OAuth Callback Handler
   - [ ] 7.1 Write integration tests for OAuth callback route (valid code, invalid code, missing code)
