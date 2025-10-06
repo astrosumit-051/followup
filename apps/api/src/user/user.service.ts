@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient, User } from '@relationhub/database';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 interface SupabaseUser {
   id: string;
@@ -11,11 +12,6 @@ interface SupabaseUser {
   app_metadata?: {
     provider?: string;
   };
-}
-
-interface UpdateProfileDto {
-  name?: string;
-  profilePicture?: string;
 }
 
 @Injectable()
