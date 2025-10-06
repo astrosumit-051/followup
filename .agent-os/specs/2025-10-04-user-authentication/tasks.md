@@ -65,10 +65,10 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [ ] 6.8 Verify all E2E tests pass (tests created, will run after environment setup)
 
 - [ ] 7. OAuth Callback Handler
-  - [ ] 7.1 Write integration tests for OAuth callback route (valid code, invalid code, missing code)
-  - [ ] 7.2 Create OAuth callback route handler (app/auth/callback/route.ts)
-  - [ ] 7.3 Implement code exchange for session (exchangeCodeForSession)
-  - [ ] 7.4 Implement redirect logic with next parameter validation (prevent open redirects)
+  - [x] 7.1 Write integration tests for OAuth callback route (valid code, invalid code, missing code)
+  - [x] 7.2 Create OAuth callback route handler (app/auth/callback/route.ts) - Already exists from Task 6
+  - [x] 7.3 Implement code exchange for session (exchangeCodeForSession) - Already implemented
+  - [x] 7.4 Implement redirect logic with next parameter validation (prevent open redirects) - Already implemented
   - [ ] 7.5 Test callback flow end-to-end with Google OAuth
   - [ ] 7.6 Test callback flow end-to-end with LinkedIn OAuth
   - [ ] 7.7 Verify all integration tests pass
