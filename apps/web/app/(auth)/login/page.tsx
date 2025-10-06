@@ -63,7 +63,7 @@ export default function LoginPage() {
             }}
             providers={['google']} // LinkedIn OAuth deferred per Task 2.4
             view="sign_in"
-            showLinks={true}
+            showLinks={false}
             redirectTo={`${window.location.origin}/auth/callback`}
           />
 
