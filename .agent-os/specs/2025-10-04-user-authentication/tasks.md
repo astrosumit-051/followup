@@ -73,14 +73,14 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [ ] 7.6 Test callback flow end-to-end with LinkedIn OAuth - ⚠️ Deferred (LinkedIn OAuth deferred per Task 2.4)
   - [ ] 7.7 Verify all integration tests pass - ⚠️ Blocked: Requires Supabase test environment (see Task 6.8)
 
-- [ ] 8. Protected Route Middleware
-  - [ ] 8.1 Write E2E tests for protected route access (authenticated and unauthenticated)
-  - [ ] 8.2 Create Next.js middleware for authentication check (middleware.ts)
-  - [ ] 8.3 Implement session verification in middleware
-  - [ ] 8.4 Implement redirect to login for unauthenticated users
-  - [ ] 8.5 Configure middleware matcher for protected routes (/dashboard, /contacts, etc.)
-  - [ ] 8.6 Test protected route redirect manually
-  - [ ] 8.7 Verify all E2E tests pass
+- [x] 8. Protected Route Middleware
+  - [x] 8.1 Write E2E tests for protected route access (authenticated and unauthenticated)
+  - [x] 8.2 Create Next.js middleware for authentication check (middleware.ts)
+  - [x] 8.3 Implement session verification in middleware
+  - [x] 8.4 Implement redirect to login for unauthenticated users
+  - [x] 8.5 Configure middleware matcher for protected routes (/dashboard, /contacts, etc.)
+  - [ ] 8.6 Test protected route redirect manually - ⚠️ Blocked: Requires running dev server and manual testing
+  - [ ] 8.7 Verify all E2E tests pass - ⚠️ Blocked: Requires Supabase test environment (see Task 6.8)
 
 - [ ] 9. Session Management & Token Refresh
   - [ ] 9.1 Write E2E tests for session persistence across page refreshes
