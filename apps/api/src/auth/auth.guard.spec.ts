@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { SupabaseService } from './supabase.service';
+import { UserService } from '../user/user.service';
 
 // Mock jose module to avoid ES module issues
 jest.mock('jose', () => ({
@@ -11,11 +12,19 @@ jest.mock('jose', () => ({
 describe('AuthGuard', () => {
   let guard: AuthGuard;
   let supabaseService: SupabaseService;
+  let userService: UserService;
 
   const mockSupabaseService = {
     extractTokenFromHeader: jest.fn(),
     verifyToken: jest.fn(),
     getUserIdFromToken: jest.fn(),
+    getUserFromToken: jest.fn(),
+  };
+
+  const mockUserService = {
+    syncUserFromSupabase: jest.fn(),
+    findBySupabaseId: jest.fn(),
+    updateProfile: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -26,11 +35,16 @@ describe('AuthGuard', () => {
           provide: SupabaseService,
           useValue: mockSupabaseService,
         },
+        {
+          provide: UserService,
+          useValue: mockUserService,
+        },
       ],
     }).compile();
 
     guard = module.get<AuthGuard>(AuthGuard);
     supabaseService = module.get<SupabaseService>(SupabaseService);
+    userService = module.get<UserService>(UserService);
 
     jest.clearAllMocks();
   });
@@ -55,9 +69,29 @@ describe('AuthGuard', () => {
         role: 'authenticated',
       };
 
+      const mockSupabaseUser = {
+        id: 'user-123',
+        email: 'test@example.com',
+        user_metadata: { full_name: 'Test User' },
+        app_metadata: { provider: 'email' },
+      };
+
+      const mockDbUser = {
+        id: 1,
+        supabaseId: 'user-123',
+        email: 'test@example.com',
+        name: 'Test User',
+        profilePicture: null,
+        provider: 'email',
+        lastLoginAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
       mockSupabaseService.extractTokenFromHeader.mockReturnValue('valid.token');
       mockSupabaseService.verifyToken.mockResolvedValue(mockPayload);
-      mockSupabaseService.getUserIdFromToken.mockResolvedValue('user-123');
+      mockSupabaseService.getUserFromToken.mockResolvedValue(mockSupabaseUser);
+      mockUserService.syncUserFromSupabase.mockResolvedValue(mockDbUser);
 
       const context = createMockExecutionContext('Bearer valid.token');
       const result = await guard.canActivate(context);
@@ -67,6 +101,8 @@ describe('AuthGuard', () => {
         'Bearer valid.token',
       );
       expect(mockSupabaseService.verifyToken).toHaveBeenCalledWith('valid.token');
+      expect(mockSupabaseService.getUserFromToken).toHaveBeenCalledWith('valid.token');
+      expect(mockUserService.syncUserFromSupabase).toHaveBeenCalledWith(mockSupabaseUser);
     });
 
     it('should throw UnauthorizedException when authorization header is missing', async () => {
@@ -133,6 +169,25 @@ describe('AuthGuard', () => {
         role: 'authenticated',
       };
 
+      const mockSupabaseUser = {
+        id: 'user-456',
+        email: 'user@example.com',
+        user_metadata: { full_name: 'User Test', avatar_url: 'https://example.com/avatar.jpg' },
+        app_metadata: { provider: 'google' },
+      };
+
+      const mockDbUser = {
+        id: 2,
+        supabaseId: 'user-456',
+        email: 'user@example.com',
+        name: 'User Test',
+        profilePicture: 'https://example.com/avatar.jpg',
+        provider: 'google',
+        lastLoginAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
       const mockRequest: any = {
         headers: {
           authorization: 'Bearer valid.token',
@@ -141,7 +196,8 @@ describe('AuthGuard', () => {
 
       mockSupabaseService.extractTokenFromHeader.mockReturnValue('valid.token');
       mockSupabaseService.verifyToken.mockResolvedValue(mockPayload);
-      mockSupabaseService.getUserIdFromToken.mockResolvedValue('user-456');
+      mockSupabaseService.getUserFromToken.mockResolvedValue(mockSupabaseUser);
+      mockUserService.syncUserFromSupabase.mockResolvedValue(mockDbUser);
 
       const context = {
         switchToHttp: () => ({
@@ -152,8 +208,12 @@ describe('AuthGuard', () => {
       await guard.canActivate(context);
 
       expect(mockRequest.user).toEqual({
+        id: 2,
         supabaseId: 'user-456',
         email: 'user@example.com',
+        name: 'User Test',
+        profilePicture: 'https://example.com/avatar.jpg',
+        provider: 'google',
         role: 'authenticated',
       });
     });

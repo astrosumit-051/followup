@@ -34,8 +34,27 @@ export class SupabaseService {
       const { payload } = await jose.jwtVerify(token, this.jwtSecret);
       return payload;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Token verification failed';
-      throw new Error(message);
+      if (error instanceof Error) {
+        // Provide specific error messages for common JWT errors
+        if (error.message.includes('signature')) {
+          throw new Error('Invalid token signature. Please log in again.');
+        }
+        if (error.message.includes('exp')) {
+          throw new Error('Token has expired. Please log in again.');
+        }
+        if (error.message.includes('iat')) {
+          throw new Error('Token issued date is invalid. Please log in again.');
+        }
+        if (error.message.includes('nbf')) {
+          throw new Error('Token is not yet valid. Please check your system time and log in again.');
+        }
+        if (error.message.includes('algorithm')) {
+          throw new Error('Token uses unsupported algorithm. Please log in again.');
+        }
+        // Generic error for other cases
+        throw new Error(`Token verification failed: ${error.message}`);
+      }
+      throw new Error('Token verification failed. Please log in again.');
     }
   }
 
@@ -68,7 +87,7 @@ export class SupabaseService {
     const payload = await this.verifyToken(token);
 
     if (!payload.sub) {
-      throw new Error('Token missing sub claim (user ID)');
+      throw new Error('Invalid token: Missing user identifier. Please log in again.');
     }
 
     return payload.sub;
@@ -85,17 +104,29 @@ export class SupabaseService {
       const { data, error } = await this.supabase.auth.getUser(token);
 
       if (error) {
-        throw new Error(`Failed to get user from Supabase: ${error.message}`);
+        // Provide specific error messages based on Supabase error codes
+        if (error.message.includes('invalid') || error.message.includes('JWT')) {
+          throw new Error('Invalid authentication token. Please log in again.');
+        }
+        if (error.message.includes('expired')) {
+          throw new Error('Your session has expired. Please log in again.');
+        }
+        if (error.message.includes('revoked')) {
+          throw new Error('Your session has been revoked. Please log in again.');
+        }
+        throw new Error(`Authentication failed: ${error.message}. Please log in again.`);
       }
 
       if (!data.user) {
-        throw new Error('User not found in Supabase');
+        throw new Error('User account not found. Please contact support if this persists.');
       }
 
       return data.user;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to get user';
-      throw new Error(message);
+      if (error instanceof Error) {
+        throw error; // Re-throw already formatted errors
+      }
+      throw new Error('Failed to retrieve user information. Please try again.');
     }
   }
 
