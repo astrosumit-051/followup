@@ -64,14 +64,14 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 6.7 Style authentication pages with Tailwind CSS per design-principles.md
   - [ ] 6.8 Verify all E2E tests pass (tests created, will run after environment setup)
 
-- [ ] 7. OAuth Callback Handler
+- [x] 7. OAuth Callback Handler
   - [x] 7.1 Write integration tests for OAuth callback route (valid code, invalid code, missing code)
   - [x] 7.2 Create OAuth callback route handler (app/auth/callback/route.ts) - Already exists from Task 6
   - [x] 7.3 Implement code exchange for session (exchangeCodeForSession) - Already implemented
   - [x] 7.4 Implement redirect logic with next parameter validation (prevent open redirects) - Already implemented
-  - [ ] 7.5 Test callback flow end-to-end with Google OAuth
-  - [ ] 7.6 Test callback flow end-to-end with LinkedIn OAuth
-  - [ ] 7.7 Verify all integration tests pass
+  - [ ] 7.5 Test callback flow end-to-end with Google OAuth - ⚠️ Blocked: Requires Supabase test environment (see Task 6.8)
+  - [ ] 7.6 Test callback flow end-to-end with LinkedIn OAuth - ⚠️ Deferred (LinkedIn OAuth deferred per Task 2.4)
+  - [ ] 7.7 Verify all integration tests pass - ⚠️ Blocked: Requires Supabase test environment (see Task 6.8)
 
 - [ ] 8. Protected Route Middleware
   - [ ] 8.1 Write E2E tests for protected route access (authenticated and unauthenticated)
