@@ -5,11 +5,20 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { createBrowserClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function LoginPage() {
   const supabase = createBrowserClient();
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+  const [origin, setOrigin] = useState('');
+
+  useEffect(() => {
+    // Only access window on the client side
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   const getErrorMessage = (errorCode: string) => {
     switch (errorCode) {
@@ -64,7 +73,7 @@ export default function LoginPage() {
             providers={['google']} // LinkedIn OAuth deferred per Task 2.4
             view="sign_in"
             showLinks={false}
-            redirectTo={`${window.location.origin}/auth/callback`}
+            redirectTo={origin ? `${origin}/auth/callback` : '/auth/callback'}
           />
 
           <div className="mt-6">
