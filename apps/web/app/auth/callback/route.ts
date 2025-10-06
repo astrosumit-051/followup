@@ -20,9 +20,11 @@ export async function GET(request: NextRequest) {
 
       if (error) {
         console.error('OAuth callback error:', error);
-        return NextResponse.redirect(
-          new URL('/login?error=oauth_callback_error', requestUrl.origin)
-        );
+        // Redirect to auth-code-error page with error details
+        const errorUrl = new URL('/auth-code-error', requestUrl.origin);
+        errorUrl.searchParams.set('error', error.code || 'oauth_callback_error');
+        errorUrl.searchParams.set('error_description', error.message || 'Failed to complete authentication');
+        return NextResponse.redirect(errorUrl);
       }
 
       // Validate and sanitize redirect URL to prevent open redirects
@@ -31,9 +33,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(safeNext, requestUrl.origin));
     } catch (error) {
       console.error('Unexpected OAuth error:', error);
-      return NextResponse.redirect(
-        new URL('/login?error=oauth_error', requestUrl.origin)
+      // Redirect to auth-code-error page for unexpected errors
+      const errorUrl = new URL('/auth-code-error', requestUrl.origin);
+      errorUrl.searchParams.set('error', 'unexpected_error');
+      errorUrl.searchParams.set(
+        'error_description',
+        error instanceof Error ? error.message : 'An unexpected error occurred during authentication'
       );
+      return NextResponse.redirect(errorUrl);
     }
   }
 

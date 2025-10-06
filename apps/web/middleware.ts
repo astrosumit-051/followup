@@ -29,15 +29,15 @@ export async function middleware(request: NextRequest) {
       console.error('Middleware auth check error:', error.message);
     }
 
-    // If no session, redirect to login
+    // If no session, redirect to unauthorized page
     if (!session) {
-      const loginUrl = new URL('/login', request.url);
+      const unauthorizedUrl = new URL('/unauthorized', request.url);
 
-      // Optionally preserve the intended destination
+      // Optionally preserve the intended destination for post-login redirect
       // Uncomment to enable return-to-URL functionality:
-      // loginUrl.searchParams.set('redirect', pathname);
+      // unauthorizedUrl.searchParams.set('redirect', pathname);
 
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(unauthorizedUrl);
     }
 
     // Check if session is close to expiring (within 5 minutes)
@@ -62,12 +62,12 @@ export async function middleware(request: NextRequest) {
       error: userError
     } = await supabase.auth.getUser();
 
-    // If token refresh failed or user is invalid, redirect to login
+    // If token refresh failed or user is invalid, redirect to unauthorized
     if (userError || !user) {
       console.error('Token refresh failed:', userError?.message);
 
-      const loginUrl = new URL('/login', request.url);
-      return NextResponse.redirect(loginUrl);
+      const unauthorizedUrl = new URL('/unauthorized', request.url);
+      return NextResponse.redirect(unauthorizedUrl);
     }
 
     // Session is valid and refreshed, allow access
@@ -76,9 +76,9 @@ export async function middleware(request: NextRequest) {
     // Handle unexpected errors gracefully
     console.error('Middleware error:', error);
 
-    // Redirect to login on error for security
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
+    // Redirect to unauthorized page on error for security
+    const unauthorizedUrl = new URL('/unauthorized', request.url);
+    return NextResponse.redirect(unauthorizedUrl);
   }
 }
 
@@ -111,8 +111,9 @@ export const config = {
      * - /auth/* (auth routes: login, signup, callback)
      * - / (home page)
      * - /login, /signup (public auth pages)
+     * - /auth-code-error, /unauthorized (error pages)
      * - .*\\..*  (files with extensions: css, js, images, etc.)
      */
-    '/((?!api|_next|auth|login|signup$|$).*)'
+    '/((?!api|_next|auth|login|signup|auth-code-error|unauthorized$|$).*)'
   ]
 };
