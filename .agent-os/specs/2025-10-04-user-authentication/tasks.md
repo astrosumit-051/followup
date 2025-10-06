@@ -37,22 +37,22 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 3.10 Apply AuthGuard globally or to protected resolvers (example /me endpoint created)
   - [x] 3.11 Verify all unit tests pass (25/25 tests passing)
 
-- [ ] 4. Backend GraphQL API
-  - [ ] 4.1 Write integration tests for `me` query (authenticated and unauthenticated)
-  - [ ] 4.2 Implement `me` query resolver using @CurrentUser decorator
-  - [ ] 4.3 Write integration tests for `updateProfile` mutation
-  - [ ] 4.4 Implement `updateProfile` mutation with validation
-  - [ ] 4.5 Add User GraphQL type with all authentication fields
+- [x] 4. Backend GraphQL API
+  - [x] 4.1 Write integration tests for `me` query (authenticated and unauthenticated)
+  - [x] 4.2 Implement `me` query resolver using @CurrentUser decorator
+  - [x] 4.3 Write integration tests for `updateProfile` mutation
+  - [x] 4.4 Implement `updateProfile` mutation with validation
+  - [x] 4.5 Add User GraphQL type with all authentication fields
   - [ ] 4.6 Test GraphQL API with manual JWT token in Postman/Insomnia
-  - [ ] 4.7 Verify all integration tests pass
+  - [x] 4.7 Verify all integration tests pass (26 tests passing)
 
-- [ ] 5. Frontend Supabase Client Setup
-  - [ ] 5.1 Write unit tests for Supabase client creation (browser and server)
-  - [ ] 5.2 Install frontend dependencies (@supabase/supabase-js, @supabase/ssr, @supabase/auth-ui-react, @supabase/auth-ui-shared)
-  - [ ] 5.3 Create browser Supabase client (apps/web/lib/supabase/client.ts)
-  - [ ] 5.4 Create server-side Supabase client with cookie management (apps/web/lib/supabase/server.ts)
-  - [ ] 5.5 Add environment variables to .env.local (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  - [ ] 5.6 Verify all unit tests pass
+- [x] 5. Frontend Supabase Client Setup
+  - [x] 5.1 Write unit tests for Supabase client creation (browser and server)
+  - [x] 5.2 Install frontend dependencies (@supabase/supabase-js, @supabase/ssr, @supabase/auth-ui-react, @supabase/auth-ui-shared)
+  - [x] 5.3 Create browser Supabase client (apps/web/lib/supabase/client.ts)
+  - [x] 5.4 Create server-side Supabase client with cookie management (apps/web/lib/supabase/server.ts)
+  - [x] 5.5 Add environment variables to .env.local (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  - [x] 5.6 Verify all unit tests pass (10 tests passing)
 
 - [ ] 6. Frontend Authentication UI
   - [ ] 6.1 Write E2E tests for signup flow (email/password registration)
