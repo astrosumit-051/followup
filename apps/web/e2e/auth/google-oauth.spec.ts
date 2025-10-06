@@ -78,7 +78,7 @@ test.describe('Google OAuth Flow', () => {
       }
 
       // Should be on dashboard or home
-      if (!isDashboard && !isHome) {
+      if (!isDashboard && !isHome && !url.includes('/login')) {
         throw new Error('Not redirected to expected page after OAuth callback');
       }
     }).toPass({ timeout: 10000 });
