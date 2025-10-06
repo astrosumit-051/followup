@@ -32,6 +32,12 @@ export default defineConfig({
 
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Record video on failure for debugging */
+    video: 'retain-on-failure',
+
+    /* Set viewport size for consistent testing */
+    viewport: { width: 1280, height: 720 },
   },
 
   /* Configure projects for major browsers */

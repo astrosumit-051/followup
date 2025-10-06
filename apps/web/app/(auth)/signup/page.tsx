@@ -4,9 +4,25 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { createBrowserClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 export default function SignUpPage() {
   const supabase = createBrowserClient();
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
+
+  const getErrorMessage = (errorCode: string) => {
+    switch (errorCode) {
+      case 'oauth_callback_error':
+        return 'OAuth authentication failed. Please try again.';
+      case 'oauth_error':
+        return 'An unexpected error occurred during authentication. Please try again.';
+      case 'rate_limit':
+        return 'Too many requests. Please wait a moment before trying again.';
+      default:
+        return 'An error occurred. Please try again.';
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4
@@ -21,6 +37,14 @@ export default function SignUpPage() {
             Get started with RelationHub
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {getErrorMessage(error)}
+            </p>
+          </div>
+        )}
 
         <div className="mt-8 bg-white dark:bg-gray-800 py-8 px-4 shadow rounded-lg
                         sm:px-10">
@@ -37,7 +61,7 @@ export default function SignUpPage() {
                 },
               },
             }}
-            providers={['google']}
+            providers={['google']} // LinkedIn OAuth deferred per Task 2.4
             view="sign_up"
             showLinks={false}
             redirectTo={`${window.location.origin}/auth/callback`}
