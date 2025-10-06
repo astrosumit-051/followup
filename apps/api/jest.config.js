@@ -12,4 +12,7 @@ module.exports = {
   moduleNameMapper: {
     '^@relationhub/database$': '<rootDir>/../../packages/database/src',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(jose)/)',
+  ],
 };

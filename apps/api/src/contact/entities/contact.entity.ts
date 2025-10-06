@@ -1,5 +1,7 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
+import { Priority as PrismaEnumPriority } from '@relationhub/database';
 import { Priority } from '../enums/priority.enum';
+import { Gender as PrismaEnumGender } from '@relationhub/database';
 import { Gender } from '../enums/gender.enum';
 
 /**
@@ -21,40 +23,40 @@ export class Contact {
   name!: string;
 
   @Field({ nullable: true })
-  email?: string;
+  email?: string | null;
 
   @Field({ nullable: true })
-  phone?: string;
+  phone?: string | null;
 
   @Field({ nullable: true })
-  linkedInUrl?: string;
+  linkedInUrl?: string | null;
 
   @Field({ nullable: true })
-  company?: string;
+  company?: string | null;
 
   @Field({ nullable: true })
-  industry?: string;
+  industry?: string | null;
 
   @Field({ nullable: true })
-  role?: string;
+  role?: string | null;
 
   @Field(() => Priority)
-  priority!: Priority;
+  priority!: PrismaEnumPriority;
 
   @Field(() => Gender, { nullable: true })
-  gender?: Gender;
+  gender?: PrismaEnumGender | null;
 
   @Field({ nullable: true })
-  birthday?: Date;
+  birthday?: Date | null;
 
   @Field({ nullable: true })
-  profilePicture?: string;
+  profilePicture?: string | null;
 
   @Field({ nullable: true })
-  notes?: string;
+  notes?: string | null;
 
   @Field({ nullable: true })
-  lastContactedAt?: Date;
+  lastContactedAt?: Date | null;
 
   @Field()
   createdAt!: Date;

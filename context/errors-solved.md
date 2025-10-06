@@ -1,7 +1,7 @@
 # Errors Solved - RelationHub Development Log
 
 > **Purpose**: Document all errors encountered during development and their solutions for quick reference
-> **Last Updated**: 2025-10-04
+> **Last Updated**: 2025-10-06
 > **Format**: Error code/description → Root cause → Solution → Prevention
 
 ---
@@ -407,6 +407,177 @@ psql "postgresql://postgres:postgres@localhost:5432/relationhub_dev"
 
 ---
 
+## GraphQL & NestJS Errors
+
+### Error: CannotDetermineInputTypeError - Missing @InputType Decorator
+
+**Full Error Message:**
+```
+CannotDetermineInputTypeError: Cannot determine a GraphQL input type ("ContactPaginationInput") for the "pagination". Make sure your class is decorated with an appropriate decorator.
+```
+
+**Context:**
+- Occurred during NestJS server startup when GraphQL schema generation runs
+- Using @nestjs/graphql v13.2.0 with code-first approach
+- DTO class had validation decorators but no GraphQL decorators
+- TypeScript compilation succeeded with 0 errors
+
+**Root Cause:**
+NestJS GraphQL (code-first approach) requires **explicit decorators** on ALL classes and fields used in the GraphQL schema:
+
+1. **Input DTOs** need `@InputType()` decorator on the class
+2. **Each field** in the input needs `@Field()` decorator to be exposed in GraphQL schema
+3. Validation decorators (`@IsOptional`, `@IsUUID`, etc.) handle runtime validation but **don't expose fields to GraphQL**
+
+The ContactPaginationInput class only had class-validator decorators:
+```typescript
+// ❌ WRONG - No GraphQL decorators
+export class ContactPaginationInput {
+  @IsOptional()
+  @IsUUID('4')
+  cursor?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 20;
+}
+```
+
+**Solution:**
+Add GraphQL decorators alongside validation decorators:
+
+```typescript
+import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsOptional, IsUUID, IsInt, Min, Max } from 'class-validator';
+
+@InputType()  // ✅ Makes class a GraphQL input type
+export class ContactPaginationInput {
+  @Field({ nullable: true })  // ✅ Exposes field to GraphQL
+  @IsOptional()
+  @IsUUID('4', { message: 'cursor must be a valid UUID' })
+  cursor?: string;
+
+  @Field(() => Int, { nullable: true, defaultValue: 20 })  // ✅ Explicit type for GraphQL
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 20;
+}
+```
+
+**Key Learning Points:**
+
+1. **Dual Decorator System:**
+   - `@InputType()` / `@ObjectType()` - Tell GraphQL about class structure
+   - `@Field()` - Expose individual fields to GraphQL schema
+   - `@IsOptional()`, `@IsString()`, etc. - Runtime validation (separate from GraphQL)
+
+2. **Field Type Specification:**
+   - Use `@Field(() => Int)` for numbers to ensure GraphQL uses `Int` type
+   - Use `@Field(() => ID)` for string IDs
+   - Use `@Field(() => EnumType)` for enums
+   - Simple types like `String` and `Boolean` are auto-detected
+
+3. **Nullable Fields:**
+   - `{ nullable: true }` - Field can be null/undefined in GraphQL
+   - `{ defaultValue: X }` - Provides default value if not specified
+
+4. **Entity vs Input Decorators:**
+   - `@ObjectType()` - For output types (query/mutation return types)
+   - `@InputType()` - For input types (mutation/query arguments)
+
+**Common Scenarios:**
+
+**Pagination Input:**
+```typescript
+@InputType()
+export class PaginationInput {
+  @Field({ nullable: true })
+  cursor?: string;
+
+  @Field(() => Int, { defaultValue: 20 })
+  limit?: number;
+}
+```
+
+**Filter Input:**
+```typescript
+@InputType()
+export class FilterInput {
+  @Field({ nullable: true })
+  search?: string;
+
+  @Field(() => Priority, { nullable: true })
+  priority?: Priority;
+}
+```
+
+**Entity Output:**
+```typescript
+@ObjectType()
+export class Contact {
+  @Field(() => ID)
+  id!: string;
+
+  @Field()
+  name!: string;
+
+  @Field({ nullable: true })
+  email?: string | null;
+}
+```
+
+**Prevention:**
+
+1. **Always add GraphQL decorators to DTOs:**
+   - `@InputType()` for classes used as mutation/query inputs
+   - `@Field()` for every field exposed in schema
+
+2. **Don't rely on validation decorators alone:**
+   - Class-validator decorators don't expose fields to GraphQL
+   - You need both validation AND GraphQL decorators
+
+3. **Check schema generation logs:**
+   - GraphQL schema generation happens during server startup
+   - Errors appear before "Mapped {/graphql, POST} route" message
+
+4. **Use TypeScript strict mode:**
+   - Helps catch missing decorators during development
+   - Enable `strictPropertyInitialization` in tsconfig.json
+
+5. **Reference official NestJS GraphQL docs:**
+   - Code-first approach: https://docs.nestjs.com/graphql/quick-start#code-first
+   - Input types: https://docs.nestjs.com/graphql/resolvers#input-types
+
+**Related Errors:**
+
+- If you see "Cannot determine GraphQL output type" → Missing `@ObjectType()` or `@Field()` on entity
+- If fields are missing in schema → Forgot `@Field()` decorator on specific properties
+- If enum errors occur → Need to `registerEnumType()` and use `@Field(() => EnumType)`
+
+**Diagnostic Commands:**
+```bash
+# Check if GraphQL schema is accessible
+curl -X POST http://localhost:3001/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ __schema { types { name } } }"}'
+
+# Check specific type fields
+curl -X POST http://localhost:3001/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ __type(name: \"Query\") { fields { name args { name } } } }"}'
+```
+
+**Related Files:**
+- `src/contact/dto/contact-pagination.input.ts` - Fixed with @InputType and @Field decorators
+- `src/contact/dto/contact-filter.input.ts` - Similar pattern for filter inputs
+- `src/contact/entities/contact.entity.ts` - Uses @ObjectType for output types
+
+---
+
 ## Future Errors Section
 
 *This section will be populated as new errors are encountered and solved.*
@@ -449,6 +620,7 @@ psql "postgresql://postgres:postgres@localhost:5432/relationhub_dev"
 - **Build Errors**: Next.js config, Tailwind CSS, TypeScript
 - **Docker Errors**: Port conflicts, Container communication
 - **Prisma Errors**: Shadow database, Schema validation
+- **GraphQL/NestJS Errors**: CannotDetermineInputTypeError, Missing decorators
 - **Environment Errors**: Missing variables, Wrong instances
 
 ---

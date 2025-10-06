@@ -65,7 +65,7 @@ export class ContactResolver {
     sortBy?: string,
     @Args('sortOrder', { type: () => String, nullable: true, defaultValue: 'desc' })
     sortOrder?: 'asc' | 'desc',
-  ) {
+  ): Promise<ContactConnection> {
     return this.contactService.findAll(
       user.id,
       filters || {},
@@ -86,7 +86,7 @@ export class ContactResolver {
   async findOne(
     @CurrentUser() user: any,
     @Args('id', { type: () => ID }) id: string,
-  ) {
+  ): Promise<Contact | null> {
     return this.contactService.findOne(id, user.id);
   }
 
@@ -101,7 +101,7 @@ export class ContactResolver {
   async createContact(
     @CurrentUser() user: any,
     @Args('input', { type: () => CreateContactDto }) input: CreateContactDto,
-  ) {
+  ): Promise<Contact> {
     return this.contactService.create(input, user.id);
   }
 
@@ -119,7 +119,7 @@ export class ContactResolver {
     @CurrentUser() user: any,
     @Args('id', { type: () => ID }) id: string,
     @Args('input', { type: () => UpdateContactDto }) input: UpdateContactDto,
-  ) {
+  ): Promise<Contact> {
     return this.contactService.update(id, input, user.id);
   }
 

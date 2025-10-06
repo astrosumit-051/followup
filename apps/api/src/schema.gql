@@ -1,0 +1,228 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+Contact GraphQL Entity
+
+Represents a contact in the GraphQL schema with all fields
+matching the Prisma Contact model.
+"""
+type Contact {
+  birthday: DateTime
+  company: String
+  createdAt: DateTime!
+  email: String
+  gender: Gender
+  id: ID!
+  industry: String
+  lastContactedAt: DateTime
+  linkedInUrl: String
+  name: String!
+  notes: String
+  phone: String
+  priority: Priority!
+  profilePicture: String
+  role: String
+  updatedAt: DateTime!
+  userId: String!
+}
+
+"""
+ContactConnection GraphQL Entity
+
+Represents a paginated list of contacts following the Relay
+connection specification for cursor-based pagination.
+
+This structure provides:
+- nodes: Array of Contact objects for easy access
+- edges: Array of ContactEdge for cursor-based navigation
+- pageInfo: Metadata about pagination state
+- totalCount: Total number of contacts matching the query
+"""
+type ContactConnection {
+  edges: [ContactEdge!]!
+  nodes: [Contact!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"""
+ContactEdge GraphQL Entity
+
+Represents an edge in a connection, containing a node and a cursor.
+Used for cursor-based pagination.
+"""
+type ContactEdge {
+  cursor: String!
+  node: Contact!
+}
+
+"""
+DTO for filtering contacts in list queries
+
+All fields are optional and can be combined for precise filtering.
+Multiple filters are combined with AND logic.
+"""
+input ContactFilterInput {
+  company: String
+  industry: String
+  priority: Priority
+  role: String
+  search: String
+}
+
+"""
+DTO for cursor-based pagination
+
+Implements cursor-based pagination for efficient scrolling through large contact lists.
+- cursor: UUID cursor pointing to a position in the result set
+- limit: Number of results per page (default: 20, max: 100)
+"""
+input ContactPaginationInput {
+  cursor: String
+  limit: Int = 20
+}
+
+"""
+DTO for creating a new contact
+
+Validation rules:
+- name: Required, 1-255 characters
+- email: Optional, valid email format
+- phone: Optional, max 50 characters
+- linkedInUrl: Optional, valid URL format
+- company: Optional, max 255 characters
+- industry: Optional, max 255 characters
+- role: Optional, max 255 characters
+- priority: Optional, valid Priority enum (defaults to MEDIUM in service layer)
+- gender: Optional, valid Gender enum
+- birthday: Optional, valid Date
+- notes: Optional, max 10,000 characters
+"""
+input CreateContactDto {
+  birthday: DateTime
+  company: String
+  email: String
+  gender: Gender
+  industry: String
+  linkedInUrl: String
+  name: String!
+  notes: String
+  phone: String
+  priority: Priority
+  role: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""Contact gender options"""
+enum Gender {
+  FEMALE
+  MALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+type Mutation {
+  createContact(input: CreateContactDto!): Contact!
+  deleteContact(id: ID!): Boolean!
+  updateContact(id: ID!, input: UpdateContactDto!): Contact!
+  updateProfile(updateProfileDto: UpdateProfileDto!): String!
+}
+
+"""
+PageInfo GraphQL Entity
+
+Contains pagination metadata for cursor-based pagination.
+Follows Relay specification for connection-based pagination.
+"""
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+"""Contact priority levels"""
+enum Priority {
+  HIGH
+  LOW
+  MEDIUM
+}
+
+type Query {
+  contact(id: ID!): Contact
+  contacts(filters: ContactFilterInput, pagination: ContactPaginationInput, sortBy: String = "createdAt", sortOrder: String = "desc"): ContactConnection!
+  me: String!
+}
+
+"""
+DTO for updating an existing contact
+
+All fields are optional to allow partial updates.
+Only provided fields will be validated and updated.
+
+All validation rules from CreateContactDto apply when fields are provided.
+Immutable fields (id, userId, createdAt) cannot be updated.
+"""
+input UpdateContactDto {
+  birthday: DateTime
+  company: String
+  email: String
+  gender: Gender
+  industry: String
+  linkedInUrl: String
+  name: String
+  notes: String
+  phone: String
+  priority: Priority
+  role: String
+}
+
+"""
+Data Transfer Object for updating user profile
+
+Security Features:
+- Input length validation (prevents buffer overflow attacks)
+- Character set validation (prevents XSS and injection attacks)
+- URL format validation (prevents malicious URL injections)
+- Optional fields (provides flexibility)
+"""
+input UpdateProfileDto {
+  """
+  User's display name
+  
+  Validation Rules:
+  - Optional field
+  - Must be a string
+  - Min length: 1 character (no empty strings)
+  - Max length: 100 characters (prevent buffer overflow)
+  - Allowed characters: Unicode letters, numbers, spaces, hyphens, apostrophes, periods
+  - Prevents: XSS attacks, SQL injection, control characters
+  
+  Supports international names including:
+  - Latin: John Doe, María García, François Müller
+  - Cyrillic: Иван Петров, Ольга Смирнова
+  - Arabic: محمد علي, فاطمة حسن
+  - Chinese: 李明, 王芳
+  - Japanese: 田中太郎, さくら
+  - Korean: 김철수, 이영희
+  """
+  name: String
+
+  """
+  URL to user's profile picture
+  
+  Validation Rules:
+  - Optional field
+  - Must be a valid URL format
+  - Must use HTTPS protocol (prevents mixed content attacks)
+  - Max length: 2048 characters (standard URL length limit)
+  - Prevents: Protocol injection, XSS attacks, file:// URIs
+  """
+  profilePicture: String
+}
