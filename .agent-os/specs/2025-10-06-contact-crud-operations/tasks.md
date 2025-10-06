@@ -7,33 +7,33 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 ## Tasks
 
-- [ ] 1. Backend: DTOs and Validation
-  - [ ] 1.1 Write unit tests for CreateContactDto validation
-  - [ ] 1.2 Create CreateContactDto with class-validator decorators (apps/api/src/contact/dto/create-contact.dto.ts)
-  - [ ] 1.3 Write unit tests for UpdateContactDto validation
-  - [ ] 1.4 Create UpdateContactDto as PartialType(CreateContactDto) (apps/api/src/contact/dto/update-contact.dto.ts)
-  - [ ] 1.5 Create ContactFilterInput and ContactPaginationInput DTOs
-  - [ ] 1.6 Verify all DTO tests pass
+- [x] 1. Backend: DTOs and Validation
+  - [x] 1.1 Write unit tests for CreateContactDto validation
+  - [x] 1.2 Create CreateContactDto with class-validator decorators (apps/api/src/contact/dto/create-contact.dto.ts)
+  - [x] 1.3 Write unit tests for UpdateContactDto validation
+  - [x] 1.4 Create UpdateContactDto with optional fields (apps/api/src/contact/dto/update-contact.dto.ts)
+  - [x] 1.5 Create ContactFilterInput and ContactPaginationInput DTOs
+  - [x] 1.6 Verify all DTO tests pass (86 tests passing)
 
-- [ ] 2. Backend: Contact Service Layer
-  - [ ] 2.1 Write unit tests for ContactService.findOne()
-  - [ ] 2.2 Implement ContactService.findOne() with Prisma (apps/api/src/contact/contact.service.ts)
-  - [ ] 2.3 Write unit tests for ContactService.findAll() with pagination
-  - [ ] 2.4 Implement ContactService.findAll() with cursor-based pagination and filters
-  - [ ] 2.5 Write unit tests for ContactService.create()
-  - [ ] 2.6 Implement ContactService.create() with userId injection
-  - [ ] 2.7 Write unit tests for ContactService.update() with authorization
-  - [ ] 2.8 Implement ContactService.update() with ownership verification
-  - [ ] 2.9 Write unit tests for ContactService.delete() with cascade behavior
-  - [ ] 2.10 Implement ContactService.delete() with ownership verification
-  - [ ] 2.11 Verify all service unit tests pass
+- [x] 2. Backend: Contact Service Layer (33 tests passing)
+  - [x] 2.1 Write unit tests for ContactService.findOne()
+  - [x] 2.2 Implement ContactService.findOne() with Prisma (apps/api/src/contact/contact.service.ts)
+  - [x] 2.3 Write unit tests for ContactService.findAll() with pagination
+  - [x] 2.4 Implement ContactService.findAll() with cursor-based pagination and filters
+  - [x] 2.5 Write unit tests for ContactService.create()
+  - [x] 2.6 Implement ContactService.create() with userId injection
+  - [x] 2.7 Write unit tests for ContactService.update() with authorization
+  - [x] 2.8 Implement ContactService.update() with ownership verification
+  - [x] 2.9 Write unit tests for ContactService.delete() with cascade behavior
+  - [x] 2.10 Implement ContactService.delete() with ownership verification
+  - [x] 2.11 Verify all service unit tests pass
 
-- [ ] 3. Backend: GraphQL Type Definitions
-  - [ ] 3.1 Create Contact GraphQL type (apps/api/src/contact/entities/contact.entity.ts)
-  - [ ] 3.2 Create ContactConnection and ContactEdge types for pagination
-  - [ ] 3.3 Create PageInfo type with hasNextPage, cursors, etc.
-  - [ ] 3.4 Create Priority and Gender GraphQL enums
-  - [ ] 3.5 Verify GraphQL schema generation works
+- [x] 3. Backend: GraphQL Type Definitions
+  - [x] 3.1 Create Contact GraphQL type (apps/api/src/contact/entities/contact.entity.ts)
+  - [x] 3.2 Create ContactConnection and ContactEdge types for pagination
+  - [x] 3.3 Create PageInfo type with hasNextPage, cursors, etc.
+  - [x] 3.4 Create Priority and Gender GraphQL enums
+  - [x] 3.5 Verify GraphQL schema generation works
 
 - [ ] 4. Backend: Contact Resolver
   - [ ] 4.1 Write integration tests for contact query (single contact retrieval)
