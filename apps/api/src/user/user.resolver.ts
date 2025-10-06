@@ -85,7 +85,7 @@ export class UserResolver {
     @CurrentUser() user: any,
     @Args('updateProfileDto') updateProfileDto: UpdateProfileDto,
   ) {
-    // UserService.updateProfile already validates user existence
-    return this.userService.updateProfile(user.id, updateProfileDto);
+    // UserService.updateProfile expects Supabase ID for proper authorization
+    return this.userService.updateProfile(user.supabaseId, updateProfileDto);
   }
 }
