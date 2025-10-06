@@ -233,12 +233,12 @@ describe('UserService', () => {
 
   describe('updateProfile', () => {
     it('should update user profile', async () => {
-      const updatedUser = {
+      const existingUser = {
         id: 'user-123',
         supabaseId: 'supabase-uuid-456',
         email: 'test@example.com',
-        name: 'Updated Name',
-        profilePicture: 'https://example.com/new-avatar.jpg',
+        name: 'Old Name',
+        profilePicture: null,
         provider: 'google',
         settings: null,
         lastLoginAt: new Date(),
@@ -246,6 +246,13 @@ describe('UserService', () => {
         updatedAt: new Date(),
       };
 
+      const updatedUser = {
+        ...existingUser,
+        name: 'Updated Name',
+        profilePicture: 'https://example.com/new-avatar.jpg',
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
       mockPrismaClient.user.update.mockResolvedValue(updatedUser);
 
       const result = await service.updateProfile('supabase-uuid-456', {
@@ -254,6 +261,9 @@ describe('UserService', () => {
       });
 
       expect(result).toEqual(updatedUser);
+      expect(mockPrismaClient.user.findUnique).toHaveBeenCalledWith({
+        where: { supabaseId: 'supabase-uuid-456' },
+      });
       expect(mockPrismaClient.user.update).toHaveBeenCalledWith({
         where: { supabaseId: 'supabase-uuid-456' },
         data: {
@@ -264,11 +274,11 @@ describe('UserService', () => {
     });
 
     it('should update only provided fields', async () => {
-      const updatedUser = {
+      const existingUser = {
         id: 'user-123',
         supabaseId: 'supabase-uuid-456',
         email: 'test@example.com',
-        name: 'Updated Name',
+        name: 'Old Name',
         profilePicture: null,
         provider: 'google',
         settings: null,
@@ -277,6 +287,12 @@ describe('UserService', () => {
         updatedAt: new Date(),
       };
 
+      const updatedUser = {
+        ...existingUser,
+        name: 'Updated Name',
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
       mockPrismaClient.user.update.mockResolvedValue(updatedUser);
 
       await service.updateProfile('supabase-uuid-456', {

@@ -100,14 +100,14 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 10.6 Test user update on subsequent logins (lastLoginAt updated)
   - [x] 10.7 Verify all integration tests pass
 
-- [ ] 11. Error Handling & Security
+- [x] 11. Error Handling & Security
   - [x] 11.1 Write security tests for JWT tampering detection
   - [x] 11.2 Implement comprehensive error messages for authentication failures
   - [x] 11.3 Create error pages (auth-code-error, unauthorized)
   - [x] 11.4 Write security tests for token expiration enforcement
   - [x] 11.5 Implement CSRF protection validation in callback route
   - [x] 11.6 Add input validation to updateProfile mutation (class-validator)
-  - [ ] 11.7 Verify all security tests pass
+  - [x] 11.7 Verify all security tests pass
 
 - [ ] 12. End-to-End Testing & Documentation
   - [ ] 12.1 Run full authentication test suite (unit + integration + E2E)

@@ -15,6 +15,7 @@ const customJestConfig = {
   testMatch: [
     '**/__tests__/**/*.test.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)',
+    '!**/e2e/**', // Exclude Playwright E2E tests
   ],
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',

@@ -77,10 +77,10 @@ describe('SupabaseService', () => {
     it('should throw error for expired JWT token', async () => {
       jest
         .spyOn(jose, 'jwtVerify')
-        .mockRejectedValue(new Error('Token expired'));
+        .mockRejectedValue(new Error('exp'));
 
       await expect(service.verifyToken('expired.token')).rejects.toThrow(
-        'Token expired',
+        'Token has expired. Please log in again.',
       );
     });
 
