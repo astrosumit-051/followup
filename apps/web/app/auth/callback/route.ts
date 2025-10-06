@@ -50,7 +50,12 @@ export async function GET(request: NextRequest) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        console.error('OAuth callback error:', error);
+        // Log only safe error details (avoid exposing sensitive OAuth data)
+        console.error('OAuth callback error:', {
+          code: error.code || 'oauth_callback_error',
+          message: error.message || 'Failed to complete authentication',
+          // Omit: error.details, full stack traces, tokens
+        });
         // Redirect to auth-code-error page with error details
         const errorUrl = new URL('/auth-code-error', requestUrl.origin);
         errorUrl.searchParams.set('error', error.code || 'oauth_callback_error');
@@ -63,7 +68,12 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.redirect(new URL(safeNext, requestUrl.origin));
     } catch (error) {
-      console.error('Unexpected OAuth error:', error);
+      // Log only safe error details (avoid exposing sensitive OAuth data)
+      console.error('Unexpected OAuth error:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        type: error instanceof Error ? error.constructor.name : typeof error,
+        // Omit: full error object, stack traces, tokens
+      });
       // Redirect to auth-code-error page for unexpected errors
       const errorUrl = new URL('/auth-code-error', requestUrl.origin);
       errorUrl.searchParams.set('error', 'unexpected_error');

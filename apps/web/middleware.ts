@@ -47,16 +47,16 @@ export async function middleware(request: NextRequest) {
     const timeUntilExpiry = expiresAt ? expiresAt - now : 0;
     const fiveMinutes = 5 * 60;
 
-    // Automatically refresh session if it's close to expiring
-    // This prevents users from being logged out mid-session
+    // Log when session is approaching expiration (for monitoring)
     if (timeUntilExpiry > 0 && timeUntilExpiry < fiveMinutes) {
       console.log(
-        `Session expiring in ${Math.floor(timeUntilExpiry / 60)} minutes, refreshing...`
+        `Session expiring in ${Math.floor(timeUntilExpiry / 60)} minutes (automatic refresh on next getUser call)`
       );
     }
 
-    // Call getUser() which triggers automatic token refresh if needed
-    // This is called on every request to ensure session is always fresh
+    // Always call getUser() to ensure session is fresh
+    // Supabase automatically refreshes tokens if they're close to expiring
+    // This is called on every protected route request
     const {
       data: { user },
       error: userError

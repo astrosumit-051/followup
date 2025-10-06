@@ -27,18 +27,28 @@ export class UpdateProfileDto {
    * - Must be a string
    * - Min length: 1 character (no empty strings)
    * - Max length: 100 characters (prevent buffer overflow)
-   * - Allowed characters: letters, numbers, spaces, hyphens, apostrophes
+   * - Allowed characters: Unicode letters, numbers, spaces, hyphens, apostrophes, periods
    * - Prevents: XSS attacks, SQL injection, control characters
+   *
+   * Supports international names including:
+   * - Latin: John Doe, María García, François Müller
+   * - Cyrillic: Иван Петров, Ольга Смирнова
+   * - Arabic: محمد علي, فاطمة حسن
+   * - Chinese: 李明, 王芳
+   * - Japanese: 田中太郎, さくら
+   * - Korean: 김철수, 이영희
    *
    * @example "John Doe"
    * @example "María García"
    * @example "O'Brien"
+   * @example "محمد علي"
+   * @example "李明"
    */
   @IsOptional()
   @IsString({ message: 'Name must be a string' })
   @MinLength(1, { message: 'Name must be at least 1 character long' })
   @MaxLength(100, { message: 'Name must not exceed 100 characters' })
-  @Matches(/^(?!\s+$)[a-zA-Z0-9 \t\-'\.À-ÿ]+$/, {
+  @Matches(/^(?!\s+$)[\p{L}\p{N} \t\-'\.]+$/u, {
     message:
       'Name can only contain letters, numbers, spaces, hyphens, apostrophes, and periods',
   })
