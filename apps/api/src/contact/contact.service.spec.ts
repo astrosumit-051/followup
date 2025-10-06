@@ -3,6 +3,8 @@ import { ContactService } from './contact.service';
 import { PrismaClient } from '@relationhub/database';
 import { ContactFilterInput } from './dto/contact-filter.input';
 import { ContactPaginationInput } from './dto/contact-pagination.input';
+import { Priority } from './enums/priority.enum';
+import { Gender } from './enums/gender.enum';
 
 describe('ContactService', () => {
   let service: ContactService;
@@ -51,9 +53,10 @@ describe('ContactService', () => {
       company: 'Tech Corp',
       industry: 'Technology',
       role: 'CTO',
-      priority: 'MEDIUM',
-      gender: 'MALE',
+      priority: Priority.MEDIUM,
+      gender: Gender.MALE,
       birthday: new Date('1990-01-15'),
+      profilePicture: null,
       notes: 'Important contact',
       lastContactedAt: null,
       createdAt: new Date(),
@@ -110,6 +113,12 @@ describe('ContactService', () => {
         'Database connection failed',
       );
     });
+
+    it('should validate sort field and throw BadRequestException for invalid field', async () => {
+      await expect(
+        service.findAll(userId, {}, {}, 'invalidField' as any, 'asc'),
+      ).rejects.toThrow('Invalid sort field');
+    });
   });
 
   describe('findAll', () => {
@@ -121,10 +130,16 @@ describe('ContactService', () => {
         name: 'Alice Johnson',
         email: 'alice@techcorp.com',
         phone: '+1234567890',
+        linkedInUrl: null,
         company: 'TechCorp',
         industry: 'Technology',
         role: 'CEO',
-        priority: 'HIGH',
+        priority: Priority.HIGH,
+        gender: null,
+        birthday: null,
+        profilePicture: null,
+        notes: null,
+        lastContactedAt: null,
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-01-01'),
       },
@@ -134,10 +149,16 @@ describe('ContactService', () => {
         name: 'Bob Smith',
         email: 'bob@designco.com',
         phone: '+1987654321',
+        linkedInUrl: null,
         company: 'DesignCo',
         industry: 'Design',
         role: 'Designer',
-        priority: 'MEDIUM',
+        priority: Priority.MEDIUM,
+        gender: null,
+        birthday: null,
+        profilePicture: null,
+        notes: null,
+        lastContactedAt: null,
         createdAt: new Date('2024-01-02'),
         updatedAt: new Date('2024-01-02'),
       },
@@ -169,14 +190,14 @@ describe('ContactService', () => {
       mockPrismaClient.contact.findMany.mockResolvedValue(highPriorityContact);
       mockPrismaClient.contact.count.mockResolvedValue(1);
 
-      const filters: ContactFilterInput = { priority: 'HIGH' as any };
+      const filters: ContactFilterInput = { priority: Priority.HIGH };
       await service.findAll(userId, filters, {});
 
       expect(prisma.contact.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             userId,
-            priority: 'HIGH',
+            priority: Priority.HIGH,
           }),
         }),
       );
@@ -227,10 +248,14 @@ describe('ContactService', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             userId,
-            OR: expect.arrayContaining([
-              { name: { contains: 'alice', mode: 'insensitive' } },
-              { email: { contains: 'alice', mode: 'insensitive' } },
-              { company: { contains: 'alice', mode: 'insensitive' } },
+            AND: expect.arrayContaining([
+              expect.objectContaining({
+                OR: expect.arrayContaining([
+                  { name: { contains: 'alice', mode: 'insensitive' } },
+                  { email: { contains: 'alice', mode: 'insensitive' } },
+                  { company: { contains: 'alice', mode: 'insensitive' } },
+                ]),
+              }),
             ]),
           }),
         }),
@@ -248,7 +273,11 @@ describe('ContactService', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             userId,
-            OR: expect.any(Array),
+            AND: expect.arrayContaining([
+              expect.objectContaining({
+                OR: expect.any(Array),
+              }),
+            ]),
           }),
         }),
       );
@@ -264,7 +293,12 @@ describe('ContactService', () => {
       expect(prisma.contact.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            OR: expect.any(Array),
+            userId,
+            AND: expect.arrayContaining([
+              expect.objectContaining({
+                OR: expect.any(Array),
+              }),
+            ]),
           }),
         }),
       );
@@ -275,7 +309,7 @@ describe('ContactService', () => {
       mockPrismaClient.contact.count.mockResolvedValue(1);
 
       const filters: ContactFilterInput = {
-        priority: 'HIGH' as any,
+        priority: Priority.HIGH,
         company: 'TechCorp',
         industry: 'Technology',
       };
@@ -285,7 +319,7 @@ describe('ContactService', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             userId,
-            priority: 'HIGH',
+            priority: Priority.HIGH,
             company: { contains: 'TechCorp', mode: 'insensitive' },
             industry: { contains: 'Technology', mode: 'insensitive' },
           }),
@@ -363,7 +397,7 @@ describe('ContactService', () => {
 
       expect(prisma.contact.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          take: 100, // Enforced maximum
+          take: 101, // Enforced maximum (100) + 1 for hasNextPage detection
         }),
       );
     });
@@ -373,15 +407,15 @@ describe('ContactService', () => {
         ...mockContacts[0],
         id: `contact-${i}`,
       }));
-      mockPrismaClient.contact.findMany.mockResolvedValue(
-        manyContacts.slice(0, 20),
-      );
+      // Mock returns 21 items (limit + 1 to detect hasNextPage)
+      mockPrismaClient.contact.findMany.mockResolvedValue(manyContacts);
       mockPrismaClient.contact.count.mockResolvedValue(21);
 
       const pagination: ContactPaginationInput = { limit: 20 };
       const result = await service.findAll(userId, {}, pagination);
 
       expect(result.pageInfo.hasNextPage).toBe(true);
+      expect(result.nodes.length).toBe(20); // Should return only 20, not 21
       expect(result.pageInfo.startCursor).toBe('contact-0');
       expect(result.pageInfo.endCursor).toBe('contact-19');
     });
@@ -430,9 +464,10 @@ describe('ContactService', () => {
       linkedInUrl: null,
       industry: null,
       role: null,
-      priority: 'MEDIUM',
+      priority: Priority.MEDIUM,
       gender: null,
       birthday: null,
+      profilePicture: null,
       notes: null,
       lastContactedAt: null,
       createdAt: new Date(),
@@ -448,8 +483,8 @@ describe('ContactService', () => {
         company: 'Tech Corp',
         industry: 'Technology',
         role: 'CTO',
-        priority: 'HIGH',
-        gender: 'MALE',
+        priority: Priority.HIGH,
+        gender: Gender.MALE,
         birthday: new Date('1990-01-15'),
         notes: 'Important contact',
       };
@@ -458,6 +493,7 @@ describe('ContactService', () => {
         id: 'contact-123',
         userId,
         ...fullDto,
+        profilePicture: null,
         lastContactedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -488,9 +524,10 @@ describe('ContactService', () => {
         company: null,
         industry: null,
         role: null,
-        priority: 'MEDIUM',
+        priority: Priority.MEDIUM,
         gender: null,
         birthday: null,
+        profilePicture: null,
         notes: null,
         lastContactedAt: null,
         createdAt: new Date(),
@@ -519,7 +556,7 @@ describe('ContactService', () => {
 
       const result = await service.create({ name: 'Test' }, userId);
 
-      expect(result.priority).toBe('MEDIUM');
+      expect(result.priority).toBe(Priority.MEDIUM);
     });
   });
 
@@ -541,9 +578,10 @@ describe('ContactService', () => {
       company: null,
       industry: null,
       role: null,
-      priority: 'MEDIUM',
+      priority: Priority.MEDIUM,
       gender: null,
       birthday: null,
+      profilePicture: null,
       notes: null,
       lastContactedAt: null,
       createdAt: new Date('2024-01-01'),
@@ -585,20 +623,20 @@ describe('ContactService', () => {
       });
     });
 
-    it('should throw error when contact does not exist', async () => {
+    it('should throw NotFoundException when contact does not exist', async () => {
       mockPrismaClient.contact.findUnique.mockResolvedValue(null);
 
       await expect(
         service.update('nonexistent-id', updateDto, userId),
-      ).rejects.toThrow();
+      ).rejects.toThrow('Contact with ID nonexistent-id not found');
     });
 
-    it('should throw error when user does not own contact', async () => {
+    it('should throw NotFoundException when user does not own contact', async () => {
       mockPrismaClient.contact.findUnique.mockResolvedValue(null);
 
       await expect(
         service.update(contactId, updateDto, 'different-user-id'),
-      ).rejects.toThrow();
+      ).rejects.toThrow(`Contact with ID ${contactId} not found`);
     });
   });
 
@@ -616,9 +654,10 @@ describe('ContactService', () => {
       company: null,
       industry: null,
       role: null,
-      priority: 'MEDIUM',
+      priority: Priority.MEDIUM,
       gender: null,
       birthday: null,
+      profilePicture: null,
       notes: null,
       lastContactedAt: null,
       createdAt: new Date(),
@@ -646,18 +685,20 @@ describe('ContactService', () => {
       expect(result).toBe(true);
     });
 
-    it('should throw error when contact does not exist', async () => {
+    it('should throw NotFoundException when contact does not exist', async () => {
       mockPrismaClient.contact.findUnique.mockResolvedValue(null);
 
-      await expect(service.delete('nonexistent-id', userId)).rejects.toThrow();
+      await expect(service.delete('nonexistent-id', userId)).rejects.toThrow(
+        'Contact with ID nonexistent-id not found',
+      );
     });
 
-    it('should throw error when user does not own contact', async () => {
+    it('should throw NotFoundException when user does not own contact', async () => {
       mockPrismaClient.contact.findUnique.mockResolvedValue(null);
 
       await expect(
         service.delete(contactId, 'different-user-id'),
-      ).rejects.toThrow();
+      ).rejects.toThrow(`Contact with ID ${contactId} not found`);
     });
   });
 });

@@ -1,13 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@relationhub/database';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { PrismaClient, Prisma } from '@relationhub/database';
 import { ContactFilterInput } from './dto/contact-filter.input';
 import { ContactPaginationInput } from './dto/contact-pagination.input';
+import { CreateContactDto } from './dto/create-contact.dto';
+import { UpdateContactDto } from './dto/update-contact.dto';
+
+// Allowed fields for sorting
+const ALLOWED_SORT_FIELDS = [
+  'name',
+  'email',
+  'company',
+  'createdAt',
+  'updatedAt',
+  'lastContactedAt',
+  'priority',
+] as const;
+type SortField = (typeof ALLOWED_SORT_FIELDS)[number];
 
 /**
  * Contact Service
  *
  * Handles all business logic for contact management.
  * Enforces user ownership and data validation.
+ *
+ * @remarks
+ * All methods enforce user ownership - contacts can only be accessed
+ * by the user who created them. Unauthorized access throws NotFoundException.
+ *
+ * @example
+ * ```typescript
+ * // Find all contacts for a user
+ * const result = await contactService.findAll(userId, {}, { limit: 20 });
+ * console.log(result.nodes); // Contact[]
+ * console.log(result.pageInfo.hasNextPage); // boolean
+ * ```
  */
 @Injectable()
 export class ContactService {
@@ -38,16 +68,25 @@ export class ContactService {
    * @param sortBy - Field to sort by (default: createdAt)
    * @param sortOrder - Sort order (default: desc)
    * @returns Paginated contact list with metadata
+   * @throws BadRequestException if invalid sort field provided
    */
   async findAll(
     userId: string,
     filters: ContactFilterInput,
     pagination: ContactPaginationInput,
-    sortBy: string = 'createdAt',
+    sortBy: SortField = 'createdAt',
     sortOrder: 'asc' | 'desc' = 'desc',
   ) {
-    // Build where clause
-    const where: any = { userId };
+    // Validate sort field
+    if (!ALLOWED_SORT_FIELDS.includes(sortBy as SortField)) {
+      throw new BadRequestException(
+        `Invalid sort field: ${sortBy}. Allowed fields: ${ALLOWED_SORT_FIELDS.join(', ')}`,
+      );
+    }
+
+    // Build where clause with proper Prisma types
+    const where: Prisma.ContactWhereInput = { userId };
+    const andConditions: Prisma.ContactWhereInput[] = [];
 
     // Apply filters
     if (filters.priority) {
@@ -66,40 +105,48 @@ export class ContactService {
       where.role = { contains: filters.role, mode: 'insensitive' };
     }
 
-    // Apply search across multiple fields
+    // Apply search across multiple fields (combine with AND to avoid conflicts)
     if (filters.search) {
-      where.OR = [
-        { name: { contains: filters.search, mode: 'insensitive' } },
-        { email: { contains: filters.search, mode: 'insensitive' } },
-        { company: { contains: filters.search, mode: 'insensitive' } },
-      ];
+      andConditions.push({
+        OR: [
+          { name: { contains: filters.search, mode: 'insensitive' } },
+          { email: { contains: filters.search, mode: 'insensitive' } },
+          { company: { contains: filters.search, mode: 'insensitive' } },
+        ],
+      });
+    }
+
+    // Combine AND conditions if any
+    if (andConditions.length > 0) {
+      where.AND = andConditions;
     }
 
     // Enforce pagination limit (max 100, default 20)
     const limit = Math.min(pagination.limit || 20, 100);
 
-    // Build pagination parameters
-    const paginationParams: any = {
-      take: limit,
+    // Build pagination parameters with proper Prisma types
+    const findManyArgs: Prisma.ContactFindManyArgs = {
+      where,
+      take: limit + 1, // Fetch one extra to determine hasNextPage
       orderBy: { [sortBy]: sortOrder },
     };
 
     if (pagination.cursor) {
-      paginationParams.cursor = { id: pagination.cursor };
-      paginationParams.skip = 1; // Skip the cursor itself
+      findManyArgs.cursor = { id: pagination.cursor };
+      findManyArgs.skip = 1; // Skip the cursor itself
     }
 
     // Execute queries
-    const [nodes, totalCount] = await Promise.all([
-      this.prisma.contact.findMany({
-        where,
-        ...paginationParams,
-      }),
+    const [fetchedNodes, totalCount] = await Promise.all([
+      this.prisma.contact.findMany(findManyArgs),
       this.prisma.contact.count({ where }),
     ]);
 
+    // Check if there are more results (using take: limit + 1 pattern)
+    const hasNextPage = fetchedNodes.length > limit;
+    const nodes = hasNextPage ? fetchedNodes.slice(0, limit) : fetchedNodes;
+
     // Calculate pagination info
-    const hasNextPage = totalCount > (nodes.length + (pagination.cursor ? 1 : 0));
     const startCursor = nodes.length > 0 ? nodes[0].id : null;
     const endCursor = nodes.length > 0 ? nodes[nodes.length - 1].id : null;
 
@@ -122,7 +169,7 @@ export class ContactService {
    * @param userId - User ID (automatically injected)
    * @returns Created contact
    */
-  async create(dto: any, userId: string) {
+  async create(dto: CreateContactDto, userId: string) {
     return this.prisma.contact.create({
       data: {
         ...dto,
@@ -138,13 +185,13 @@ export class ContactService {
    * @param dto - Contact update data
    * @param userId - User ID (for ownership verification)
    * @returns Updated contact
-   * @throws Error if contact not found or user doesn't own it
+   * @throws NotFoundException if contact not found or user doesn't own it
    */
-  async update(id: string, dto: any, userId: string) {
+  async update(id: string, dto: UpdateContactDto, userId: string) {
     // Verify ownership first
     const contact = await this.findOne(id, userId);
     if (!contact) {
-      throw new Error('Contact not found or unauthorized');
+      throw new NotFoundException(`Contact with ID ${id} not found`);
     }
 
     return this.prisma.contact.update({
@@ -159,13 +206,13 @@ export class ContactService {
    * @param id - Contact ID
    * @param userId - User ID (for ownership verification)
    * @returns True if deletion successful
-   * @throws Error if contact not found or user doesn't own it
+   * @throws NotFoundException if contact not found or user doesn't own it
    */
   async delete(id: string, userId: string): Promise<boolean> {
     // Verify ownership first
     const contact = await this.findOne(id, userId);
     if (!contact) {
-      throw new Error('Contact not found or unauthorized');
+      throw new NotFoundException(`Contact with ID ${id} not found`);
     }
 
     await this.prisma.contact.delete({
