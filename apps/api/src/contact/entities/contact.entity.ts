@@ -13,7 +13,8 @@ export class Contact {
   @Field(() => ID)
   id!: string;
 
-  @Field()
+  // userId is used internally for authorization but not exposed in GraphQL schema
+  // This prevents information leakage about user ownership
   userId!: string;
 
   @Field()

@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 
@@ -10,9 +11,22 @@ import helmet from 'helmet';
  * - CORS with environment-based origin configuration
  * - Credentials support for cookie-based authentication
  * - GraphQL-friendly CSP directives
+ * - Global ValidationPipe for DTO validation
  */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Global Input Validation - applies to all resolvers and controllers
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Strip properties not in DTO
+      forbidNonWhitelisted: true, // Throw error on unknown properties
+      transform: true, // Auto-transform types (e.g., string to number)
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
 
   // Security Headers with Helmet
   app.use(
