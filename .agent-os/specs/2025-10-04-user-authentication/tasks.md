@@ -110,10 +110,10 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 11.7 Verify all security tests pass
 
 - [ ] 12. End-to-End Testing & Documentation
-  - [ ] 12.1 Run full authentication test suite (unit + integration + E2E)
-  - [ ] 12.2 Verify 80%+ code coverage for authentication module
+  - [x] 12.1 Run full authentication test suite (unit + integration + E2E)
+  - [x] 12.2 Verify 80%+ code coverage for authentication module
   - [ ] 12.3 Test complete registration → login → dashboard → logout flow manually
-  - [ ] 12.4 Update CLAUDE.md with authentication setup notes (if needed)
-  - [ ] 12.5 Document environment variables in .env.example files
-  - [ ] 12.6 Create brief setup guide for local development with Supabase
-  - [ ] 12.7 Verify all tests pass across all test suites
+  - [x] 12.4 Update CLAUDE.md with authentication setup notes (if needed)
+  - [x] 12.5 Document environment variables in .env.example files
+  - [x] 12.6 Create brief setup guide for local development with Supabase
+  - [x] 12.7 Verify all tests pass across all test suites

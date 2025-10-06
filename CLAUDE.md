@@ -410,6 +410,68 @@ When conflicts arise, follow this priority hierarchy:
 
 ---
 
+## Local Development Setup
+
+### First-Time Setup
+
+**📚 Complete Setup Guide:** `SETUP.md`
+
+For new developers setting up the project locally, follow the comprehensive setup guide which includes:
+- Prerequisites (Node.js v22+, pnpm v8+, PostgreSQL v17+)
+- Supabase project creation and configuration
+- Authentication provider setup (Email + Google OAuth)
+- Environment variable configuration for both frontend and backend
+- Database migrations with Prisma
+- Development server startup options
+- Authentication flow verification
+- Troubleshooting common setup issues
+
+**Quick Setup Steps:**
+```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Configure environment variables
+# Frontend: apps/web/.env.local (see apps/web/.env.local.example)
+# Backend: apps/api/.env (see apps/api/.env.example)
+
+# 3. Run database migrations
+cd apps/api && pnpm prisma migrate dev
+
+# 4. Start development servers
+pnpm dev  # Starts both frontend (3000) and backend (4000)
+```
+
+**Environment Variables Required:**
+
+**Frontend** (`apps/web/.env.local`):
+- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous public key
+
+**Backend** (`apps/api/.env`):
+- `SUPABASE_URL` - Your Supabase project URL (same as frontend)
+- `SUPABASE_JWT_SECRET` - JWT secret from Supabase dashboard
+- `SUPABASE_SERVICE_ROLE_KEY` - Service role key (keep secret, bypasses RLS)
+- `DATABASE_URL` - PostgreSQL connection string
+
+**Testing Authentication Setup:**
+1. Start servers: `pnpm dev`
+2. Visit http://localhost:3000
+3. Test signup flow: http://localhost:3000/signup
+4. Test login flow: http://localhost:3000/login
+5. Test Google OAuth if configured
+6. Verify dashboard access at http://localhost:3000/dashboard
+7. Test logout functionality
+
+**GraphQL Playground:**
+- Access at http://localhost:4000/graphql
+- Test authenticated queries (requires JWT token from login session)
+- Example query: `{ me { id email name profilePicture lastLoginAt } }`
+
+**For detailed troubleshooting and complete setup instructions, see `SETUP.md` in the project root.**
+
+---
+
 ## Additional Resources
 
 ### MCP Server Documentation
