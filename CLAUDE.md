@@ -66,134 +66,43 @@ Guide: `~/.agent-os/instructions/execute-tasks.md`
 ---
 
 ## MCP Servers for RelationHub
-Reference: `/context/mcp-instructions.md` for full details
-### Priority Hierarchy
 
-#### 1. Ref (PRIMARY - Use First)
-**Purpose:** Token-efficient documentation search for all technical APIs and frameworks
+**📖 Complete Documentation:** `/context/mcp-instructions.md`
 
-**When to Use:**
-- ANY Next.js, React, TypeScript documentation lookup
-- NestJS, Prisma, GraphQL API references
-- LangChain, LlamaIndex, OpenAI documentation
-- Supabase Auth, BullMQ, Redis configuration
-- TanStack Query, React Hook Form, Zod schemas
-- Before implementing ANY external library or API
+All MCP server details including full tool lists, usage patterns, and workflows are documented in the comprehensive guide. Below is a quick reference of available servers:
 
-**Critical Rule:** Never hallucinate API signatures, configurations, or methods. Always check Ref first.
+### Quick Reference - 8 MCP Servers Available
 
-**Examples:**
-```
-"Use Ref to look up Prisma schema syntax for one-to-many relationships"
-"Search Ref for Next.js 14 App Router server actions documentation"
-"Find LangChain prompt template documentation in Ref"
-```
+| # | Server | Primary Purpose | Key Tools |
+|---|--------|-----------------|-----------|
+| 1 | **Ref** | Token-efficient documentation search (USE FIRST) | `ref_search_documentation`, `ref_read_url` |
+| 2 | **Brave Search** | Web search for tutorials, examples, community content | `brave_web_search`, `brave_local_search` |
+| 3 | **Playwright** | Browser automation & E2E testing | 20 tools for navigation, interaction, testing |
+| 4 | **Semgrep** | Security scanning & static analysis | 7 tools for vulnerability detection |
+| 5 | **GitHub** | Repository management & PR automation | 30+ tools for code, issues, PRs, workflows |
+| 6 | **Sequential Thinking** | Complex multi-step problem solving | `sequentialthinking` |
+| 7 | **PostgreSQL** | Read-only database queries for debugging | `query` |
+| 8 | **Notion** | Documentation & specs management | 14 tools for pages, databases, search |
 
-#### 2. Semgrep (Security - Always Scan)
-**Purpose:** Static code analysis for security vulnerabilities
+### Priority Rules
 
-**Mandatory Scans:**
-- All authentication and authorization code
-- Database query construction (Prisma, raw SQL)
-- API endpoint handlers (GraphQL resolvers, REST routes)
-- File upload/download functionality
-- Environment variable usage
-- OAuth integration code
-- Email sending with user data
-- AI/LLM prompt injection prevention
+**ALWAYS start with Ref** for any technical documentation lookup - never hallucinate API signatures.
 
-**When to Use:**
-- After implementing any auth/security feature
-- Before committing database interaction code
-- When handling user input or PII
-- After integrating external APIs
+**For every feature:**
+1. 🔍 **Research**: Ref → Sequential Thinking → Brave Search
+2. 🛠️ **Implement**: Follow tech-stack.md with continuous Ref lookups
+3. 🔒 **Security**: Semgrep scan on auth/database/API code
+4. 🗄️ **Database**: PostgreSQL to verify schema after migrations
+5. 🧪 **Testing**: Playwright E2E tests for user flows
+6. 📝 **Document**: Notion for architectural decisions
+7. 🚀 **Deploy**: GitHub PR creation
 
-**Examples:**
-```
-"Scan the authentication middleware with Semgrep for security issues"
-"Run Semgrep on the contact CRUD API endpoints"
-"Check this OAuth flow for vulnerabilities using Semgrep"
-```
-
-#### 3. Playwright (Testing - Critical Flows)
-**Purpose:** E2E testing for user workflows
-
-**Required Tests:**
-- Contact Management: Add/Edit/Delete/Search/Filter flows
-- Email Composition: Template generation, A/B testing, sending
-- Dashboard: Quick Add, analytics visualization, action items
-- Authentication: Login/logout, OAuth providers
-- Calendar Integration: Event sync, reminder creation
-- AI Features: Email generation, follow-up automation
-
-**When to Use:**
-- After completing any user-facing feature
-- Before marking features as "done"
-- When refactoring critical paths
-- For regression testing
-
-**Examples:**
-```
-"Create Playwright E2E test for the contact creation flow"
-"Generate Playwright tests for email composition with AI templates"
-"Test the dashboard Quick Add feature with Playwright"
-```
-
-#### 4. Sequential Thinking (Complex Planning)
-**Purpose:** Structured problem-solving for multi-step features
-
-**When to Use:**
-- Planning AI email generation architecture
-- Designing calendar bidirectional sync logic
-- Architecting contact history tracking system
-- Planning LinkedIn profile scraping strategy
-- Designing email tracking implementation
-- Structuring LLM context management
-
-**Examples:**
-```
-"Use Sequential Thinking to plan the AI email template generation system"
-"Break down the calendar OAuth integration architecture with Sequential Thinking"
-"Plan the contact import/export feature using Sequential Thinking"
-```
-
-#### 5. Exa (Code Examples)
-**Purpose:** Find real-world implementation patterns from production codebases
-
-**When to Use:**
-- Looking for Next.js + NestJS integration patterns
-- GraphQL subscription implementation examples
-- LangChain prompt chaining patterns
-- Prisma complex relationship examples
-- OAuth 2.0 implementation references
-
-**Examples:**
-```
-"Use Exa to find Next.js + NestJS monorepo structure examples"
-"Search Exa for LangChain email generation implementations"
-"Find GraphQL subscription examples with Apollo Server in Exa"
-```
-
-#### 6. Brave Search (Broader Research)
-**Purpose:** Web search for community content, tutorials, and current information
-
-**When to Use:**
-- Researching LLM integration best practices
-- Finding tutorials for specific tech combinations
-- Looking up error messages and solutions
-- Checking for known issues with libraries
-- Finding blog posts on architectural patterns
-
-**Note:** Use after Ref when official docs don't provide enough context.
-
-#### 7. GitHub (Repository Management)
-**Purpose:** PR automation, code search, and repository operations
-
-**When to Use:**
-- Creating pull requests for completed features
-- Searching existing codebase patterns
-- Analyzing commit history
-- Managing issues and project boards
+**📚 See `/context/mcp-instructions.md` for:**
+- Complete tool lists for each server
+- Detailed usage examples and when to trigger
+- Tool chaining workflows and patterns
+- Security scanning requirements
+- Best practices and integration strategies
 
 ---
 
@@ -206,7 +115,7 @@ Reference: `/context/mcp-instructions.md` for full details
 1. Check .agent-os/product/roadmap.md for current priorities
 2. Use Ref to research required APIs and frameworks
 3. Use Sequential Thinking for complex feature planning
-4. Use Exa to find real-world implementation examples
+4. Use Brave Search to find real-world implementation examples
 ```
 
 #### Step 2: Implementation
@@ -235,45 +144,35 @@ Reference: `/context/mcp-instructions.md` for full details
 
 ## Feature-Specific MCP Workflows
 
-### Contact Management Features
+**📖 Detailed workflows:** See `/context/mcp-instructions.md` section "Workflow Patterns"
+
+### Quick Feature Workflow Templates
+
+#### Contact Management Features
 ```
-1. Ref → Prisma schema documentation
-2. Sequential Thinking → Plan CRUD architecture
-3. Ref → Next.js form handling patterns
-4. [Implement Feature]
-5. Semgrep → Scan API routes
-6. Playwright → Test contact creation/editing/deletion flows
+Ref (Prisma) → Sequential Thinking → Ref (Next.js) → Implement →
+Semgrep → PostgreSQL → Playwright
 ```
 
-### AI Email Generation Features
+#### AI Email Generation Features
 ```
-1. Sequential Thinking → Plan LLM integration architecture
-2. Ref → LangChain documentation
-3. Ref → OpenAI/Grok API documentation
-4. Exa → Find production email generation examples
-5. [Implement Feature]
-6. Semgrep → Check prompt injection vulnerabilities
-7. Playwright → Test email generation and A/B testing
+Sequential Thinking → Ref (LangChain + OpenAI) → Brave Search →
+Implement → Semgrep (prompt injection) → PostgreSQL → Playwright
 ```
 
-### Calendar Integration Features
+#### Calendar Integration Features
 ```
-1. Sequential Thinking → Plan bidirectional sync logic
-2. Ref → Google Calendar API documentation
-3. Ref → OAuth 2.0 flow documentation
-4. Exa → Find calendar sync implementation examples
-5. [Implement Feature]
-6. Semgrep → Scan OAuth implementation
-7. Playwright → Test event sync and creation
+Sequential Thinking → Ref (Calendar APIs + OAuth) → Brave Search →
+Implement → Semgrep (OAuth) → Playwright
 ```
 
-### Dashboard & Analytics Features
+#### Dashboard & Analytics Features
 ```
-1. Ref → Recharts/visualization library documentation
-2. Ref → TanStack Query data fetching patterns
-3. [Implement Feature]
-4. Playwright → Test all dashboard cards and interactions
+Ref (Recharts + TanStack Query) → Implement → PostgreSQL (query testing) →
+Playwright
 ```
+
+**💡 For complete workflows with detailed steps, see the comprehensive workflow patterns in `/context/mcp-instructions.md`**
 
 
 ---
@@ -419,18 +318,28 @@ When conflicts arise, follow this priority hierarchy:
 
 ### MCP Server Usage Rules
 
-**ALWAYS:**
-- Use Ref FIRST for all technical documentation
-- Run Semgrep on authentication, database, and API code
-- Create Playwright tests for critical user flows
-- Use Sequential Thinking for complex feature planning
-- Verify with Ref before implementing any API/library
+**📖 Complete rules and best practices:** `/context/mcp-instructions.md`
 
-**NEVER:**
+**Golden Rules:**
+
+✅ **ALWAYS:**
+- Use **Ref FIRST** for all technical documentation (PRIMARY - never hallucinate APIs)
+- Run **Semgrep** on authentication, database, and API code
+- Create **Playwright** tests for critical user flows (80% coverage minimum)
+- Use **Sequential Thinking** for complex feature planning
+- Verify with **Ref** before implementing any API/library
+- Check **PostgreSQL** schema before and after migrations
+- Document architectural decisions in **Notion**
+
+❌ **NEVER:**
 - Hallucinate API signatures, methods, or configurations
 - Skip security scanning on auth or data handling code
 - Implement features without E2E tests
 - Make assumptions about library usage without checking Ref
+- Run destructive queries with PostgreSQL MCP (READ-ONLY - use Prisma for writes)
+- Skip documentation of important implementation decisions
+
+**🔗 See `/context/mcp-instructions.md` for detailed usage patterns, tool chaining workflows, and integration best practices**
 
 ### Security Requirements
 
@@ -473,10 +382,12 @@ When conflicts arise, follow this priority hierarchy:
 ### Execute Tasks
 ```
 1. Follow: ~/.agent-os/instructions/execute-tasks.md
-2. Reference: /context/mcp-instructions.md for MCP workflows
-3. Implement with continuous Ref lookups
-4. Scan with Semgrep
-5. Test with Playwright
+2. Reference: /context/mcp-instructions.md for MCP workflows and tool lists
+3. Implement with continuous Ref lookups (never hallucinate)
+4. Scan with Semgrep (security-critical code)
+5. Verify with PostgreSQL (schema changes)
+6. Test with Playwright (E2E user flows)
+7. Document with Notion (architectural decisions)
 ```
 
 ### Visual Changes
@@ -499,14 +410,81 @@ When conflicts arise, follow this priority hierarchy:
 
 ---
 
+## Local Development Setup
+
+### First-Time Setup
+
+**📚 Complete Setup Guide:** `SETUP.md`
+
+For new developers setting up the project locally, follow the comprehensive setup guide which includes:
+- Prerequisites (Node.js v22+, pnpm v8+, PostgreSQL v17+)
+- Supabase project creation and configuration
+- Authentication provider setup (Email + Google OAuth)
+- Environment variable configuration for both frontend and backend
+- Database migrations with Prisma
+- Development server startup options
+- Authentication flow verification
+- Troubleshooting common setup issues
+
+**Quick Setup Steps:**
+```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Configure environment variables
+# Frontend: apps/web/.env.local (see apps/web/.env.local.example)
+# Backend: apps/api/.env (see apps/api/.env.example)
+
+# 3. Run database migrations
+cd apps/api && pnpm prisma migrate dev
+
+# 4. Start development servers
+pnpm dev  # Starts both frontend (3000) and backend (4000)
+```
+
+**Environment Variables Required:**
+
+**Frontend** (`apps/web/.env.local`):
+- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous public key
+
+**Backend** (`apps/api/.env`):
+- `SUPABASE_URL` - Your Supabase project URL (same as frontend)
+- `SUPABASE_JWT_SECRET` - JWT secret from Supabase dashboard
+- `SUPABASE_SERVICE_ROLE_KEY` - Service role key (keep secret, bypasses RLS)
+- `DATABASE_URL` - PostgreSQL connection string
+
+**Testing Authentication Setup:**
+1. Start servers: `pnpm dev`
+2. Visit http://localhost:3000
+3. Test signup flow: http://localhost:3000/signup
+4. Test login flow: http://localhost:3000/login
+5. Test Google OAuth if configured
+6. Verify dashboard access at http://localhost:3000/dashboard
+7. Test logout functionality
+
+**GraphQL Playground:**
+- Access at http://localhost:4000/graphql
+- Test authenticated queries (requires JWT token from login session)
+- Example query: `{ me { id email name profilePicture lastLoginAt } }`
+
+**For detailed troubleshooting and complete setup instructions, see `SETUP.md` in the project root.**
+
+---
+
 ## Additional Resources
 
 ### MCP Server Documentation
-**Primary Guide:** `/context/mcp-instructions.md`
-- Complete MCP server capabilities
-- Detailed usage examples
-- Tool chaining patterns
-- Security and testing workflows
+**📖 PRIMARY REFERENCE:** `/context/mcp-instructions.md`
+
+This comprehensive guide contains:
+- **Complete tool lists** for all 8 MCP servers (70+ tools total)
+- **Detailed usage patterns** and when to trigger each server
+- **Tool chaining workflows** for common development patterns
+- **Security scanning requirements** and best practices
+- **Integration strategies** and proactive tool usage
+- **Quick reference table** for rapid tool lookup
+- **Workflow patterns** for feature development, bug investigation, API integration, and more
 
 ### Project Documentation
 - Mission: `.agent-os/product/mission.md`

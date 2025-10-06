@@ -18,13 +18,12 @@ This file instructs Claude Code to leverage specific MCP (Model Context Protocol
 
 ## Available MCP Servers & When to Use Them
 
-### 1. **Ref** (`ref`) ⭐ PRIMARY DOCUMENTATION SOURCE
+### 1. **Ref** (`ref`)
 **Purpose:** Token-efficient documentation search to stop hallucinations with accurate, up-to-date technical documentation
 
 **Tools Available:**
-- `ref_search_documentation`: Search through 1000s of technical docs (APIs, frameworks, libraries, services)
-- `ref_read_url`: Read full web page content with smart chunking
-- `ref_search_web`: Fallback web search for broader queries
+- `mcp__Ref__ref_search_documentation`: Search through 1000s of technical docs (APIs, frameworks, libraries, services)
+- `mcp__Ref__ref_read_url`: Read full web page content with smart chunking
 
 **Key Features:**
 - **Token Efficiency**: Returns only the most relevant 200-5000 tokens instead of entire pages (e.g., Figma API is 80k tokens, Ref returns just the ~200 you need)
@@ -71,7 +70,7 @@ Accuracy Benefits:
 1. Use Ref FIRST before implementing any external API integration
 2. Search for specific endpoints/methods, not general topics
 3. Read returned URLs for detailed implementation examples
-4. Combine with Exa for code examples from real projects
+4. Use Brave Search for real-world code examples from production projects
 
 CRITICAL: Always use Ref instead of relying on memory for:
 - API signatures and parameters
@@ -83,7 +82,6 @@ CRITICAL: Always use Ref instead of relying on memory for:
 **Example Prompts:**
 ```
 "Search Ref for Stripe subscription creation API documentation"
-"Find the latest Supabase auth configuration options"
 "Look up Next.js 15 server actions best practices in the docs"
 "Get the exact parameters for Figma's REST API comment endpoint"
 "Search Vercel Edge Functions rate limits and configuration"
@@ -96,12 +94,17 @@ CRITICAL: Always use Ref instead of relying on memory for:
 ### 2. **Brave Search** (`brave-search`)
 **Purpose:** Real-time web search for current information, documentation, and technical references
 
+**Tools Available:**
+- `mcp__brave-search__brave_web_search`: General web search with pagination
+- `mcp__brave-search__brave_local_search`: Local business and places search
+
 **Use Cases:**
 - Finding latest library versions and API documentation
 - Researching current best practices and design patterns
 - Verifying compatibility between technologies
 - Looking up error messages and solutions
 - Finding code examples from real-world implementations
+- Looking for blog posts, tutorials, or community solutions
 
 **When to Trigger:**
 - User asks about "latest", "current", or "recent" information (but Ref can't answer)
@@ -109,6 +112,7 @@ CRITICAL: Always use Ref instead of relying on memory for:
 - Looking for blog posts, tutorials, or community solutions
 - Debugging issues that require Stack Overflow context
 - Finding news, announcements, or release notes
+- Finding real-world implementation examples from production codebases
 
 **Note:** Prefer **Ref** for official documentation. Use Brave for broader web search, community content, and real-time information.
 
@@ -117,44 +121,35 @@ CRITICAL: Always use Ref instead of relying on memory for:
 "Search for the latest Next.js 15 App Router authentication patterns"
 "Find current React Server Components best practices"
 "Look up TypeScript 5.4 new features and migration guide"
-```
-
----
-
-### 2. **Exa** (`exa`)
-**Purpose:** Semantic search with code context, research capabilities, and deep technical search
-
-**Tools Available:**
-- `get_code_context_exa`: Search code snippets, examples, and documentation from GitHub repos
-- `web_search_exa`: High-quality web search optimized for technical content
-- `company_research`: Deep research on companies and their tech stacks
-- `crawling`: Extract content from specific URLs
-- `deep_researcher_start/check`: Launch in-depth research projects
-
-**Use Cases:**
-- Finding implementation examples from production codebases
-- Understanding how open-source projects implement specific features
-- Researching API usage patterns from real code
-- Deep technical documentation retrieval
-- Competitive analysis of similar products
-
-**When to Trigger:**
-- Need code examples from actual repositories
-- Want to see how popular libraries implement features
-- Researching architectural decisions
-- Building features similar to existing products
-
-**Example Prompts:**
-```
-"Use exa-code to find authentication implementations in Next.js SaaS projects"
-"Search for Stripe integration examples with TypeScript and Next.js"
-"Research how Vercel implements edge middleware patterns"
+"Find Stripe integration examples with TypeScript and Next.js"
 ```
 
 ---
 
 ### 3. **Playwright** (`playwright`)
 **Purpose:** Browser automation and end-to-end testing
+
+**Tools Available:**
+- `mcp__playwright__browser_navigate`: Navigate to a URL
+- `mcp__playwright__browser_navigate_back`: Go back to previous page
+- `mcp__playwright__browser_click`: Click on elements
+- `mcp__playwright__browser_type`: Type text into input fields
+- `mcp__playwright__browser_press_key`: Press keyboard keys
+- `mcp__playwright__browser_hover`: Hover over elements
+- `mcp__playwright__browser_select_option`: Select dropdown options
+- `mcp__playwright__browser_drag`: Drag and drop elements
+- `mcp__playwright__browser_fill_form`: Fill multiple form fields
+- `mcp__playwright__browser_take_screenshot`: Capture screenshots
+- `mcp__playwright__browser_snapshot`: Get accessibility tree snapshot
+- `mcp__playwright__browser_console_messages`: Get console logs
+- `mcp__playwright__browser_evaluate`: Execute JavaScript
+- `mcp__playwright__browser_wait_for`: Wait for conditions
+- `mcp__playwright__browser_resize`: Resize browser window
+- `mcp__playwright__browser_close`: Close browser
+- `mcp__playwright__browser_tabs`: Manage browser tabs
+- `mcp__playwright__browser_handle_dialog`: Handle alerts/dialogs
+- `mcp__playwright__browser_file_upload`: Upload files
+- `mcp__playwright__browser_network_requests`: Monitor network activity
 
 **Capabilities:**
 - Navigate web pages and interact with elements
@@ -191,12 +186,13 @@ CRITICAL: Always use Ref instead of relying on memory for:
 **Purpose:** Static code analysis for security vulnerabilities and code quality
 
 **Tools Available:**
-- `security_check`: Scan code for security vulnerabilities
-- `semgrep_scan`: Scan files with specific configurations
-- `semgrep_scan_with_custom_rule`: Use custom security rules
-- `get_abstract_syntax_tree`: Analyze code structure
-- `supported_languages`: Check language support
-- `semgrep_rule_schema`: Get rule writing documentation
+- `mcp__semgrep__semgrep_scan`: Scan local code files for vulnerabilities
+- `mcp__semgrep__semgrep_scan_with_custom_rule`: Scan with custom Semgrep rules
+- `mcp__semgrep__semgrep_scan_supply_chain`: Scan for third-party vulnerabilities
+- `mcp__semgrep__semgrep_findings`: Fetch findings from Semgrep AppSec Platform
+- `mcp__semgrep__get_abstract_syntax_tree`: Get AST for code analysis
+- `mcp__semgrep__get_supported_languages`: List supported programming languages
+- `mcp__semgrep__semgrep_rule_schema`: Get schema for writing Semgrep rules
 
 **Use Cases:**
 - Scanning generated code for security vulnerabilities
@@ -236,6 +232,41 @@ Always scan security-critical code with Semgrep before finalizing:
 ### 5. **GitHub** (`github`)
 **Purpose:** Repository management, PR automation, and CI/CD integration
 
+**Tools Available:**
+- `mcp__github__search_repositories`: Search for repositories
+- `mcp__github__search_code`: Search code across GitHub
+- `mcp__github__search_issues`: Search issues
+- `mcp__github__search_pull_requests`: Search pull requests
+- `mcp__github__search_users`: Find GitHub users
+- `mcp__github__search_orgs`: Find organizations
+- `mcp__github__get_file_contents`: Read file/directory contents
+- `mcp__github__create_or_update_file`: Create or update files
+- `mcp__github__delete_file`: Delete files
+- `mcp__github__push_files`: Push multiple files in one commit
+- `mcp__github__create_repository`: Create new repository
+- `mcp__github__get_issue`: Get issue details
+- `mcp__github__create_issue`: Create new issue
+- `mcp__github__update_issue`: Update existing issue
+- `mcp__github__add_issue_comment`: Comment on issues
+- `mcp__github__list_issues`: List repository issues
+- `mcp__github__create_pull_request`: Create new PR
+- `mcp__github__update_pull_request`: Update PR details
+- `mcp__github__get_pull_request`: Get PR details
+- `mcp__github__list_pull_requests`: List repository PRs
+- `mcp__github__merge_pull_request`: Merge a PR
+- `mcp__github__create_branch`: Create new branch
+- `mcp__github__list_branches`: List repository branches
+- `mcp__github__list_commits`: Get commit history
+- `mcp__github__get_commit`: Get commit details
+- `mcp__github__list_workflows`: List GitHub Actions workflows
+- `mcp__github__list_workflow_runs`: List workflow run history
+- `mcp__github__get_workflow_run`: Get workflow run details
+- `mcp__github__list_workflow_jobs`: List jobs in a workflow run
+- `mcp__github__get_job_logs`: Get job logs
+- `mcp__github__fork_repository`: Fork a repository
+- `mcp__github__create_gist`: Create GitHub gist
+- And 50+ more GitHub API operations...
+
 **Capabilities:**
 - Browse and search code across repositories
 - Create, update, and manage issues and pull requests
@@ -271,6 +302,9 @@ Always scan security-critical code with Semgrep before finalizing:
 
 ### 6. **Sequential Thinking** (`sequential-thinking`)
 **Purpose:** Structured, step-by-step problem-solving and complex reasoning
+
+**Tools Available:**
+- `mcp__sequential-thinking__sequentialthinking`: Execute structured multi-step reasoning with the ability to revise, branch, and adjust thinking dynamically
 
 **Capabilities:**
 - Break down complex problems into manageable steps
@@ -313,167 +347,190 @@ Use sequential thinking for problems that require:
 
 ---
 
-### 7. **Ref** (`ref`)
-**Purpose:** Token-efficient documentation search to stop hallucinations with accurate, up-to-date technical documentation
+### 7. **PostgreSQL** (`postgres`)
+**Purpose:** Direct read-only database query execution for debugging, analysis, and schema verification
 
 **Tools Available:**
-- `ref_search_documentation`: Search through 1000s of technical docs (APIs, frameworks, libraries, services)
-- `ref_read_url`: Read full web page content with smart chunking
-- `ref_search_web`: Fallback web search for broader queries
+- `mcp__postgres__query`: Execute read-only SQL queries on the PostgreSQL database
 
 **Key Features:**
-- **Token Efficiency**: Returns only the most relevant 200-5000 tokens instead of entire pages (e.g., Figma API is 80k tokens, Ref returns just the ~200 you need)
-- **Smart Chunking**: Pre-chunks documentation to avoid context bloat
-- **Session Awareness**: Never returns duplicate results in the same session
-- **Deep Linking**: Provides exact documentation section links for verification
-- **Documentation-Optimized**: Loads all code tabs, syntax examples, and interactive elements
-- **Covers 1000s of Sources**: Public GitHub repos, official docs sites, and all major platforms/libraries
+- **Read-Only Safety**: Cannot execute INSERT, UPDATE, DELETE, or DROP operations
+- **Direct Database Access**: Query production or development databases without ORM layer
+- **Schema Inspection**: Analyze table structures, indexes, and constraints
+- **Performance Analysis**: Run EXPLAIN queries to diagnose slow queries
+- **Data Validation**: Verify data integrity and relationships
 
 **Use Cases:**
-- Looking up API parameters and methods
-- Finding framework-specific patterns and best practices
-- Checking library versions and breaking changes
-- Understanding service configuration and setup
-- Getting exact syntax for unfamiliar APIs
-- Validating implementation approaches
-- Reading README files and getting started guides
+- Debugging database schema issues
+- Verifying Prisma migrations applied correctly
+- Analyzing query performance with EXPLAIN
+- Checking data integrity and foreign key relationships
+- Testing complex JOIN queries before implementing in code
+- Monitoring table sizes and index usage
+- Validating database constraints
 
 **When to Trigger:**
-- Working with any external API, library, or framework
-- User asks "how do I use X"
-- Need to check API documentation
-- Implementing features with unfamiliar tools
-- Debugging API integration issues
-- Before making assumptions about API behavior
+- After running Prisma migrations (verify schema changes)
+- When debugging data-related issues
+- Need to analyze query performance
+- Validating relationships between tables
+- Checking for orphaned records or data inconsistencies
+- Before implementing complex database queries
 
-**Why Ref Over General Search:**
+**Security & Safety:**
 ```
-Context Efficiency:
-- Standard web fetch: 20k+ tokens (mostly irrelevant)
-- Ref: 200-5000 tokens (highly relevant)
-- Cost savings: ~$0.09 per step with Opus
-- Less context = smarter model responses
-
-Accuracy Benefits:
-- Documentation-specific crawler
-- Always up-to-date information
-- Deep links to exact sections
-- No hallucinated API signatures
+CRITICAL RULES:
+- This tool is READ-ONLY - use Prisma for data modifications
+- Never run destructive queries (DROP, TRUNCATE, DELETE)
+- Always use LIMIT for potentially large result sets
+- Test queries on development database first
+- No write operations - Prisma handles all data changes
 ```
 
 **Best Practice:**
 ```
-1. Use Ref FIRST before implementing any external API integration
-2. Search for specific endpoints/methods, not general topics
-3. Read returned URLs for detailed implementation examples
-4. Combine with Exa for code examples from real projects
+1. Use for inspection and analysis only
+2. Always include LIMIT clause for data queries
+3. Use EXPLAIN ANALYZE for performance debugging
+4. Verify schema after migrations
+5. Check indexes on frequently queried columns
+6. Use for debugging, not for application logic
 ```
 
 **Example Prompts:**
 ```
-"Search Ref for Stripe subscription creation API documentation"
-"Find the latest Supabase auth configuration options"
-"Look up Next.js 15 server actions best practices in the docs"
-"Get the exact parameters for Figma's REST API comment endpoint"
-"Search Vercel Edge Functions rate limits and configuration"
+"Check the contacts table schema in PostgreSQL"
+"Verify email conversation history is storing correctly"
+"Analyze performance of slow contact search query with EXPLAIN"
+"Count total contacts by priority level"
+"Check for orphaned records in emails table"
+"Verify indexes exist on user_id columns"
+"Show table sizes in the database"
 ```
 
 ---
 
-<!-- ### 8. **Figma** (`figma`)
-**Purpose:** Design-to-code conversion with design system context
+### 8. **Notion** (`notion`)
+**Purpose:** Notion workspace integration for product documentation, specifications, and project management
 
 **Tools Available:**
-- `get_code`: Generate code from Figma frames
-- `get_design_tokens`: Extract variables, styles, and tokens
-- `get_components`: Access component libraries
-- `inspect_design`: Get layout and styling details
-- `get_make_resources`: Access code from Figma Make files
+- `mcp__notion__notion-search`: Semantic search across Notion workspace (internal/user search)
+- `mcp__notion__notion-fetch`: Retrieve page or database contents by URL/ID
+- `mcp__notion__notion-create-pages`: Create one or more new pages with properties and content
+- `mcp__notion__notion-update-page`: Update page properties or content (replace/insert/update)
+- `mcp__notion__notion-move-pages`: Move pages or databases to new parent
+- `mcp__notion__notion-duplicate-page`: Duplicate an existing page
+- `mcp__notion__notion-create-database`: Create new database with schema and properties
+- `mcp__notion__notion-update-database`: Update database schema, properties, or configuration
+- `mcp__notion__notion-create-comment`: Add comments to pages
+- `mcp__notion__notion-get-comments`: Retrieve all comments from a page
+- `mcp__notion__notion-get-teams`: List workspace teams (teamspaces)
+- `mcp__notion__notion-get-users`: List all workspace users
+- `mcp__notion__notion-get-self`: Get current bot user information
+- `mcp__notion__notion-get-user`: Retrieve specific user details
 
-**Capabilities:**
-- Convert Figma frames to React/Tailwind code
-- Extract design tokens and variables
-- Map design components to code components
-- Access Code Connect mappings
-- Retrieve spacing, colors, and typography
+**Key Features:**
+- **Semantic Search**: Natural language search across all workspace content
+- **Database Integration**: Create and manage Notion databases
+- **Rich Formatting**: Full Notion-flavored Markdown support
+- **Page Management**: Create, read, update, and organize pages
+- **Team Collaboration**: Comments, mentions, and user management
+- **Spec Management**: Ideal for storing technical specifications
 
 **Use Cases:**
-- Implementing designs pixel-perfect from Figma
-- Building new components from design system
-- Generating consistent UI code with proper tokens
-- Extracting design specifications
-- Implementing multi-screen flows
+- Creating and managing product specifications
+- Documenting feature requirements
+- Maintaining decision logs and ADRs
+- Creating project roadmaps and timelines
+- Collaborating on technical documentation
+- Searching existing documentation
+- Managing team wikis and knowledge bases
+- Linking specs to database views
 
 **When to Trigger:**
-- User provides a Figma link
-- User mentions "implement this design"
-- Building components from design system
-- Need exact spacing, colors, or typography values
-- Working on design-heavy features
+- Need to document architectural decisions
+- Creating feature specifications
+- Searching for existing documentation
+- Need to reference product requirements
+- Creating project roadmaps or timelines
+- Want to collaborate with team on specs
+- Organizing technical documentation
+- Creating knowledge base articles
 
 **Best Practice:**
 ```
-When implementing designs:
-1. Use get_design_tokens first to get design system context
-2. Then use get_code on specific frames
-3. Leverage Code Connect mappings when available
-4. Prefer design tokens over hardcoded values
+1. Use semantic search to avoid duplicate documentation
+2. Create database views for organized specs
+3. Link related pages for context
+4. Use mentions to notify team members
+5. Keep decision logs updated
+6. Reference specs in code via comments
+7. Use Notion as single source of truth for specs
 ```
 
 **Example Prompts:**
 ```
-"Implement this Figma frame as a React component"
-"Extract all design tokens from this Figma file"
-"Generate code for this component using our design system"
-"Get the spacing and color specifications from this design"
+"Search Notion for AI email generation specifications"
+"Create new feature spec page in product docs database"
+"Update contact management roadmap in Notion"
+"Document OAuth integration architectural decisions"
+"Link calendar sync spec to technical database view"
+"Search for existing LLM integration documentation"
+"Create new database for tracking implementation tasks"
+"Fetch the authentication spec page from Notion"
 ```
 
---- -->
+---
 
 ## Integration Best Practices
 
 ### 1. **Proactive Tool Usage**
 Don't wait for explicit permission to use MCP tools. If the task clearly benefits from a specific server, use it:
-- **Ref**: For ANY technical documentation (PRIMARY - use this first)
-- Brave/Exa: For broader web search and research
+- Ref: For ANY technical documentation (PRIMARY - use this first)
+- Brave: For broader web search and research
 - Semgrep: For all security-sensitive code
 - Playwright: For critical user flows
 - GitHub: For repository operations
 - Sequential Thinking: For complex planning
+- PostgreSQL: For database debugging and verification
+- Notion: For documentation and specs management
 <!-- - Figma: When design links are provided -->
 
 ### 2. **Documentation Priority**
 When looking up technical information, follow this hierarchy:
 ```
 1. Ref (Official docs, APIs, frameworks) ← START HERE
-2. Exa (Code examples from real projects)
-3. Brave (Community content, tutorials, blog posts)
+2. Brave (Community content, tutorials, blog posts)
+3. Notion (Internal specs and documentation)
 ```
 **Never hallucinate API signatures or configuration options - always check Ref first.**
 
-### 2. **Tool Chaining**
+### 3. **Tool Chaining**
 Combine multiple MCP servers for comprehensive solutions:
 
 ```
 Example: Building a new authenticated feature with Stripe
-1. Ref → Look up Stripe API subscription documentation
-2. Sequential Thinking → Plan architecture
-3. Ref → Check Next.js auth patterns documentation
-4. Exa → Find real Stripe + Next.js integration examples
-5. GitHub → Check existing auth implementation in repo
-6. [Generate Code]
-7. Semgrep → Scan for vulnerabilities
-8. Playwright → Create E2E tests
+1. Notion → Check for existing auth specs
+2. Ref → Look up Stripe API subscription documentation
+3. Sequential Thinking → Plan architecture
+4. Ref → Check Next.js auth patterns documentation
+5. Brave → Find real Stripe + Next.js integration examples
+6. GitHub → Check existing auth implementation in repo
+7. [Generate Code]
+8. Semgrep → Scan for vulnerabilities
+9. PostgreSQL → Verify database schema
+10. Playwright → Create E2E tests
+11. Notion → Document implementation decisions
 ```
 
-### 3. **Context Preservation**
+### 4. **Context Preservation**
 When using Sequential Thinking or complex workflows:
 - Document intermediate decisions
 - Explain reasoning for tool choices
 - Maintain state across tool calls
 - Reference previous analysis when making decisions
 
-### 4. **Security-First Approach**
+### 5. **Security-First Approach**
 ```
 ALWAYS run Semgrep on:
 - Authentication/authorization code
@@ -481,14 +538,27 @@ ALWAYS run Semgrep on:
 - API endpoints handling user input
 - File upload/download functionality
 - Any code dealing with secrets or credentials
+
+ALWAYS verify with PostgreSQL after:
+- Running database migrations
+- Schema changes
+- Adding indexes or constraints
 ```
 
-### 5. **Design System Consistency**
+### 6. **Design System Consistency**
 When Figma MCP is available:
 - Always extract design tokens before coding
 - Use Code Connect mappings when available
 - Reference existing components from design system
 - Validate implementations match design specifications
+
+### 7. **Database Operations**
+```
+For database work:
+1. Use Prisma for schema definitions and migrations
+2. Use PostgreSQL MCP for verification and debugging
+3. Never use PostgreSQL MCP for writes - use Prisma only
+```
 
 ---
 
@@ -496,25 +566,31 @@ When Figma MCP is available:
 
 ### Pattern 1: New Feature Development
 ```
-1. Ref: Look up relevant API documentation
-2. Sequential Thinking: Plan feature architecture
-3. Exa: Research implementation patterns from real codebases
-4. GitHub: Check for similar features in current codebase
-5. [Generate Implementation]
-6. Semgrep: Security scan
-7. Playwright: E2E tests
-8. GitHub: Create PR
+1. Notion: Check for existing specs and documentation
+2. Ref: Look up relevant API documentation
+3. Sequential Thinking: Plan feature architecture
+4. Brave: Research implementation patterns from real codebases
+5. GitHub: Check for similar features in current codebase
+6. [Generate Implementation]
+7. PostgreSQL: Verify database schema if DB changes
+8. Semgrep: Security scan
+9. Playwright: E2E tests
+10. Notion: Document implementation decisions
+11. GitHub: Create PR
 ```
 
 ### Pattern 2: Bug Investigation
 ```
-1. Ref: Search official docs for expected behavior
-2. Brave: Search for similar issues and community solutions
-3. GitHub: Analyze recent commits and related code
-4. Sequential Thinking: Reason through root cause
-5. [Implement Fix]
-6. Playwright: Add regression test
-7. GitHub: Create PR with fix
+1. Notion: Search for known issues or related docs
+2. PostgreSQL: Check database state if data-related
+3. Ref: Search official docs for expected behavior
+4. Brave: Search for similar issues and community solutions
+5. GitHub: Analyze recent commits and related code
+6. Sequential Thinking: Reason through root cause
+7. [Implement Fix]
+8. Playwright: Add regression test
+9. Notion: Document the bug and fix
+10. GitHub: Create PR with fix
 ```
 
 ### Pattern 3: Design Implementation
@@ -539,12 +615,28 @@ When Figma MCP is available:
 
 ### Pattern 5: API Integration
 ```
-1. Ref: Search for API documentation (PRIMARY)
-2. Ref: Read specific endpoint documentation
-3. Exa: Find real-world implementation examples
-4. [Generate Integration Code]
-5. Semgrep: Scan for security issues
-6. Playwright: Create integration tests
+1. Notion: Check for existing API integrations
+2. Ref: Search for API documentation (PRIMARY)
+3. Ref: Read specific endpoint documentation
+4. Brave: Find real-world implementation examples
+5. [Generate Integration Code]
+6. Semgrep: Scan for security issues
+7. Playwright: Create integration tests
+8. Notion: Document API integration details
+```
+
+### Pattern 6: Database Migration
+```
+1. Notion: Check migration plans and decisions
+2. Sequential Thinking: Plan migration strategy
+3. Ref: Look up Prisma migration documentation
+4. Supabase: Create database branch for testing
+5. [Generate Migration]
+6. PostgreSQL: Verify schema changes on branch
+7. Supabase: Test on branch
+8. Supabase: Merge branch to production
+9. PostgreSQL: Verify production schema
+10. Notion: Document migration completion
 ```
 
 ---
@@ -565,13 +657,6 @@ Ensure these MCP servers are configured in `.claude.json`:
       "args": ["-y", "@brave/brave-search-mcp-server"],
       "env": {
         "BRAVE_API_KEY": "${BRAVE_API_KEY}"
-      }
-    },
-    "exa": {
-      "command": "npx",
-      "args": ["-y", "exa-mcp-server"],
-      "env": {
-        "EXA_API_KEY": "${EXA_API_KEY}"
       }
     },
     "playwright": {
@@ -607,10 +692,11 @@ Ensure these MCP servers are configured in `.claude.json`:
 **Get API Keys:**
 - Ref: Sign up at https://ref.tools
 - Brave: https://brave.com/search/api/
-- Exa: https://dashboard.exa.ai/
 - Semgrep: https://semgrep.dev/
 - GitHub: https://github.com/settings/tokens
 - Figma: Enable in Figma Desktop app preferences
+- PostgreSQL: Use connection string from your database provider
+- Notion: Get integration token from https://www.notion.so/my-integrations
 
 ---
 
@@ -618,19 +704,22 @@ Ensure these MCP servers are configured in `.claude.json`:
 
 | Need to... | Use Server | Tool |
 |------------|------------|------|
-| Look up API documentation | **Ref** | ref_search_documentation |
-| Research current best practices | Ref → Brave | ref_search_documentation, web_search |
-| Find code examples | Ref → Exa | ref_search_documentation, get_code_context |
-| Scan for security issues | Semgrep | security_check |
-| Test user flows | Playwright | browser automation |
-| Manage repository | GitHub | repo operations |
-| Plan complex feature | Sequential Thinking | step-by-step reasoning |
-| Implement design | Figma | get_code, get_design_tokens |
-| Read documentation page | Ref | ref_read_url |
-| Create PR | GitHub | create_pull_request |
-| Generate tests | Playwright | test generation |
-| Analyze vulnerabilities | Semgrep | semgrep_scan |
-| Check library syntax | **Ref** | ref_search_documentation |
+| Look up API documentation | **Ref** | mcp__Ref__ref_search_documentation |
+| Research current best practices | Ref → Brave | mcp__Ref__ref_search_documentation, mcp__brave-search__brave_web_search |
+| Find code examples | Ref → Brave | mcp__Ref__ref_search_documentation, mcp__brave-search__brave_web_search |
+| Scan for security issues | Semgrep | mcp__semgrep__semgrep_scan |
+| Test user flows | Playwright | mcp__playwright__browser_* |
+| Manage repository | GitHub | mcp__github__* |
+| Plan complex feature | Sequential Thinking | mcp__sequential-thinking__sequentialthinking |
+| Implement design | Figma | mcp__figma__* |
+| Read documentation page | Ref | mcp__Ref__ref_read_url |
+| Create PR | GitHub | mcp__github__create_pull_request |
+| Generate tests | Playwright | mcp__playwright__browser_snapshot |
+| Analyze vulnerabilities | Semgrep | mcp__semgrep__semgrep_scan |
+| Check library syntax | **Ref** | mcp__Ref__ref_search_documentation |
+| Query database | PostgreSQL | mcp__postgres__query |
+| Document decisions | Notion | mcp__notion__notion-create-pages |
+| Search internal docs | Notion | mcp__notion__notion-search |
 
 ---
 
