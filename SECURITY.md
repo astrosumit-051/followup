@@ -1,218 +1,190 @@
-# Security & Credential Management
+# Security Documentation
 
-## Overview
+> Last Updated: 2025-10-06
+> Version: 1.0.0
 
-This repository is **open source** and publicly accessible. Follow these guidelines to protect sensitive credentials while contributing to RelationHub.
+This document outlines the security measures implemented in RelationHub to protect against common vulnerabilities and attacks.
 
----
+## Security Features
 
-## 🔒 Protected Files
+### 1. Authentication & Authorization
 
-The following files contain sensitive credentials and are **git-ignored**:
+**Implementation:**
+- Supabase Auth with OAuth 2.0 and PKCE flow
+- JWT token verification with `jose` library
+- HTTP-only cookies for session storage
+- Automatic token refresh before expiration
 
-```
-apps/web/.env
-apps/web/.env.local
-apps/api/.env
-apps/api/.env.local
-packages/**/.env
-```
+**Protection Against:**
+- Unauthorized access (OWASP A01:2021)
+- Session hijacking
+- Token theft
+- CSRF attacks (via PKCE)
 
-**NEVER commit these files to the repository.**
+**Files:**
+- `apps/api/src/auth/auth.guard.ts` - Authentication guard
+- `apps/api/src/auth/supabase.service.ts` - JWT verification
+- `apps/web/middleware.ts` - Session management
+- `apps/web/lib/supabase/server.ts` - Cookie-based client
 
----
+### 2. Rate Limiting
 
-## ✅ What IS Committed (Safe)
+**Implementation:**
+- Global rate limiting with `@nestjs/throttler`
+- 10 requests per 60 seconds per IP address
+- Applied to all API endpoints
 
-Template files with placeholder values:
+**Protection Against:**
+- Brute-force attacks
+- DDoS attempts
+- API abuse
 
-- `apps/web/.env.local.example` - Frontend environment template
-- `apps/api/.env.example` - Backend environment template
+**Configuration:**
+\`\`\`typescript
+// apps/api/src/app.module.ts
+ThrottlerModule.forRoot([
+  {
+    name: 'default',
+    ttl: 60000, // 60 seconds
+    limit: 10, // 10 requests per minute
+  },
+])
+\`\`\`
 
-These files show the **structure** of required environment variables without exposing actual credentials.
+### 3. Security Headers
 
----
+**Implementation:**
+- Helmet middleware on NestJS API
+- Custom security headers on Next.js frontend
 
-## 🛠️ Setting Up Your Environment
+**Protection Against:**
+- Clickjacking (X-Frame-Options)
+- MIME type sniffing (X-Content-Type-Options)
+- XSS attacks (Content-Security-Policy)
+- Protocol downgrade attacks (Strict-Transport-Security)
 
-### 1. Copy Template Files
+**Backend Headers (Helmet):**
+\`\`\`typescript
+// apps/api/src/main.ts
+app.use(helmet({
+  contentSecurityPolicy: { ... },
+  hsts: { maxAge: 31536000 },
+  frameguard: { action: 'deny' },
+  noSniff: true,
+  xssFilter: true,
+}));
+\`\`\`
 
-For the **frontend** (Next.js):
-```bash
-cp apps/web/.env.local.example apps/web/.env.local
-```
+**Frontend Headers (Next.js):**
+\`\`\`javascript
+// apps/web/next.config.mjs
+async headers() {
+  return [{
+    source: '/:path*',
+    headers: [
+      { key: 'X-Frame-Options', value: 'DENY' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=()...' },
+    ],
+  }];
+}
+\`\`\`
 
-For the **backend** (NestJS):
-```bash
-cp apps/api/.env.example apps/api/.env
-```
+### 4. Input Validation
 
-### 2. Fill In Your Credentials
+**Implementation:**
+- \`class-validator\` decorators on all DTOs
+- Unicode-aware regex patterns
+- Strict type checking with TypeScript
 
-Edit the copied `.env` and `.env.local` files with your actual credentials:
+**Protection Against:**
+- XSS attacks
+- SQL injection (via Prisma ORM)
+- Command injection
+- Path traversal
 
-**Frontend (`apps/web/.env.local`):**
-- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anon (public) key
+### 5. CORS Configuration
 
-**Backend (`apps/api/.env`):**
-- `SUPABASE_URL` - Your Supabase project URL
-- `SUPABASE_JWT_SECRET` - Supabase JWT secret
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (⚠️ **NEVER expose this publicly**)
-- `DATABASE_URL` - PostgreSQL connection string
+**Implementation:**
+- Environment-based origin whitelist
+- Credentials support for cookies
+- Explicit method and header allowlist
 
-### 3. Verify .gitignore Protection
+**Protection Against:**
+- Cross-origin attacks
+- Unauthorized API access
 
-Before committing, run:
-```bash
-git status
-```
+**Configuration:**
+\`\`\`typescript
+// apps/api/src/main.ts
+const allowedOrigins = process.env.FRONTEND_URL?.split(',') || ['http://localhost:3000'];
 
-You should **NOT** see:
-- `apps/web/.env.local`
-- `apps/api/.env`
+app.enableCors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+});
+\`\`\`
 
-If these appear, **DO NOT COMMIT**. They should be git-ignored.
+## Production Security Checklist
 
----
+### Before Deployment
 
-## 🚨 Credential Security Best Practices
+- [ ] Update \`FRONTEND_URL\` to production domain(s)
+- [ ] Set \`PORT\` if not using default 3001
+- [ ] Verify \`SUPABASE_URL\` points to production Supabase project
+- [ ] Rotate \`SUPABASE_JWT_SECRET\` and \`SUPABASE_SERVICE_ROLE_KEY\`
+- [ ] Update \`DATABASE_URL\` to production database
+- [ ] Enable HTTPS in production (required for Helmet HSTS)
+- [ ] Configure CSP directives for production (remove 'unsafe-inline')
+- [ ] Set up monitoring for rate limit violations
 
-### DO:
-✅ Use `.env.example` templates for documentation
-✅ Store credentials in local `.env` files (git-ignored)
-✅ Use environment variables in CI/CD (GitHub Secrets, Vercel, etc.)
-✅ Rotate credentials if accidentally exposed
-✅ Use different credentials for dev/staging/production
+### Environment Variables
 
-### DON'T:
-❌ Hardcode credentials in source code
-❌ Commit `.env` files to the repository
-❌ Share credentials in pull request descriptions
-❌ Store credentials in screenshots or logs
-❌ Use production credentials in development
+**Required:**
+\`\`\`bash
+# Backend (apps/api/.env)
+SUPABASE_URL=https://YOUR-PRODUCTION-PROJECT.supabase.co
+SUPABASE_JWT_SECRET=your-production-jwt-secret
+SUPABASE_SERVICE_ROLE_KEY=your-production-service-role-key
+DATABASE_URL=postgresql://postgres:PASSWORD@production-db:5432/postgres
+FRONTEND_URL=https://your-production-domain.com
+PORT=3001
 
----
+# Frontend (apps/web/.env.local)
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PRODUCTION-PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-production-anon-key
+\`\`\`
 
-## 🔄 Supabase Credentials
+## Security Testing
 
-### Where to Find Your Credentials
+**Total Tests:** 91 passing
+- Authentication: 25 tests
+- Input Validation: 33 tests
+- Security Configuration: 7 tests
+- User Service: 19 tests
+- Integration: 7 tests
 
-1. **Project URL**: `https://YOUR_PROJECT_REF.supabase.co`
-2. **Anon Key**: Project Settings → API → Project API keys → `anon` `public`
-3. **Service Role Key**: Project Settings → API → Project API keys → `service_role` (⚠️ **Secret**)
-4. **JWT Secret**: Project Settings → API → JWT Settings → JWT Secret
+**Run Security Tests:**
+\`\`\`bash
+cd apps/api && pnpm jest
+\`\`\`
 
-### Credential Types
+## Changelog
 
-| Credential | Exposure Level | Usage |
-|------------|----------------|-------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Public (in frontend bundle) | Frontend API calls |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public (in frontend bundle) | Frontend authentication |
-| `SUPABASE_JWT_SECRET` | **Secret** | Backend JWT verification |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Secret** | Backend admin operations |
-| `DATABASE_URL` | **Secret** | Direct database access |
-
-**Note:** `NEXT_PUBLIC_` variables are exposed in the browser. Only use for non-sensitive, client-safe keys.
-
----
-
-## 🚀 Production Deployment
-
-### Recommended Platforms
-
-**Frontend (Next.js):**
-- Vercel
-- Netlify
-- AWS Amplify
-
-**Backend (NestJS):**
-- Railway
-- Render
-- AWS ECS/EKS
-- DigitalOcean App Platform
-
-### Setting Environment Variables
-
-**Vercel:**
-```bash
-vercel env add NEXT_PUBLIC_SUPABASE_URL production
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
-```
-
-**Railway:**
-```bash
-railway variables set SUPABASE_URL=https://...
-railway variables set SUPABASE_JWT_SECRET=...
-railway variables set SUPABASE_SERVICE_ROLE_KEY=...
-railway variables set DATABASE_URL=postgresql://...
-```
-
-**GitHub Actions (CI/CD):**
-Add secrets in: `Repository → Settings → Secrets and variables → Actions`
-
----
-
-## 🔍 Accidental Exposure Response
-
-If you accidentally commit credentials:
-
-### Immediate Actions:
-
-1. **Rotate Credentials Immediately**
-   - Go to Supabase → Project Settings → API
-   - Generate new service role key
-   - Update JWT secret if exposed
-
-2. **Remove from Git History**
-   ```bash
-   # Remove sensitive file from all commits
-   git filter-branch --force --index-filter \
-     "git rm --cached --ignore-unmatch apps/api/.env" \
-     --prune-empty --tag-name-filter cat -- --all
-
-   # Force push (⚠️ Coordinate with team first)
-   git push origin --force --all
-   ```
-
-3. **Notify Team**
-   - Alert collaborators about credential rotation
-   - Update environment variables in all deployments
-
----
-
-## 📝 Adding New Secrets
-
-When introducing new environment variables:
-
-1. Add placeholder to `.env.example` files:
-   ```env
-   # New Service API Key
-   NEW_SERVICE_API_KEY=your-api-key-here
-   ```
-
-2. Document in this `SECURITY.md` file
-
-3. Update deployment documentation
-
-4. Verify git-ignore protection
+### v1.0.0 (2025-10-06)
+- Initial security implementation
+- Rate limiting with @nestjs/throttler (10 req/min)
+- Helmet security headers
+- Next.js security headers
+- Environment-based CORS configuration
+- Input validation with Unicode support
+- Open redirect prevention
+- Sanitized error logging
+- Comprehensive security test suite (91 tests)
 
 ---
 
-## 🆘 Support
-
-If you discover a security vulnerability, please email: **security@relationhub.io** (or your security contact).
-
-Do **not** open a public issue for security vulnerabilities.
-
----
-
-## 📚 Additional Resources
-
-- [Supabase Security Best Practices](https://supabase.com/docs/guides/platform/security)
-- [OWASP Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_CheatSheet.html)
-- [GitHub Secret Scanning](https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning)
-
----
-
-**Last Updated:** 2025-10-04
+**Note:** This document should be reviewed and updated whenever security features are added, modified, or removed.
