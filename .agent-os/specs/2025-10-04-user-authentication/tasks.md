@@ -91,14 +91,14 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 9.6 Implement logout functionality (API route + LogoutButton component + dashboard page)
   - [ ] 9.7 Verify all E2E tests pass - ⚠️ Blocked: Requires Supabase test environment (see Task 6.8)
 
-- [ ] 10. User Profile Sync Integration
-  - [ ] 10.1 Write integration tests for user sync on first login
-  - [ ] 10.2 Implement user sync call in AuthGuard after JWT validation
-  - [ ] 10.3 Extract user metadata from OAuth providers (name, email, profilePicture)
-  - [ ] 10.4 Test user creation on first Google login
-  - [ ] 10.5 Test user creation on first LinkedIn login
-  - [ ] 10.6 Test user update on subsequent logins (lastLoginAt updated)
-  - [ ] 10.7 Verify all integration tests pass
+- [x] 10. User Profile Sync Integration
+  - [x] 10.1 Write integration tests for user sync on first login
+  - [x] 10.2 Implement user sync call in AuthGuard after JWT validation
+  - [x] 10.3 Extract user metadata from OAuth providers (name, email, profilePicture)
+  - [x] 10.4 Test user creation on first Google login
+  - [ ] 10.5 Test user creation on first LinkedIn login - ⚠️ Deferred (LinkedIn OAuth deferred per Task 2.4)
+  - [x] 10.6 Test user update on subsequent logins (lastLoginAt updated)
+  - [x] 10.7 Verify all integration tests pass
 
 - [ ] 11. Error Handling & Security
   - [ ] 11.1 Write security tests for JWT tampering detection

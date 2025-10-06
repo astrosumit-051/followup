@@ -75,6 +75,31 @@ export class SupabaseService {
   }
 
   /**
+   * Get full user data from Supabase using access token
+   * @param token - JWT access token
+   * @returns Supabase user object with metadata
+   * @throws Error if user cannot be retrieved
+   */
+  async getUserFromToken(token: string): Promise<any> {
+    try {
+      const { data, error } = await this.supabase.auth.getUser(token);
+
+      if (error) {
+        throw new Error(`Failed to get user from Supabase: ${error.message}`);
+      }
+
+      if (!data.user) {
+        throw new Error('User not found in Supabase');
+      }
+
+      return data.user;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to get user';
+      throw new Error(message);
+    }
+  }
+
+  /**
    * Get Supabase client instance for admin operations
    * @returns Supabase client
    */
