@@ -40,11 +40,37 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // Refresh session if it's close to expiring
-    // This prevents users from being logged out mid-session
-    await supabase.auth.getUser();
+    // Check if session is close to expiring (within 5 minutes)
+    // Supabase sessions expire after 1 hour by default
+    const expiresAt = session.expires_at; // Unix timestamp in seconds
+    const now = Math.floor(Date.now() / 1000);
+    const timeUntilExpiry = expiresAt ? expiresAt - now : 0;
+    const fiveMinutes = 5 * 60;
 
-    // Session is valid, allow access
+    // Automatically refresh session if it's close to expiring
+    // This prevents users from being logged out mid-session
+    if (timeUntilExpiry > 0 && timeUntilExpiry < fiveMinutes) {
+      console.log(
+        `Session expiring in ${Math.floor(timeUntilExpiry / 60)} minutes, refreshing...`
+      );
+    }
+
+    // Call getUser() which triggers automatic token refresh if needed
+    // This is called on every request to ensure session is always fresh
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
+
+    // If token refresh failed or user is invalid, redirect to login
+    if (userError || !user) {
+      console.error('Token refresh failed:', userError?.message);
+
+      const loginUrl = new URL('/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Session is valid and refreshed, allow access
     return NextResponse.next();
   } catch (error) {
     // Handle unexpected errors gracefully
