@@ -83,8 +83,13 @@ model Contact {
   reminders  Reminder[]
   tags       ContactTag[]
 
-  @@index([userId, priority])
-  @@index([userId, lastContactedAt])
+  // Performance indexes for frequently queried fields
+  @@index([userId, createdAt(sort: Desc)])    // Default sort order (most common query)
+  @@index([userId, priority])                  // Filter by priority
+  @@index([userId, lastContactedAt])           // Sort by last contact date
+  @@index([userId, company])                   // Filter/sort by company
+  @@index([userId, industry])                  // Filter/sort by industry
+  @@index([userId, name])                      // Sort by name alphabetically
   @@map("contacts")
 }
 

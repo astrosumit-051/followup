@@ -13,6 +13,7 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { ContactFilterInput } from './dto/contact-filter.input';
 import { ContactPaginationInput } from './dto/contact-pagination.input';
+import { ContactSortField } from './enums/contact-sort-field.enum';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 
@@ -50,7 +51,7 @@ export class ContactResolver {
    * @param user - Current user from JWT (injected by @CurrentUser decorator)
    * @param filters - Optional filter criteria (priority, company, search, etc.)
    * @param pagination - Pagination parameters (cursor, limit)
-   * @param sortBy - Field to sort by (default: createdAt)
+   * @param sortBy - Field to sort by (default: CREATED_AT)
    * @param sortOrder - Sort order (default: desc)
    * @returns Paginated list of contacts with metadata
    */
@@ -61,8 +62,8 @@ export class ContactResolver {
     filters?: ContactFilterInput,
     @Args('pagination', { type: () => ContactPaginationInput, nullable: true })
     pagination?: ContactPaginationInput,
-    @Args('sortBy', { type: () => String, nullable: true, defaultValue: 'createdAt' })
-    sortBy?: string,
+    @Args('sortBy', { type: () => ContactSortField, nullable: true, defaultValue: ContactSortField.CREATED_AT })
+    sortBy?: ContactSortField,
     @Args('sortOrder', { type: () => String, nullable: true, defaultValue: 'desc' })
     sortOrder?: 'asc' | 'desc',
   ): Promise<ContactConnection> {

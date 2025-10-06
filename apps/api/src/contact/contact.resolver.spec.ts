@@ -3,6 +3,7 @@ import { ContactResolver } from './contact.resolver';
 import { ContactService } from './contact.service';
 import { Priority } from './enums/priority.enum';
 import { Gender } from './enums/gender.enum';
+import { ContactSortField } from './enums/contact-sort-field.enum';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { ContactFilterInput } from './dto/contact-filter.input';
@@ -134,7 +135,7 @@ describe('ContactResolver', () => {
         mockUser,
         undefined,
         undefined,
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
 
@@ -143,7 +144,7 @@ describe('ContactResolver', () => {
         'user-123',
         {},
         {},
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
     });
@@ -156,7 +157,7 @@ describe('ContactResolver', () => {
         mockUser,
         filters,
         undefined,
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
 
@@ -165,7 +166,7 @@ describe('ContactResolver', () => {
         'user-123',
         filters,
         {},
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
     });
@@ -178,7 +179,7 @@ describe('ContactResolver', () => {
         mockUser,
         filters,
         undefined,
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
 
@@ -186,7 +187,7 @@ describe('ContactResolver', () => {
         'user-123',
         filters,
         {},
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
     });
@@ -199,7 +200,7 @@ describe('ContactResolver', () => {
         mockUser,
         filters,
         undefined,
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
 
@@ -207,7 +208,7 @@ describe('ContactResolver', () => {
         'user-123',
         filters,
         {},
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
     });
@@ -223,7 +224,7 @@ describe('ContactResolver', () => {
         mockUser,
         undefined,
         pagination,
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
 
@@ -231,7 +232,7 @@ describe('ContactResolver', () => {
         'user-123',
         {},
         pagination,
-        'createdAt',
+        ContactSortField.CREATED_AT,
         'desc',
       );
     });
@@ -243,7 +244,7 @@ describe('ContactResolver', () => {
         mockUser,
         undefined,
         undefined,
-        'name',
+        ContactSortField.NAME,
         'asc',
       );
 
@@ -251,7 +252,7 @@ describe('ContactResolver', () => {
         'user-123',
         {},
         {},
-        'name',
+        ContactSortField.NAME,
         'asc',
       );
     });
@@ -272,7 +273,7 @@ describe('ContactResolver', () => {
         mockUser,
         filters,
         pagination,
-        'name',
+        ContactSortField.NAME,
         'asc',
       );
 
@@ -280,7 +281,7 @@ describe('ContactResolver', () => {
         'user-123',
         filters,
         pagination,
-        'name',
+        ContactSortField.NAME,
         'asc',
       );
     });

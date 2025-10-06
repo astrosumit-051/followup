@@ -7,6 +7,10 @@ Contact GraphQL Entity
 
 Represents a contact in the GraphQL schema with all fields
 matching the Prisma Contact model.
+
+Security:
+- userId is hidden from GraphQL schema to prevent information leakage
+- Only accessible internally for authorization checks
 """
 type Contact {
   birthday: DateTime
@@ -25,7 +29,6 @@ type Contact {
   profilePicture: String
   role: String
   updatedAt: DateTime!
-  userId: String!
 }
 
 """
@@ -82,6 +85,16 @@ Implements cursor-based pagination for efficient scrolling through large contact
 input ContactPaginationInput {
   cursor: String
   limit: Int = 20
+}
+
+"""Fields available for sorting contacts"""
+enum ContactSortField {
+  COMPANY
+  CREATED_AT
+  INDUSTRY
+  LAST_CONTACTED_AT
+  NAME
+  PRIORITY
 }
 
 """
@@ -156,7 +169,7 @@ enum Priority {
 
 type Query {
   contact(id: ID!): Contact
-  contacts(filters: ContactFilterInput, pagination: ContactPaginationInput, sortBy: String = "createdAt", sortOrder: String = "desc"): ContactConnection!
+  contacts(filters: ContactFilterInput, pagination: ContactPaginationInput, sortBy: ContactSortField = CREATED_AT, sortOrder: String = "desc"): ContactConnection!
   me: String!
 }
 

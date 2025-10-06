@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
+import { ObjectType, Field, ID, registerEnumType, HideField } from '@nestjs/graphql';
 import { Priority as PrismaEnumPriority } from '@relationhub/database';
 import { Priority } from '../enums/priority.enum';
 import { Gender as PrismaEnumGender } from '@relationhub/database';
@@ -9,14 +9,25 @@ import { Gender } from '../enums/gender.enum';
  *
  * Represents a contact in the GraphQL schema with all fields
  * matching the Prisma Contact model.
+ *
+ * Security:
+ * - userId is hidden from GraphQL schema to prevent information leakage
+ * - Only accessible internally for authorization checks
  */
 @ObjectType()
 export class Contact {
   @Field(() => ID)
   id!: string;
 
-  // userId is used internally for authorization but not exposed in GraphQL schema
-  // This prevents information leakage about user ownership
+  /**
+   * User ID for authorization (hidden from GraphQL schema)
+   *
+   * @remarks
+   * This field is used internally for ownership verification but is
+   * explicitly hidden from the GraphQL schema using @HideField() to prevent
+   * information leakage about user ownership patterns.
+   */
+  @HideField()
   userId!: string;
 
   @Field()
