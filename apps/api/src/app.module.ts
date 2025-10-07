@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { join } from 'path';
 import { Request, Response } from 'express';
@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ContactModule } from './contact/contact.module';
+import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 
 /**
  * Main Application Module
@@ -63,10 +64,10 @@ import { ContactModule } from './contact/contact.module';
   controllers: [AppController],
   providers: [
     AppService,
-    // Apply rate limiting globally to all routes
+    // Apply rate limiting globally to all routes (including GraphQL)
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: GqlThrottlerGuard,
     },
   ],
 })

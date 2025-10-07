@@ -1,8 +1,10 @@
 import {
   useQuery,
+  useInfiniteQuery,
   useMutation,
   useQueryClient,
   type UseQueryOptions,
+  type UseInfiniteQueryOptions,
   type UseMutationOptions,
 } from '@tanstack/react-query';
 import {
@@ -16,6 +18,9 @@ import {
   type GetContactsVariables,
   type CreateContactInput,
   type UpdateContactInput,
+  type ContactFilterInput,
+  type ContactSortField,
+  type SortOrder,
 } from '@/lib/graphql/contacts';
 
 /**
@@ -97,45 +102,95 @@ export function useContact(
 }
 
 /**
+ * Variables for useContacts infinite query hook
+ * This interface matches what the contacts page passes
+ */
+export interface UseContactsVariables {
+  search?: string;
+  filter?: ContactFilterInput;
+  sortBy?: ContactSortField;
+  sortOrder?: SortOrder;
+  first?: number;
+}
+
+/**
  * Hook to fetch paginated list of contacts with filtering and sorting
+ * Uses infinite query for cursor-based pagination
  *
  * @param variables - Query variables for filtering, pagination, and sorting
- * @param options - TanStack Query options
- * @returns Query result with contact list, loading state, and error
+ * @param options - TanStack Query infinite query options
+ * @returns Infinite query result with contact pages, loading state, and pagination functions
  *
  * @example
  * ```tsx
  * function ContactList() {
- *   const { data, isLoading, error } = useContacts({
- *     filters: { priority: 'HIGH' },
- *     pagination: { limit: 20 },
- *     sortBy: 'CREATED_AT',
- *     sortOrder: 'desc'
+ *   const {
+ *     data,
+ *     isLoading,
+ *     error,
+ *     hasNextPage,
+ *     fetchNextPage,
+ *   } = useContacts({
+ *     search: 'john',
+ *     filter: { priority: 'HIGH' },
+ *     sortBy: 'NAME',
+ *     first: 12,
  *   });
  *
  *   if (isLoading) return <div>Loading...</div>;
  *   if (error) return <div>Error: {error.message}</div>;
  *
+ *   const contacts = data?.pages.flatMap(page => page.edges.map(edge => edge.node)) ?? [];
+ *
  *   return (
  *     <div>
- *       {data.nodes.map(contact => (
+ *       {contacts.map(contact => (
  *         <ContactCard key={contact.id} contact={contact} />
  *       ))}
+ *       {hasNextPage && (
+ *         <button onClick={() => fetchNextPage()}>Load More</button>
+ *       )}
  *     </div>
  *   );
  * }
  * ```
  */
 export function useContacts(
-  variables?: GetContactsVariables,
+  variables?: UseContactsVariables,
   options?: Omit<
-    UseQueryOptions<ContactConnection, Error>,
-    'queryKey' | 'queryFn'
+    UseInfiniteQueryOptions<ContactConnection, Error>,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
 ) {
-  return useQuery<ContactConnection, Error>({
+  return useInfiniteQuery<ContactConnection, Error>({
     queryKey: contactKeys.list(variables),
-    queryFn: () => getContacts(variables),
+    queryFn: ({ pageParam }) => {
+      // Transform the variables to match GraphQL schema
+      const graphqlVariables: GetContactsVariables = {
+        filters: variables?.filter,
+        pagination: {
+          limit: variables?.first || 12,
+          cursor: pageParam as string | undefined,
+        },
+        sortBy: variables?.sortBy,
+        sortOrder: variables?.sortOrder || 'asc', // Use provided sortOrder or default to 'asc'
+      };
+
+      // Add search to filters if provided
+      if (variables?.search) {
+        graphqlVariables.filters = {
+          ...graphqlVariables.filters,
+          search: variables.search,
+        };
+      }
+
+      return getContacts(graphqlVariables);
+    },
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => {
+      // Return the endCursor if there's a next page, undefined otherwise
+      return lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined;
+    },
     ...options,
   });
 }
@@ -171,7 +226,7 @@ export function useContacts(
  *
  *   return (
  *     <form onSubmit={handleSubmit}>
- *       {/* form fields */}
+ *       // form fields here
  *       <button disabled={createContact.isPending}>Create</button>
  *     </form>
  *   );
@@ -226,7 +281,7 @@ export function useCreateContact(
  *
  *   return (
  *     <form onSubmit={handleSubmit}>
- *       {/* form fields */}
+ *       // form fields here
  *       <button disabled={updateContact.isPending}>Save</button>
  *     </form>
  *   );

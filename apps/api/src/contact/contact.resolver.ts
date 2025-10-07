@@ -28,6 +28,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
  * - @CurrentUser(): Extracts authenticated user from JWT token
  * - ValidationPipe: Validates all input DTOs using class-validator
  * - Service layer enforces user ownership on all operations
+ * - Rate limiting handled by GqlThrottlerGuard globally
  *
  * @example
  * ```graphql

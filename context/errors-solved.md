@@ -578,6 +578,736 @@ curl -X POST http://localhost:3001/graphql \
 
 ---
 
+## Contact CRUD Implementation Errors
+
+### Error: Type Safety Issues with 'any' in ContactService
+
+**Full Error Message:**
+```
+Warning: Using 'any' type in service methods creates runtime errors and reduces type safety
+```
+
+**Context:**
+- Occurred during ContactService implementation for CRUD operations
+- Using generic 'any' types for DTOs and Prisma where clauses
+- Reduced code maintainability and increased bug risk
+
+**Root Cause:**
+TypeScript 'any' type bypasses all type checking:
+1. No compile-time validation of DTO structure
+2. Prisma type hints lost, allowing invalid queries
+3. GraphQL schema generation couldn't validate types
+4. Runtime errors harder to debug without proper types
+
+**Solution:**
+```typescript
+// ❌ WRONG - Using 'any' types
+async create(createContactDto: any, userId: string) {
+  const data: any = {
+    ...createContactDto,
+    userId,
+  };
+  return this.prisma.contact.create({ data });
+}
+
+// ✅ CORRECT - Using proper DTOs and types
+async create(createContactDto: CreateContactDto, userId: string): Promise<Contact> {
+  const data: Prisma.ContactCreateInput = {
+    name: createContactDto.name,
+    email: createContactDto.email,
+    phone: createContactDto.phone,
+    linkedinUrl: createContactDto.linkedinUrl,
+    notes: createContactDto.notes,
+    priority: createContactDto.priority,
+    birthday: createContactDto.birthday,
+    gender: createContactDto.gender,
+    company: createContactDto.company,
+    industry: createContactDto.industry,
+    role: createContactDto.role,
+    user: {
+      connect: { id: userId },
+    },
+  };
+  return this.prisma.contact.create({ data });
+}
+```
+
+**Prevention:**
+- Always use specific DTO types for input parameters
+- Use Prisma generated types (Prisma.ContactCreateInput, Prisma.ContactWhereInput)
+- Add return type annotations to all service methods
+- Enable TypeScript strict mode in tsconfig.json
+- Use linting rules to prevent 'any' type usage
+
+**Related Files:**
+- `apps/api/src/contact/contact.service.ts` - Fixed type annotations
+- `apps/api/src/contact/dto/create-contact.dto.ts` - DTO definitions
+- `apps/api/src/contact/dto/update-contact.dto.ts` - Update DTO
+
+---
+
+### Error: Pagination hasNextPage Calculation Bug
+
+**Full Error Message:**
+```
+Bug: hasNextPage always returns false on last page, even when more results exist
+```
+
+**Context:**
+- Occurred during cursor-based pagination implementation
+- Using `contacts.length === limit` to determine hasNextPage
+- Edge case: when exactly limit contacts exist on final page, hasNextPage incorrectly returns true
+
+**Root Cause:**
+Incorrect pagination pattern - checking `contacts.length === limit` doesn't account for the edge case where the final page has exactly `limit` contacts:
+
+```typescript
+// ❌ WRONG PATTERN
+const contacts = await this.prisma.contact.findMany({
+  take: limit,
+  cursor: cursor ? { id: cursor } : undefined,
+});
+
+return {
+  edges: contacts.map(contact => ({ cursor: contact.id, node: contact })),
+  pageInfo: {
+    hasNextPage: contacts.length === limit, // ❌ Wrong on last page
+    endCursor: contacts[contacts.length - 1]?.id,
+  },
+};
+```
+
+**Solution:**
+Use the **limit + 1 pattern** (standard Prisma/database pagination technique):
+
+```typescript
+// ✅ CORRECT PATTERN
+const limit = pagination?.limit ?? 20;
+const take = limit + 1; // Fetch one extra to check if more exist
+
+const contacts = await this.prisma.contact.findMany({
+  take,
+  cursor: cursor ? { id: cursor } : undefined,
+  where: whereClause,
+  orderBy: { [sortBy]: 'asc' },
+});
+
+const hasNextPage = contacts.length > limit; // If we got limit+1, more exist
+const edges = contacts.slice(0, limit); // Return only requested limit
+
+return {
+  edges: edges.map(contact => ({
+    cursor: contact.id,
+    node: contact,
+  })),
+  pageInfo: {
+    hasNextPage,
+    hasPreviousPage: !!cursor,
+    startCursor: edges[0]?.id ?? null,
+    endCursor: edges[edges.length - 1]?.id ?? null,
+  },
+};
+```
+
+**Key Learning Points:**
+1. **Limit + 1 Pattern**: Always fetch `limit + 1` records
+2. **Check Extra Record**: If you get more than `limit` records, hasNextPage = true
+3. **Slice Results**: Return only first `limit` records to user
+4. **Standard Practice**: This is the recommended pattern for all cursor pagination
+
+**Prevention:**
+- Always use limit + 1 pattern for cursor-based pagination
+- Test pagination with exact page boundaries (10, 20, 50 contacts)
+- Add integration tests for edge cases
+- Document pagination logic in service methods
+
+**Related Files:**
+- `apps/api/src/contact/contact.service.ts` - Fixed pagination logic
+- `apps/api/test/contact.service.spec.ts` - Updated test expectations
+
+---
+
+### Error: Filter Conflicts in Complex Queries
+
+**Full Error Message:**
+```
+Error: Search filter overriding other filters (priority, company, industry)
+Combined filters not working as expected
+```
+
+**Context:**
+- Occurred when implementing multi-field filtering (search + priority + company)
+- Using flat filter structure caused conflicts between different filter types
+- Search filter would override priority/company filters
+
+**Root Cause:**
+Incorrect filter structure - using multiple separate where conditions instead of combining them properly:
+
+```typescript
+// ❌ WRONG - Filters conflict
+const whereClause = {
+  userId,
+  ...(search && {
+    OR: [
+      { name: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: 'insensitive' } },
+    ],
+  }),
+  ...(priority && { priority }), // Gets overridden by OR above
+  ...(company && { company: { contains: company, mode: 'insensitive' } }),
+};
+```
+
+**Solution:**
+Use proper **AND + OR structure** to combine filters:
+
+```typescript
+// ✅ CORRECT - AND/OR structure
+const whereClause: Prisma.ContactWhereInput = {
+  userId,
+  AND: [
+    // All conditions must be true
+    ...(search
+      ? [
+          {
+            OR: [
+              // At least one search field must match
+              { name: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+              { company: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+        ]
+      : []),
+    ...(priority ? [{ priority }] : []),
+    ...(company ? [{ company: { contains: company, mode: 'insensitive' } }] : []),
+    ...(industry ? [{ industry: { contains: industry, mode: 'insensitive' } }] : []),
+  ],
+};
+```
+
+**Key Structure:**
+```
+{
+  userId: "abc",
+  AND: [
+    { OR: [search conditions] },  // At least one search field matches
+    { priority: "HIGH" },          // AND priority is HIGH
+    { company: { contains: "Google" } }  // AND company contains "Google"
+  ]
+}
+```
+
+**Prevention:**
+- Always use AND array for combining multiple filter conditions
+- Use OR only within a single filter group (e.g., search across multiple fields)
+- Test filter combinations (search + priority, search + company, all together)
+- Add integration tests for complex filter scenarios
+
+**Related Files:**
+- `apps/api/src/contact/contact.service.ts` - Fixed filter structure
+- `apps/api/test/contact.service.spec.ts` - Added filter combination tests
+
+---
+
+### Error: Invalid Sort Field Causes Prisma Error
+
+**Full Error Message:**
+```
+PrismaClientValidationError: Invalid field name used in orderBy
+```
+
+**Context:**
+- Occurred when user provides arbitrary sort field in GraphQL query
+- No validation on sortBy parameter before passing to Prisma
+- Prisma throws runtime error for invalid field names
+
+**Root Cause:**
+Missing input validation - accepting any string for sortBy without validating against Contact model fields:
+
+```typescript
+// ❌ WRONG - No validation
+const sortBy = sort?.sortBy ?? 'createdAt';
+const contacts = await this.prisma.contact.findMany({
+  orderBy: { [sortBy]: 'asc' }, // Could be invalid field
+});
+```
+
+**Solution:**
+Add validation with allowed fields list:
+
+```typescript
+// ✅ CORRECT - Validate sort field
+const ALLOWED_SORT_FIELDS = [
+  'name',
+  'email',
+  'company',
+  'industry',
+  'priority',
+  'createdAt',
+  'updatedAt',
+  'lastContactedAt',
+] as const;
+
+const sortBy = sort?.sortBy ?? 'createdAt';
+
+// Validate sortBy is an allowed field
+if (!ALLOWED_SORT_FIELDS.includes(sortBy as any)) {
+  throw new BadRequestException(
+    `Invalid sort field: ${sortBy}. Allowed fields: ${ALLOWED_SORT_FIELDS.join(', ')}`
+  );
+}
+
+const contacts = await this.prisma.contact.findMany({
+  orderBy: { [sortBy]: sort?.sortOrder ?? 'asc' },
+});
+```
+
+**Prevention:**
+- Always validate user input against allowed values
+- Use TypeScript const arrays for allowed values
+- Throw BadRequestException for invalid input (not generic Error)
+- Add JSDoc comments documenting allowed sort fields
+- Add unit tests for invalid sort field validation
+
+**Related Files:**
+- `apps/api/src/contact/contact.service.ts` - Added sort field validation
+- `apps/api/src/contact/dto/contact-sort.input.ts` - Sort DTO definition
+- `apps/api/test/contact.service.spec.ts` - Added validation tests
+
+---
+
+### Error: Generic Error Instead of NestJS Exceptions
+
+**Full Error Message:**
+```
+Error: Contact not found
+(No HTTP status code, generic 500 error returned to client)
+```
+
+**Context:**
+- Occurred during findOne, update, and delete operations
+- Using generic JavaScript Error instead of NestJS exceptions
+- GraphQL client receives generic 500 error instead of proper 404
+
+**Root Cause:**
+Not using NestJS exception classes - generic Error doesn't integrate with NestJS HTTP exception filters:
+
+```typescript
+// ❌ WRONG - Generic error
+async findOne(id: string, userId: string): Promise<Contact | null> {
+  const contact = await this.prisma.contact.findUnique({ where: { id } });
+
+  if (!contact) {
+    throw new Error('Contact not found'); // Generic error, no HTTP status
+  }
+
+  if (contact.userId !== userId) {
+    throw new Error('Unauthorized'); // No 403 status code
+  }
+
+  return contact;
+}
+```
+
+**Solution:**
+Use proper NestJS exceptions with descriptive messages:
+
+```typescript
+// ✅ CORRECT - NestJS exceptions
+import { NotFoundException, ForbiddenException } from '@nestjs/common';
+
+async findOne(id: string, userId: string): Promise<Contact> {
+  const contact = await this.prisma.contact.findUnique({ where: { id } });
+
+  if (!contact) {
+    throw new NotFoundException(`Contact with ID ${id} not found`);
+  }
+
+  if (contact.userId !== userId) {
+    throw new ForbiddenException(
+      `You do not have permission to access contact ${id}`
+    );
+  }
+
+  return contact;
+}
+```
+
+**NestJS Exception Types:**
+- `NotFoundException` - 404 (resource not found)
+- `ForbiddenException` - 403 (unauthorized access)
+- `BadRequestException` - 400 (invalid input)
+- `UnauthorizedException` - 401 (not authenticated)
+- `ConflictException` - 409 (duplicate resource)
+
+**Benefits:**
+1. Proper HTTP status codes in API responses
+2. Consistent error format across application
+3. Better GraphQL error messages
+4. Integration with NestJS exception filters
+5. Easier error handling in frontend
+
+**Prevention:**
+- Always use NestJS exception classes (never generic Error)
+- Include resource ID in error messages for debugging
+- Use appropriate exception type for each error scenario
+- Document expected exceptions in service method JSDoc
+- Add unit tests verifying correct exception types
+
+**Related Files:**
+- `apps/api/src/contact/contact.service.ts` - Fixed exception handling
+- `apps/api/test/contact.service.spec.ts` - Verified exception types
+
+---
+
+### Error: Client-Side Missing Authentication Check
+
+**Full Error Message:**
+```
+Warning: Page accessible without authentication check
+GraphQL query fails with 401 after page loads
+```
+
+**Context:**
+- Occurred on `/contacts` page implementation
+- Middleware protects route but no client-side auth check
+- Page attempts to render before checking authentication
+- Poor UX: page flashes before redirect
+
+**Root Cause:**
+Missing client-side authentication verification before rendering protected content:
+
+```typescript
+// ❌ WRONG - No auth check
+'use client';
+
+export default function ContactsPage() {
+  const { data, isLoading } = useContacts();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return <div>{/* Protected content */}</div>;
+}
+```
+
+**Solution:**
+Add client-side auth check with Supabase:
+
+```typescript
+// ✅ CORRECT - Auth check before rendering
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+
+export default function ContactsPage() {
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const { data, isLoading } = useContacts();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+
+      setIsCheckingAuth(false);
+    };
+
+    checkAuth();
+  }, [router]);
+
+  if (isCheckingAuth) {
+    return <div>Checking authentication...</div>;
+  }
+
+  if (isLoading) {
+    return <ContactListSkeleton />;
+  }
+
+  return <div>{/* Protected content */}</div>;
+}
+```
+
+**Key Points:**
+1. **Middleware Protection**: Required but not sufficient alone
+2. **Client Check**: Prevents page flash before redirect
+3. **Better UX**: Show "Checking authentication..." state
+4. **Redirect**: Use Next.js router for client-side navigation
+5. **Session Validation**: Always check session exists before rendering
+
+**Prevention:**
+- Add auth check to all protected pages
+- Use dedicated auth checking state (separate from loading)
+- Show appropriate loading states during auth check
+- Consider creating a custom useAuth hook for reusability
+- Test auth flow: logged out → visit protected page → redirect to login
+
+**Related Files:**
+- `apps/web/app/(protected)/contacts/page.tsx` - Added auth check
+- `apps/web/lib/supabase/client.ts` - Supabase client utilities
+
+---
+
+### Error: Performance Issues with ContactCard Rendering
+
+**Full Error Message:**
+```
+Warning: Expensive calculations running on every render
+React profiler shows ContactCard as performance bottleneck
+```
+
+**Context:**
+- Occurred during ContactCard rendering in list view
+- Date formatting, initials generation, and color calculation running on every render
+- No memoization causing unnecessary recalculations
+- Performance degradation with 50+ contacts
+
+**Root Cause:**
+Missing React memoization for expensive calculations:
+
+```typescript
+// ❌ WRONG - Calculations on every render
+export function ContactCard({ contact }: ContactCardProps) {
+  // Runs on EVERY render, even when contact hasn't changed
+  const formattedDate = contact.lastContactedAt
+    ? new Date(contact.lastContactedAt).toLocaleDateString()
+    : 'Never';
+
+  const initials = contact.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+
+  const priorityColor =
+    contact.priority === 'HIGH' ? 'text-red-600' :
+    contact.priority === 'MEDIUM' ? 'text-yellow-600' :
+    'text-green-600';
+
+  return <div>{/* Card content */}</div>;
+}
+```
+
+**Solution:**
+Use React.useMemo for expensive calculations:
+
+```typescript
+// ✅ CORRECT - Memoized calculations
+import { useMemo } from 'react';
+
+export function ContactCard({ contact }: ContactCardProps) {
+  // Only recalculates when contact.lastContactedAt changes
+  const formattedDate = useMemo(() => {
+    if (!contact.lastContactedAt) return 'Never';
+    return new Date(contact.lastContactedAt).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }, [contact.lastContactedAt]);
+
+  // Only recalculates when contact.name changes
+  const initials = useMemo(() => {
+    return contact.name
+      .split(' ')
+      .filter(Boolean)
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2); // Max 2 characters
+  }, [contact.name]);
+
+  // Only recalculates when contact.priority changes
+  const priorityColor = useMemo(() => {
+    switch (contact.priority) {
+      case 'HIGH':
+        return 'text-red-600 dark:text-red-400';
+      case 'MEDIUM':
+        return 'text-yellow-600 dark:text-yellow-400';
+      case 'LOW':
+        return 'text-green-600 dark:text-green-400';
+      default:
+        return 'text-gray-600 dark:text-gray-400';
+    }
+  }, [contact.priority]);
+
+  return <div>{/* Card content */}</div>;
+}
+```
+
+**When to Use useMemo:**
+1. **Expensive calculations** (date formatting, string parsing)
+2. **Rendered in lists** (component used multiple times)
+3. **Derived data** (computed from props/state)
+4. **Reference equality matters** (objects, arrays passed to child components)
+
+**When NOT to Use useMemo:**
+- Simple property access (contact.name, contact.email)
+- Calculations that are already fast (<1ms)
+- One-off components (not in lists)
+
+**Prevention:**
+- Profile with React DevTools before optimizing
+- Use useMemo for list items (CardCard, UserCard, etc.)
+- Test performance with realistic data (100+ items)
+- Add performance tests with Chrome DevTools
+- Consider React.memo for entire components if needed
+
+**Related Files:**
+- `apps/web/components/contacts/ContactCard.tsx` - Added useMemo
+- `apps/web/e2e/contacts/performance.spec.ts` - Performance tests
+
+---
+
+### Error: Missing ErrorBoundary for Graceful Failures
+
+**Full Error Message:**
+```
+Error: Component crashed, entire page white screen
+No user-facing error message
+Console shows React error boundary needed
+```
+
+**Context:**
+- Occurred when GraphQL query failed unexpectedly
+- No error boundary to catch component errors
+- White screen instead of user-friendly error message
+- Poor UX and no recovery path
+
+**Root Cause:**
+React components without error boundaries show white screen on uncaught errors:
+
+```typescript
+// ❌ WRONG - No error boundary
+export default function ContactsPage() {
+  const { data } = useContacts(); // If this throws, white screen
+
+  return (
+    <div>
+      {data.contacts.map(contact => (
+        <ContactCard key={contact.id} contact={contact} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Solution:**
+Create and use ErrorBoundary component:
+
+```typescript
+// ✅ Step 1: Create ErrorBoundary component
+'use client';
+
+import React from 'react';
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('ErrorBoundary caught error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        this.props.fallback || (
+          <div className="p-8 text-center">
+            <h2 className="text-2xl font-bold text-red-600">
+              Something went wrong
+            </h2>
+            <p className="mt-2 text-gray-600">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Reload Page
+            </button>
+          </div>
+        )
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// ✅ Step 2: Wrap page with ErrorBoundary
+export default function ContactsPage() {
+  return (
+    <ErrorBoundary>
+      <ContactsPageContent />
+    </ErrorBoundary>
+  );
+}
+
+function ContactsPageContent() {
+  const { data, isLoading, error } = useContacts();
+
+  if (error) {
+    throw error; // ErrorBoundary will catch this
+  }
+
+  // Rest of component logic
+}
+```
+
+**Key Benefits:**
+1. **Graceful Degradation**: Show error message instead of white screen
+2. **User Recovery**: Provide reload button or retry action
+3. **Error Logging**: Log errors for debugging
+4. **Better UX**: Users understand what happened
+5. **Development Aid**: See error details in dev mode
+
+**Best Practices:**
+- Wrap entire page with ErrorBoundary
+- Provide custom fallback UI per page/section
+- Log errors to monitoring service (Sentry, LogRocket)
+- Show actionable recovery options (retry, go back, reload)
+- Test error scenarios (network failures, auth errors)
+
+**Prevention:**
+- Add ErrorBoundary to all pages with data fetching
+- Create reusable ErrorBoundary with consistent styling
+- Test error scenarios during development
+- Monitor error frequency in production
+- Provide recovery paths for common errors
+
+**Related Files:**
+- `apps/web/components/ErrorBoundary.tsx` - Reusable error boundary
+- `apps/web/app/(protected)/contacts/page.tsx` - Wrapped with ErrorBoundary
+
+---
+
 ## Future Errors Section
 
 *This section will be populated as new errors are encountered and solved.*
@@ -619,9 +1349,12 @@ curl -X POST http://localhost:3001/graphql \
 - **Database Errors**: P1010, P1012, Environment Variables
 - **Build Errors**: Next.js config, Tailwind CSS, TypeScript
 - **Docker Errors**: Port conflicts, Container communication
-- **Prisma Errors**: Shadow database, Schema validation
-- **GraphQL/NestJS Errors**: CannotDetermineInputTypeError, Missing decorators
+- **Prisma Errors**: Shadow database, Schema validation, Pagination bugs
+- **GraphQL/NestJS Errors**: CannotDetermineInputTypeError, Missing decorators, Exception handling
 - **Environment Errors**: Missing variables, Wrong instances
+- **TypeScript Errors**: Type safety with 'any', Missing type annotations
+- **Query Errors**: Filter conflicts (AND/OR structure), Invalid sort fields
+- **Frontend Errors**: Missing auth checks, Performance issues (useMemo), ErrorBoundary
 
 ---
 

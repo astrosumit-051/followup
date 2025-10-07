@@ -127,7 +127,7 @@ CRITICAL: Always use Ref instead of relying on memory for:
 ---
 
 ### 3. **Playwright** (`playwright`)
-**Purpose:** Browser automation and end-to-end testing
+**Purpose:** Broad browser automation and end-to-end testing (use for high-level E2E tests and workflow validation)
 
 **Tools Available:**
 - `mcp__playwright__browser_navigate`: Navigate to a URL
@@ -157,6 +157,7 @@ CRITICAL: Always use Ref instead of relying on memory for:
 - Generate test code from browser interactions
 - Validate UI behavior and accessibility
 - Extract content from web pages
+- **Broad diagnosis**: High-level workflow validation
 
 **Use Cases:**
 - Creating E2E tests for critical user flows
@@ -165,12 +166,14 @@ CRITICAL: Always use Ref instead of relying on memory for:
 - Testing responsive designs across viewports
 - Validating accessibility tree structure
 - Web scraping and data extraction
+- High-level feature verification before deep performance analysis
 
 **When to Trigger:**
 - User mentions "test", "e2e", "end-to-end", or "integration test"
 - Need to validate multi-step user workflows
 - Implementing visual testing or screenshot comparisons
 - Automating browser-based tasks
+- Need broad user flow validation (use before Chrome DevTools for detailed profiling)
 
 **Example Prompts:**
 ```
@@ -178,11 +181,125 @@ CRITICAL: Always use Ref instead of relying on memory for:
 "Create a test that validates the shopping cart checkout process"
 "Take screenshots of the dashboard at mobile and desktop sizes"
 "Test that the login form shows proper validation errors"
+"Verify the contact creation workflow works end-to-end"
 ```
 
 ---
 
-### 4. **Semgrep** (`semgrep`)
+### 4. **Chrome DevTools** (`chrome-devtools`)
+**Purpose:** Deep Chrome-specific diagnostics and performance analysis (use for detailed debugging)
+
+**Complementary Relationship with Playwright:**
+```
+Playwright = Broad Diagnosis (E2E tests, user flows, visual testing)
+Chrome DevTools = Deep Diagnosis (performance profiling, network analysis, precise debugging)
+
+Use Together:
+1. Playwright: Validate feature works end-to-end
+2. Chrome DevTools: Profile performance, analyze Core Web Vitals, inspect network requests
+```
+
+**Tools Available:**
+
+**Performance Tools:**
+- `mcp__chrome-devtools__performance_analyze_insight`: Analyze performance traces for Core Web Vitals
+- `mcp__chrome-devtools__performance_start_trace`: Start recording performance trace
+- `mcp__chrome-devtools__performance_stop_trace`: Stop recording and get trace data
+
+**Input Automation:**
+- `mcp__chrome-devtools__click`: Click on elements (selector-driven)
+- `mcp__chrome-devtools__drag`: Drag and drop elements
+- `mcp__chrome-devtools__fill`: Fill input fields
+- `mcp__chrome-devtools__fill_form`: Fill multiple form fields
+- `mcp__chrome-devtools__handle_dialog`: Handle browser dialogs
+- `mcp__chrome-devtools__hover`: Hover over elements
+- `mcp__chrome-devtools__upload_file`: Upload files
+
+**Navigation:**
+- `mcp__chrome-devtools__close_page`: Close current page
+- `mcp__chrome-devtools__list_pages`: List all open pages
+- `mcp__chrome-devtools__navigate_page`: Navigate to URL
+- `mcp__chrome-devtools__navigate_page_history`: Navigate history (back/forward)
+- `mcp__chrome-devtools__new_page`: Open new page
+- `mcp__chrome-devtools__select_page`: Switch to specific page
+- `mcp__chrome-devtools__wait_for`: Wait for conditions
+
+**Emulation:**
+- `mcp__chrome-devtools__emulate_cpu`: Throttle CPU to simulate slow devices
+- `mcp__chrome-devtools__emulate_network`: Throttle network (3G, 4G, offline)
+- `mcp__chrome-devtools__resize_page`: Resize viewport
+
+**Network:**
+- `mcp__chrome-devtools__get_network_request`: Get specific network request details
+- `mcp__chrome-devtools__list_network_requests`: List all network requests
+
+**Debugging:**
+- `mcp__chrome-devtools__evaluate_script`: Execute JavaScript in page context
+- `mcp__chrome-devtools__list_console_messages`: Get console logs/errors
+- `mcp__chrome-devtools__take_screenshot`: Capture screenshots
+- `mcp__chrome-devtools__take_snapshot`: Get accessibility tree snapshot
+
+**Key Features:**
+- **Performance Profiling**: "Lighthouse-style" Core Web Vitals analysis in real-time
+- **Device Emulation**: Precise CPU and network throttling
+- **Interactive Debugging**: Iterative performance improvement cycles
+- **Network Inspection**: Detailed request/response analysis
+- **Chrome-Specific**: Deep integration with Chrome DevTools Protocol
+
+**Use Cases:**
+- **Performance optimization**: Analyzing LCP, CLS, FID, TTFB
+- **Slow device testing**: Emulating low-end devices with CPU throttling
+- **Network debugging**: Testing on 3G/4G, analyzing request waterfalls
+- **Core Web Vitals**: Iterative performance improvements
+- **Detailed network inspection**: Analyzing specific API calls
+- **Interactive debugging**: Step-by-step performance profiling
+
+**When to Trigger:**
+- User mentions "performance", "slow", "Core Web Vitals", or "optimization"
+- Need to profile page load performance
+- Debugging network requests or API calls
+- Testing on slow networks or devices
+- Need detailed Chrome DevTools diagnostics
+- Analyzing rendering performance
+- After Playwright tests pass but performance needs improvement
+
+**Best Practice:**
+```
+Complementary Usage Pattern:
+1. Playwright: Verify feature works (E2E tests)
+2. Chrome DevTools: Profile and optimize (performance analysis)
+
+Example Workflow:
+1. Use Playwright to test checkout flow works
+2. Use Chrome DevTools to profile checkout performance
+3. Emulate slow 3G network with Chrome DevTools
+4. Analyze Core Web Vitals with Chrome DevTools
+5. Optimize based on insights
+6. Re-run Playwright tests to verify functionality still works
+```
+
+**Example Prompts:**
+```
+"Profile the dashboard page load performance with Chrome DevTools"
+"Analyze Core Web Vitals for the contact list page"
+"Test the email composition flow on a slow 3G network"
+"Emulate low-end device with 4x CPU slowdown and measure performance"
+"Inspect the network request for the contact creation API call"
+"Start performance trace, navigate to dashboard, stop trace and analyze"
+"Check console errors when submitting the email form"
+```
+
+**Selector Strategy:**
+Use `take_snapshot` to get accessibility tree with element identifiers:
+```
+1. Navigate to page
+2. take_snapshot to get element refs
+3. Use refs in click, fill, hover operations
+```
+
+---
+
+### 5. **Semgrep** (`semgrep`)
 **Purpose:** Static code analysis for security vulnerabilities and code quality
 
 **Tools Available:**
@@ -229,7 +346,7 @@ Always scan security-critical code with Semgrep before finalizing:
 
 ---
 
-### 5. **GitHub** (`github`)
+### 6. **GitHub** (`github`)
 **Purpose:** Repository management, PR automation, and CI/CD integration
 
 **Tools Available:**
@@ -300,7 +417,7 @@ Always scan security-critical code with Semgrep before finalizing:
 
 ---
 
-### 6. **Sequential Thinking** (`sequential-thinking`)
+### 7. **Sequential Thinking** (`sequential-thinking`)
 **Purpose:** Structured, step-by-step problem-solving and complex reasoning
 
 **Tools Available:**
@@ -347,7 +464,7 @@ Use sequential thinking for problems that require:
 
 ---
 
-### 7. **PostgreSQL** (`postgres`)
+### 8. **PostgreSQL** (`postgres`)
 **Purpose:** Direct read-only database query execution for debugging, analysis, and schema verification
 
 **Tools Available:**
@@ -410,7 +527,7 @@ CRITICAL RULES:
 
 ---
 
-### 8. **Notion** (`notion`)
+### 9. **Notion** (`notion`)
 **Purpose:** Notion workspace integration for product documentation, specifications, and project management
 
 **Tools Available:**
@@ -488,13 +605,13 @@ CRITICAL RULES:
 Don't wait for explicit permission to use MCP tools. If the task clearly benefits from a specific server, use it:
 - Ref: For ANY technical documentation (PRIMARY - use this first)
 - Brave: For broader web search and research
+- Playwright: For broad E2E testing and workflow validation
+- Chrome DevTools: For deep performance profiling and debugging
 - Semgrep: For all security-sensitive code
-- Playwright: For critical user flows
 - GitHub: For repository operations
 - Sequential Thinking: For complex planning
 - PostgreSQL: For database debugging and verification
 - Notion: For documentation and specs management
-<!-- - Figma: When design links are provided -->
 
 ### 2. **Documentation Priority**
 When looking up technical information, follow this hierarchy:
@@ -520,7 +637,8 @@ Example: Building a new authenticated feature with Stripe
 8. Semgrep → Scan for vulnerabilities
 9. PostgreSQL → Verify database schema
 10. Playwright → Create E2E tests
-11. Notion → Document implementation decisions
+11. Chrome DevTools → Profile performance and Core Web Vitals
+12. Notion → Document implementation decisions
 ```
 
 ### 4. **Context Preservation**
@@ -530,7 +648,7 @@ When using Sequential Thinking or complex workflows:
 - Maintain state across tool calls
 - Reference previous analysis when making decisions
 
-### 5. **Security-First Approach**
+### 5. **Security & Performance-First Approach**
 ```
 ALWAYS run Semgrep on:
 - Authentication/authorization code
@@ -543,6 +661,12 @@ ALWAYS verify with PostgreSQL after:
 - Running database migrations
 - Schema changes
 - Adding indexes or constraints
+
+ALWAYS profile with Chrome DevTools for:
+- Performance-critical pages (dashboards, lists)
+- After implementing new features
+- Core Web Vitals optimization
+- Slow device/network testing
 ```
 
 ### 6. **Design System Consistency**
@@ -574,23 +698,26 @@ For database work:
 6. [Generate Implementation]
 7. PostgreSQL: Verify database schema if DB changes
 8. Semgrep: Security scan
-9. Playwright: E2E tests
-10. Notion: Document implementation decisions
-11. GitHub: Create PR
+9. Playwright: E2E tests (broad validation)
+10. Chrome DevTools: Performance profiling (deep analysis)
+11. Notion: Document implementation decisions
+12. GitHub: Create PR
 ```
 
-### Pattern 2: Bug Investigation
+### Pattern 2: Bug Investigation & Performance Debugging
 ```
 1. Notion: Search for known issues or related docs
-2. PostgreSQL: Check database state if data-related
-3. Ref: Search official docs for expected behavior
-4. Brave: Search for similar issues and community solutions
-5. GitHub: Analyze recent commits and related code
-6. Sequential Thinking: Reason through root cause
-7. [Implement Fix]
-8. Playwright: Add regression test
-9. Notion: Document the bug and fix
-10. GitHub: Create PR with fix
+2. Chrome DevTools: Profile page performance and inspect network
+3. PostgreSQL: Check database state if data-related
+4. Ref: Search official docs for expected behavior
+5. Brave: Search for similar issues and community solutions
+6. GitHub: Analyze recent commits and related code
+7. Sequential Thinking: Reason through root cause
+8. [Implement Fix]
+9. Playwright: Add regression test
+10. Chrome DevTools: Verify performance improvements
+11. Notion: Document the bug and fix
+12. GitHub: Create PR with fix
 ```
 
 ### Pattern 3: Design Implementation
@@ -600,7 +727,9 @@ For database work:
 3. Ref: Look up component library documentation
 4. [Refine Implementation]
 5. Playwright: Visual regression tests
-6. GitHub: Create PR
+6. Chrome DevTools: Test responsive design at various viewports
+7. Chrome DevTools: Profile rendering performance
+8. GitHub: Create PR
 ```
 
 ### Pattern 4: Security Review
@@ -708,7 +837,11 @@ Ensure these MCP servers are configured in `.claude.json`:
 | Research current best practices | Ref → Brave | mcp__Ref__ref_search_documentation, mcp__brave-search__brave_web_search |
 | Find code examples | Ref → Brave | mcp__Ref__ref_search_documentation, mcp__brave-search__brave_web_search |
 | Scan for security issues | Semgrep | mcp__semgrep__semgrep_scan |
-| Test user flows | Playwright | mcp__playwright__browser_* |
+| Test user flows (broad) | Playwright | mcp__playwright__browser_* |
+| Profile performance (deep) | Chrome DevTools | mcp__chrome-devtools__performance_* |
+| Analyze Core Web Vitals | Chrome DevTools | mcp__chrome-devtools__performance_analyze_insight |
+| Test slow network/device | Chrome DevTools | mcp__chrome-devtools__emulate_* |
+| Debug network requests | Chrome DevTools | mcp__chrome-devtools__list_network_requests |
 | Manage repository | GitHub | mcp__github__* |
 | Plan complex feature | Sequential Thinking | mcp__sequential-thinking__sequentialthinking |
 | Implement design | Figma | mcp__figma__* |
@@ -732,7 +865,9 @@ Ensure these MCP servers are configured in `.claude.json`:
 - Always scan security-critical code with Semgrep
 - Use Sequential Thinking for complex planning
 - Extract design tokens before implementing from Figma
-- Create E2E tests with Playwright for critical flows
+- Create E2E tests with Playwright for critical flows (broad validation)
+- Profile with Chrome DevTools for performance optimization (deep analysis)
+- Use Playwright + Chrome DevTools together for comprehensive testing
 - Verify documentation with Ref before making assumptions
 
 ❌ **DON'T:**
@@ -743,6 +878,7 @@ Ensure these MCP servers are configured in `.claude.json`:
 - Forget to create tests for critical user flows
 - Ignore existing code patterns in the repository
 - Use outdated documentation (Ref always has latest)
+- Skip performance profiling for user-facing features
 
 ---
 
