@@ -106,6 +106,53 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 - Security scanning requirements
 - Best practices and integration strategies
 
+### Auto-Approved MCP Tools
+
+The following MCP tools can be used without requiring user approval for automated testing and development workflows:
+
+**Playwright MCP:**
+- `mcp__playwright__browser_navigate` - Navigate to URLs
+- `mcp__playwright__browser_snapshot` - Capture page snapshots
+- `mcp__playwright__browser_take_screenshot` - Take screenshots
+- `mcp__playwright__browser_click` - Click elements
+- `mcp__playwright__browser_fill` - Fill form fields
+- `mcp__playwright__browser_type` - Type text
+- `mcp__playwright__browser_console_messages` - Get console messages
+- `mcp__playwright__browser_wait_for` - Wait for conditions
+- `mcp__playwright__browser_install` - Install browser
+
+**Chrome DevTools MCP:**
+- `mcp__chrome-devtools__navigate_page` - Navigate to URLs
+- `mcp__chrome-devtools__take_screenshot` - Take screenshots
+- `mcp__chrome-devtools__resize_page` - Resize viewport
+- `mcp__chrome-devtools__list_console_messages` - Get console messages
+- `mcp__chrome-devtools__list_network_requests` - Get network requests
+- `mcp__chrome-devtools__list_pages` - List open pages
+- `mcp__chrome-devtools__performance_start_trace` - Start performance trace
+- `mcp__chrome-devtools__performance_stop_trace` - Stop performance trace
+- `mcp__chrome-devtools__performance_analyze_insight` - Analyze performance
+
+**PostgreSQL MCP:**
+- `mcp__postgres__query` - Read-only database queries for debugging
+
+**Ref MCP:**
+- `mcp__Ref__ref_search_documentation` - Search documentation
+- `mcp__Ref__ref_read_url` - Read documentation URLs
+
+**Brave Search MCP:**
+- `mcp__brave-search__brave_web_search` - Web search
+- `mcp__brave-search__brave_local_search` - Local business search
+
+**Sequential Thinking MCP:**
+- `mcp__sequential-thinking__sequentialthinking` - Complex problem solving
+
+**Semgrep MCP:**
+- `mcp__semgrep__semgrep_scan` - Security scanning
+- `mcp__semgrep__semgrep_findings` - Get security findings
+- `mcp__semgrep__semgrep_scan_with_custom_rule` - Custom rule scanning
+
+**Note:** These tools are pre-approved for automated workflows. For destructive operations or changes to production systems, explicit user approval is still required.
+
 ---
 
 ## Development Workflow
