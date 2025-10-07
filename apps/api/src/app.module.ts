@@ -11,7 +11,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ContactModule } from './contact/contact.module';
-import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
+import { GqlThrottlerGuard } from '../../../src/common/guards/gql-throttler.guard';
 
 /**
  * Main Application Module
