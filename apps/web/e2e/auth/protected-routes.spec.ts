@@ -2,44 +2,44 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Protected Route Access', () => {
   test.describe('Unauthenticated Access', () => {
-    test('should redirect to login when accessing /dashboard without authentication', async ({ page }) => {
+    test('should redirect to unauthorized page when accessing /dashboard without authentication', async ({ page }) => {
       // Attempt to access protected dashboard route
       await page.goto('/dashboard');
 
-      // Should redirect to login page
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized page
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
-    test('should redirect to login when accessing /contacts without authentication', async ({ page }) => {
+    test('should redirect to unauthorized page when accessing /contacts without authentication', async ({ page }) => {
       // Attempt to access protected contacts route
       await page.goto('/contacts');
 
-      // Should redirect to login page
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized page
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
-    test('should redirect to login when accessing /settings without authentication', async ({ page }) => {
+    test('should redirect to unauthorized page when accessing /settings without authentication', async ({ page }) => {
       // Attempt to access protected settings route
       await page.goto('/settings');
 
-      // Should redirect to login page
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized page
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
-    test('should redirect to login when accessing /profile without authentication', async ({ page }) => {
+    test('should redirect to unauthorized page when accessing /profile without authentication', async ({ page }) => {
       // Attempt to access protected profile route
       await page.goto('/profile');
 
-      // Should redirect to login page
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized page
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should preserve intended destination after login redirect', async ({ page }) => {
       // Try to access protected route
       await page.goto('/dashboard/contacts');
 
-      // Should redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
 
       // Check if URL includes redirect parameter pointing to original destination
       const currentUrl = page.url();
@@ -82,16 +82,16 @@ test.describe('Protected Route Access', () => {
       // Try accessing a deeply nested route
       await page.goto('/dashboard/contacts/123/edit');
 
-      // Should redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should handle protected routes with query parameters', async ({ page }) => {
       // Try accessing protected route with query params
       await page.goto('/dashboard?tab=analytics&period=30d');
 
-      // Should redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
   });
 
@@ -131,9 +131,9 @@ test.describe('Protected Route Access', () => {
 
       const finalUrl = page.url();
 
-      // Should be on dashboard OR login (depending on token validation)
+      // Should be on dashboard OR unauthorized (depending on token validation)
       const isValidState =
-        finalUrl.includes('/dashboard') || finalUrl.includes('/login');
+        finalUrl.includes('/dashboard') || finalUrl.includes('/unauthorized');
 
       expect(isValidState).toBeTruthy();
     });
@@ -155,8 +155,8 @@ test.describe('Protected Route Access', () => {
       // Try accessing protected route with expired token
       await page.goto('/dashboard');
 
-      // Should redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should handle invalid session token gracefully', async ({ page, context }) => {
@@ -176,8 +176,8 @@ test.describe('Protected Route Access', () => {
       // Try accessing protected route with invalid token
       await page.goto('/dashboard');
 
-      // Should redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should maintain session across page navigation', async ({ page, context }) => {
@@ -205,7 +205,7 @@ test.describe('Protected Route Access', () => {
 
         await page.waitForLoadState('networkidle', { timeout: 5000 });
 
-        // Should stay authenticated (or consistently redirect to login)
+        // Should stay authenticated (or consistently redirect to unauthorized)
         // Either state is valid - testing that behavior is consistent
         const url = page.url();
 
@@ -214,7 +214,7 @@ test.describe('Protected Route Access', () => {
       }
     });
 
-    test('should log out and redirect to login when session is cleared', async ({ page, context }) => {
+    test('should log out and redirect to unauthorized when session is cleared', async ({ page, context }) => {
       // Set up authenticated session
       await context.addCookies([
         {
@@ -237,8 +237,8 @@ test.describe('Protected Route Access', () => {
       // Try accessing protected route again
       await page.goto('/dashboard');
 
-      // Should redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
   });
 
@@ -247,8 +247,8 @@ test.describe('Protected Route Access', () => {
       // API routes should be accessible (may have their own auth)
       const response = await page.goto('/api/health');
 
-      // Should not redirect to login page
-      expect(response?.url()).not.toContain('/login');
+      // Should not redirect to unauthorized page
+      expect(response?.url()).not.toContain('/unauthorized');
 
       // API should respond (200, 401, 404 are all valid)
       const status = response?.status();
@@ -288,9 +288,9 @@ test.describe('Protected Route Access', () => {
 
         const url = page.url();
 
-        // Should not redirect to login (unless it's already the login page)
+        // Should not redirect to unauthorized (unless it's already the login page)
         if (!route.includes('login')) {
-          expect(url).not.toContain('/login');
+          expect(url).not.toContain('/unauthorized');
         }
       }
     });
@@ -314,16 +314,16 @@ test.describe('Protected Route Access', () => {
       // Try accessing protected route
       await page.goto('/dashboard');
 
-      // Should reject invalid token and redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should reject invalid token and redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should handle missing cookie header gracefully', async ({ page }) => {
       // Navigate without any cookies
       await page.goto('/dashboard');
 
-      // Should redirect to login without crashing
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should redirect to unauthorized without crashing
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should handle malformed cookies gracefully', async ({ page, context }) => {
@@ -343,8 +343,8 @@ test.describe('Protected Route Access', () => {
       // Try accessing protected route
       await page.goto('/dashboard');
 
-      // Should handle gracefully and redirect to login
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Should handle gracefully and redirect to unauthorized
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should not expose sensitive session information in redirects', async ({ page }) => {
@@ -352,7 +352,7 @@ test.describe('Protected Route Access', () => {
       await page.goto('/dashboard');
 
       // Wait for redirect
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
 
       const finalUrl = page.url();
 
@@ -374,8 +374,8 @@ test.describe('Protected Route Access', () => {
       // All should handle gracefully (no crashes or errors)
       await Promise.allSettled(requests);
 
-      // Final state should be consistent (on login page)
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      // Final state should be consistent (on unauthorized page)
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
     });
 
     test('should handle concurrent requests from different tabs', async ({ page, context }) => {
@@ -393,9 +393,9 @@ test.describe('Protected Route Access', () => {
         )
       );
 
-      // All should redirect to login
+      // All should redirect to unauthorized
       for (const p of pages) {
-        await expect(p).toHaveURL(/\/login/, { timeout: 5000 });
+        await expect(p).toHaveURL(/\/unauthorized/, { timeout: 5000 });
         await p.close();
       }
     });
@@ -409,7 +409,7 @@ test.describe('Protected Route Access', () => {
       await page.goto('/dashboard');
 
       // Wait for redirect
-      await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
+      await expect(page).toHaveURL(/\/unauthorized/, { timeout: 5000 });
 
       const endTime = Date.now();
       const duration = endTime - startTime;
