@@ -324,6 +324,7 @@ function createMockExecutionContext(token: string): ExecutionContext {
   };
 
   return {
+    getType: () => 'http',
     switchToHttp: () => ({
       getRequest: () => mockRequest,
     }),
