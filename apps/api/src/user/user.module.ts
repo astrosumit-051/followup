@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserResolver } from './user.resolver';
 import { PrismaClient } from '@relationhub/database';
+import { AuthModule } from '../auth/auth.module';
 
 /**
  * User Module
@@ -14,6 +15,7 @@ import { PrismaClient } from '@relationhub/database';
  * Exports UserService for use in other modules (e.g., AuthModule)
  */
 @Module({
+  imports: [forwardRef(() => AuthModule)],
   providers: [
     UserService,
     UserResolver,

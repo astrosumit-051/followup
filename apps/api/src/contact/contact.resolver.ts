@@ -13,6 +13,7 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { ContactFilterInput } from './dto/contact-filter.input';
 import { ContactPaginationInput } from './dto/contact-pagination.input';
+import { ContactSortField } from './enums/contact-sort-field.enum';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 
@@ -50,7 +51,7 @@ export class ContactResolver {
    * @param user - Current user from JWT (injected by @CurrentUser decorator)
    * @param filters - Optional filter criteria (priority, company, search, etc.)
    * @param pagination - Pagination parameters (cursor, limit)
-   * @param sortBy - Field to sort by (default: createdAt)
+   * @param sortBy - Field to sort by (default: CREATED_AT)
    * @param sortOrder - Sort order (default: desc)
    * @returns Paginated list of contacts with metadata
    */
@@ -61,11 +62,11 @@ export class ContactResolver {
     filters?: ContactFilterInput,
     @Args('pagination', { type: () => ContactPaginationInput, nullable: true })
     pagination?: ContactPaginationInput,
-    @Args('sortBy', { type: () => String, nullable: true, defaultValue: 'createdAt' })
-    sortBy?: string,
+    @Args('sortBy', { type: () => ContactSortField, nullable: true, defaultValue: ContactSortField.CREATED_AT })
+    sortBy?: ContactSortField,
     @Args('sortOrder', { type: () => String, nullable: true, defaultValue: 'desc' })
     sortOrder?: 'asc' | 'desc',
-  ) {
+  ): Promise<ContactConnection> {
     return this.contactService.findAll(
       user.id,
       filters || {},
@@ -86,7 +87,7 @@ export class ContactResolver {
   async findOne(
     @CurrentUser() user: any,
     @Args('id', { type: () => ID }) id: string,
-  ) {
+  ): Promise<Contact | null> {
     return this.contactService.findOne(id, user.id);
   }
 
@@ -101,7 +102,7 @@ export class ContactResolver {
   async createContact(
     @CurrentUser() user: any,
     @Args('input', { type: () => CreateContactDto }) input: CreateContactDto,
-  ) {
+  ): Promise<Contact> {
     return this.contactService.create(input, user.id);
   }
 
@@ -119,7 +120,7 @@ export class ContactResolver {
     @CurrentUser() user: any,
     @Args('id', { type: () => ID }) id: string,
     @Args('input', { type: () => UpdateContactDto }) input: UpdateContactDto,
-  ) {
+  ): Promise<Contact> {
     return this.contactService.update(id, input, user.id);
   }
 

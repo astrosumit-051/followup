@@ -18,10 +18,10 @@ export class PageInfo {
   hasPreviousPage!: boolean;
 
   @Field({ nullable: true })
-  startCursor?: string;
+  startCursor?: string | null;
 
   @Field({ nullable: true })
-  endCursor?: string;
+  endCursor?: string | null;
 }
 
 /**

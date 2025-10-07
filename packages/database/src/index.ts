@@ -1,13 +1,16 @@
-import { PrismaClient } from './generated/client';
+// Import Prisma Client types for local use
+import { PrismaClient as PrismaClientType } from '@prisma/client';
 
-export * from './generated/client';
+// Re-export Prisma Client and all generated types
+export { PrismaClient, Prisma } from '@prisma/client';
+export type * from '@prisma/client';
 
 // Singleton pattern for Prisma Client
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = global as unknown as { prisma: PrismaClientType };
 
 export const prisma =
   globalForPrisma.prisma ||
-  new PrismaClient({
+  new PrismaClientType({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 

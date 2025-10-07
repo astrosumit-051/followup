@@ -84,8 +84,9 @@ export class UserResolver {
   async updateProfile(
     @CurrentUser() user: any,
     @Args('updateProfileDto') updateProfileDto: UpdateProfileDto,
-  ) {
+  ): Promise<string> {
     // UserService.updateProfile expects Supabase ID for proper authorization
-    return this.userService.updateProfile(user.supabaseId, updateProfileDto);
+    const updatedUser = await this.userService.updateProfile(user.supabaseId, updateProfileDto);
+    return updatedUser.id;
   }
 }

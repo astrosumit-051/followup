@@ -6,6 +6,7 @@ import {
   MinLength,
   Matches,
 } from 'class-validator';
+import { InputType, Field } from '@nestjs/graphql';
 
 /**
  * Data Transfer Object for updating user profile
@@ -18,6 +19,7 @@ import {
  *
  * @see https://github.com/typestack/class-validator
  */
+@InputType()
 export class UpdateProfileDto {
   /**
    * User's display name
@@ -44,6 +46,7 @@ export class UpdateProfileDto {
    * @example "محمد علي"
    * @example "李明"
    */
+  @Field({ nullable: true })
   @IsOptional()
   @IsString({ message: 'Name must be a string' })
   @MinLength(1, { message: 'Name must be at least 1 character long' })
@@ -67,6 +70,7 @@ export class UpdateProfileDto {
    * @example "https://example.com/avatar.jpg"
    * @example "https://storage.googleapis.com/bucket/profile-123.png"
    */
+  @Field({ nullable: true })
   @IsOptional()
   @IsUrl(
     {

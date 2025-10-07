@@ -150,8 +150,15 @@ export class ContactService {
     const startCursor = nodes.length > 0 ? nodes[0].id : null;
     const endCursor = nodes.length > 0 ? nodes[nodes.length - 1].id : null;
 
+    // Create edges for Relay connection spec
+    const edges = nodes.map((node) => ({
+      node,
+      cursor: node.id,
+    }));
+
     return {
       nodes,
+      edges,
       totalCount,
       pageInfo: {
         hasNextPage,

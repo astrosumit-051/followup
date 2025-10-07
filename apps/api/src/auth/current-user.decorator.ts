@@ -15,12 +15,12 @@ export interface CurrentUserData {
 export const CurrentUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): CurrentUserData => {
     // Check if we're in a GraphQL context
-    if (ctx.getType() === 'graphql') {
+    if (ctx.getType<string>() === 'graphql') {
       const gqlContext = GqlExecutionContext.create(ctx);
       const { req } = gqlContext.getContext();
       return req.user;
     }
-    
+
     // Default to HTTP context
     const request = ctx.switchToHttp().getRequest();
     return request.user;
