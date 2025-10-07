@@ -6,6 +6,15 @@ import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useContact, useDeleteContact } from '@/lib/hooks/useContacts';
 import { ContactDeleteDialog } from '@/components/contacts/ContactDeleteDialog';
+import { ContactLoadingSkeleton } from '@/components/contacts/ContactLoadingSkeleton';
+import { ContactErrorState } from '@/components/contacts/ContactErrorState';
+import {
+  formatDate,
+  formatDateTime,
+  formatPriority,
+  formatGender,
+  getPriorityColor,
+} from '@/lib/utils/contact-formatters';
 
 /**
  * Contact Detail Page
@@ -59,56 +68,12 @@ export default function ContactDetailPage() {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4
-                      sm:px-6
-                      lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white shadow-sm rounded-lg p-6
-                          sm:p-8">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ContactLoadingSkeleton />;
   }
 
   // Error state
   if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4
-                      sm:px-6
-                      lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white shadow-sm rounded-lg p-6
-                          sm:p-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Error Loading Contact
-              </h2>
-              <p className="text-gray-600 mb-4">
-                {error instanceof Error ? error.message : 'An unexpected error occurred'}
-              </p>
-              <button
-                onClick={() => router.push('/contacts')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md
-                           hover:bg-blue-700 focus:outline-none
-                           focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Back to Contacts
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ContactErrorState error={error} />;
   }
 
   // Not found state
@@ -129,6 +94,7 @@ export default function ContactDetailPage() {
               </p>
               <button
                 onClick={() => router.push('/contacts')}
+                aria-label="Return to contacts list"
                 className="px-4 py-2 bg-blue-600 text-white rounded-md
                            hover:bg-blue-700 focus:outline-none
                            focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -141,51 +107,6 @@ export default function ContactDetailPage() {
       </div>
     );
   }
-
-  // Helper functions for formatting
-  const formatDate = (dateString?: string | null) => {
-    if (!dateString) return 'Not set';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
-  const formatDateTime = (dateString?: string | null) => {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
-  const formatPriority = (priority?: string | null) => {
-    if (!priority) return 'Not set';
-    return priority.charAt(0) + priority.slice(1).toLowerCase();
-  };
-
-  const formatGender = (gender?: string | null) => {
-    if (!gender) return 'Not specified';
-    if (gender === 'PREFER_NOT_TO_SAY') return 'Prefer not to say';
-    return gender.charAt(0) + gender.slice(1).toLowerCase();
-  };
-
-  const getPriorityColor = (priority?: string | null) => {
-    switch (priority) {
-      case 'HIGH':
-        return 'bg-red-100 text-red-800';
-      case 'MEDIUM':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'LOW':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4
@@ -203,6 +124,7 @@ export default function ContactDetailPage() {
             {/* Edit Button */}
             <button
               onClick={() => router.push(`/contacts/${id}/edit`)}
+              aria-label={`Edit ${contact.name}'s contact information`}
               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium
                          text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
                          focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -213,6 +135,7 @@ export default function ContactDetailPage() {
             {/* Delete Button */}
             <button
               onClick={() => setIsDeleteDialogOpen(true)}
+              aria-label={`Delete ${contact.name} from contacts`}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium
                          text-white bg-red-600 hover:bg-red-700 focus:outline-none
                          focus:ring-2 focus:ring-offset-2 focus:ring-red-500"

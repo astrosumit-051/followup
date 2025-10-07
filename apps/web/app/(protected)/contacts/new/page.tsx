@@ -72,6 +72,7 @@ export default function CreateContactPage() {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isSubmitting={createContact.isPending}
+            aria-label="Create new contact form"
           />
         </div>
       </div>
