@@ -1,9 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 import { useContacts } from '@/lib/hooks/useContacts';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ContactCard } from '@/components/contacts/ContactCard';
+import { ContactListSkeleton } from '@/components/contacts/ContactCardSkeleton';
 import { ContactListEmpty } from '@/components/contacts/ContactListEmpty';
 import { ContactSearchBar } from '@/components/contacts/ContactSearchBar';
 import { ContactFilters } from '@/components/contacts/ContactFilters';
@@ -22,12 +26,39 @@ import type { ContactFilterInput, ContactSortField } from '@/lib/graphql/contact
  * - Cursor-based pagination with "Load More" button
  * - Empty state when no contacts exist
  * - Create new contact button
+ * - Client-side authentication check
+ * - Error boundary for graceful error handling
+ * - Loading skeleton for better UX
+ * - Adjustable page size
  */
-export default function ContactsPage() {
+function ContactsPageContent() {
+  const router = useRouter();
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<ContactFilterInput>({});
   const [sortBy, setSortBy] = useState<ContactSortField>('name');
+  const [pageSize, setPageSize] = useState(12);
+
+  // Client-side auth check (in addition to middleware)
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+
+      setIsAuthChecking(false);
+    };
+
+    checkAuth();
+  }, [router]);
 
   // Fetch contacts with pagination
   const {
@@ -42,7 +73,7 @@ export default function ContactsPage() {
     search: searchQuery,
     filter: filters,
     sortBy,
-    first: 12, // Load 12 contacts per page
+    first: pageSize,
   });
 
   // Flatten paginated results
@@ -63,14 +94,49 @@ export default function ContactsPage() {
     setSortBy(field);
   };
 
-  // Loading state
-  if (isLoading) {
+  // Show loading while checking auth
+  if (isAuthChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2
                           border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading contacts...</p>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading skeleton state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4
+                      sm:px-6
+                      lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <div className="flex flex-col space-y-4
+                            sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+              <div className="space-y-2">
+                <div className="h-9 bg-gray-300 rounded w-32 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded w-48 animate-pulse"></div>
+              </div>
+              <div className="h-10 bg-gray-300 rounded w-40 animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Search and Filters Skeleton */}
+          <div className="mb-6 space-y-4">
+            <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+            <div className="flex space-x-4">
+              <div className="h-10 bg-gray-200 rounded flex-1 animate-pulse"></div>
+              <div className="h-10 bg-gray-200 rounded w-40 animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Contact Cards Skeleton */}
+          <ContactListSkeleton count={pageSize} />
         </div>
       </div>
     );
@@ -141,11 +207,33 @@ export default function ContactsPage() {
             placeholder="Search contacts by name, email, or company..."
           />
 
-          {/* Filters and Sort */}
+          {/* Filters, Sort, and Page Size */}
           <div className="flex flex-col space-y-4
                           sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4">
             <ContactFilters filters={filters} onChange={handleFilterChange} />
-            <ContactSortDropdown value={sortBy} onChange={handleSortChange} />
+            <div className="flex space-x-4">
+              {/* Page Size Selector */}
+              <div className="flex items-center space-x-2">
+                <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+                  Show:
+                </label>
+                <select
+                  id="pageSize"
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                             focus:outline-none focus:ring-2 focus:ring-blue-500
+                             focus:border-blue-500 text-sm"
+                >
+                  <option value={12}>12</option>
+                  <option value={24}>24</option>
+                  <option value={48}>48</option>
+                  <option value={96}>96</option>
+                </select>
+              </div>
+
+              <ContactSortDropdown value={sortBy} onChange={handleSortChange} />
+            </div>
           </div>
         </div>
 
@@ -219,5 +307,14 @@ export default function ContactsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Wrap with error boundary for graceful error handling
+export default function ContactsPage() {
+  return (
+    <ErrorBoundary>
+      <ContactsPageContent />
+    </ErrorBoundary>
   );
 }

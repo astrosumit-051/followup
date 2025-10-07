@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import Link from 'next/link';
 import type { Contact } from '@/lib/graphql/contacts';
 
@@ -26,28 +27,28 @@ interface ContactCardProps {
  */
 export function ContactCard({ contact }: ContactCardProps) {
   // Generate initials from name
-  const getInitials = (name: string) => {
-    return name
+  const initials = useMemo(() => {
+    return contact.name
       .split(' ')
       .map((n) => n[0])
       .join('')
       .toUpperCase()
       .slice(0, 2);
-  };
+  }, [contact.name]);
 
-  // Format date for display
-  const formatDate = (date: string | null) => {
-    if (!date) return 'Never';
-    return new Date(date).toLocaleDateString('en-US', {
+  // Memoized date formatting for performance
+  const formattedDate = useMemo(() => {
+    if (!contact.lastContactedAt) return 'Never';
+    return new Date(contact.lastContactedAt).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
     });
-  };
+  }, [contact.lastContactedAt]);
 
   // Get priority badge color
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
+  const priorityColor = useMemo(() => {
+    switch (contact.priority) {
       case 'HIGH':
         return 'bg-red-100 text-red-800';
       case 'MEDIUM':
@@ -57,7 +58,7 @@ export function ContactCard({ contact }: ContactCardProps) {
       default:
         return 'bg-gray-100 text-gray-800';
     }
-  };
+  }, [contact.priority]);
 
   return (
     <Link
@@ -78,7 +79,7 @@ export function ContactCard({ contact }: ContactCardProps) {
           ) : (
             <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
               <span className="text-white font-semibold text-sm">
-                {getInitials(contact.name)}
+                {initials}
               </span>
             </div>
           )}
@@ -96,9 +97,7 @@ export function ContactCard({ contact }: ContactCardProps) {
 
         {/* Priority Badge */}
         <span
-          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
-            contact.priority
-          )}`}
+          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityColor}`}
         >
           {contact.priority}
         </span>
@@ -126,7 +125,7 @@ export function ContactCard({ contact }: ContactCardProps) {
       {/* Industry and Last Contacted */}
       <div className="flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
         <span>{contact.industry || 'No industry'}</span>
-        <span>Last contact: {formatDate(contact.lastContactedAt)}</span>
+        <span>Last contact: {formattedDate}</span>
       </div>
     </Link>
   );
