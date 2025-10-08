@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -42,6 +42,13 @@ export default function ContactDetailPage() {
   const deleteContactMutation = useDeleteContact();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // Update document title when contact loads
+  useEffect(() => {
+    if (contact) {
+      document.title = 'Contact Details - RelationHub';
+    }
+  }, [contact]);
 
   const handleDelete = async () => {
     try {
@@ -118,8 +125,7 @@ export default function ContactDetailPage() {
         <div className="mb-6 flex flex-col space-y-4
                         sm:flex-row sm:justify-between sm:items-start sm:space-y-0">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900
-                           sm:text-3xl">{contact.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{contact.name}</h1>
             <p className="mt-1 text-sm text-gray-500">Contact Details</p>
           </div>
 

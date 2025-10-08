@@ -191,7 +191,7 @@ test.describe('Contact Detail Page', () => {
       await expect(birthdayLabel).toBeVisible();
 
       const birthdayValue = birthdayLabel.locator('+ dd');
-      await expect(birthdayValue).toHaveText(/May 15, 2025/); // Formatted date
+      await expect(birthdayValue).toHaveText(/May 14, 1990/); // Formatted date (matches seed data)
     });
 
     test('should display notes with preserved whitespace', async ({ page }) => {
@@ -232,7 +232,8 @@ test.describe('Contact Detail Page', () => {
       await expect(createdLabel).toBeVisible();
 
       const createdValue = createdLabel.locator('+ dd');
-      await expect(createdValue).toHaveText(/Dec 1, 2024/); // Formatted datetime
+      // Verify date is displayed (will be current time due to Prisma @default(now()))
+      await expect(createdValue).toHaveText(/\w+ \d+, \d{4}/); // Pattern: "Oct 7, 2025, 8:46 PM"
     });
 
     test('should display formatted updated date', async ({ page }) => {
@@ -242,7 +243,8 @@ test.describe('Contact Detail Page', () => {
       await expect(updatedLabel).toBeVisible();
 
       const updatedValue = updatedLabel.locator('+ dd');
-      await expect(updatedValue).toHaveText(/Jan 5, 2025/); // Formatted datetime
+      // Verify date is displayed (will be current time due to Prisma @updatedAt)
+      await expect(updatedValue).toHaveText(/\w+ \d+, \d{4}/); // Pattern: "Oct 7, 2025, 8:46 PM"
     });
 
     test('should use responsive grid layout for contact fields', async ({ page }) => {
