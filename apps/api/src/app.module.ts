@@ -50,11 +50,14 @@ import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
       }),
     }),
     // Global rate limiting to prevent abuse
+    // Note: Disabled when DISABLE_RATE_LIMIT=true to allow E2E tests to run without hitting limits
+    // In production, this env var should NEVER be set
     ThrottlerModule.forRoot([
       {
         name: 'default',
         ttl: 60000, // 60 seconds
         limit: 10, // 10 requests per minute per IP
+        skipIf: () => process.env.DISABLE_RATE_LIMIT === 'true', // Skip rate limiting when explicitly disabled
       },
     ]),
     AuthModule,

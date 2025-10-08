@@ -63,6 +63,7 @@ export function ContactCard({ contact }: ContactCardProps) {
   return (
     <Link
       href={`/contacts/${contact.id}`}
+      data-testid={`contact-card-${contact.id}`}
       className="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm
                  hover:shadow-md transition-shadow duration-200
                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
