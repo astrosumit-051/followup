@@ -39,6 +39,18 @@ export function LogoutButton({ className, children }: LogoutButtonProps) {
         console.error('Logout error:', error.message);
       }
 
+      // Clear all Supabase-related items from local storage
+      if (typeof window !== 'undefined') {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('sb-')) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+      }
+
       // Always redirect to login, even if logout had an error
       // This ensures user is logged out from the UI
       router.push('/login');

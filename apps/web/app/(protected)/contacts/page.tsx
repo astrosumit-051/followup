@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { useContacts } from '@/lib/hooks/useContacts';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ContactCard } from '@/components/contacts/ContactCard';
@@ -12,7 +12,7 @@ import { ContactListEmpty } from '@/components/contacts/ContactListEmpty';
 import { ContactSearchBar } from '@/components/contacts/ContactSearchBar';
 import { ContactFilters } from '@/components/contacts/ContactFilters';
 import { ContactSortDropdown } from '@/components/contacts/ContactSortDropdown';
-import type { ContactFilterInput, ContactSortField } from '@/lib/graphql/contacts';
+import type { ContactFilterInput, ContactSortField, SortOrder } from '@/lib/graphql/contacts';
 
 /**
  * Contact List Page
@@ -38,13 +38,14 @@ function ContactsPageContent() {
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<ContactFilterInput>({});
-  const [sortBy, setSortBy] = useState<ContactSortField>('name');
+  const [sortBy, setSortBy] = useState<ContactSortField>('NAME');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [pageSize, setPageSize] = useState(12);
 
   // Client-side auth check (in addition to middleware)
   useEffect(() => {
     const checkAuth = async () => {
-      const supabase = createClient();
+      const supabase = createBrowserClient();
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -73,11 +74,12 @@ function ContactsPageContent() {
     search: searchQuery,
     filter: filters,
     sortBy,
+    sortOrder,
     first: pageSize,
   });
 
   // Flatten paginated results
-  const contacts = data?.pages.flatMap((page) => page.edges.map((edge) => edge.node)) ?? [];
+  const contacts = data?.pages.flatMap((page) => page.nodes) ?? [];
 
   // Handle search query changes
   const handleSearchChange = (query: string) => {
@@ -90,8 +92,9 @@ function ContactsPageContent() {
   };
 
   // Handle sort changes
-  const handleSortChange = (field: ContactSortField) => {
+  const handleSortChange = (field: ContactSortField, order: SortOrder) => {
     setSortBy(field);
+    setSortOrder(order);
   };
 
   // Show loading while checking auth
@@ -232,7 +235,11 @@ function ContactsPageContent() {
                 </select>
               </div>
 
-              <ContactSortDropdown value={sortBy} onChange={handleSortChange} />
+              <ContactSortDropdown
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={handleSortChange}
+              />
             </div>
           </div>
         </div>
@@ -251,7 +258,9 @@ function ContactsPageContent() {
         {/* Contact Grid */}
         {contacts.length > 0 && (
           <>
-            <div className="grid grid-cols-1 gap-6
+            <div
+              data-testid="contact-grid"
+              className="grid grid-cols-1 gap-6
                             sm:grid-cols-2
                             lg:grid-cols-3
                             xl:grid-cols-4">

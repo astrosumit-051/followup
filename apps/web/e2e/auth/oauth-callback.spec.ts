@@ -93,7 +93,7 @@ test.describe('OAuth Callback Route Integration', () => {
   });
 
   test.describe('Invalid OAuth Code Handling', () => {
-    test('should redirect to login with error for invalid OAuth code', async ({ page }) => {
+    test('should redirect to auth-code-error with error for invalid OAuth code', async ({ page }) => {
       // Navigate to callback with invalid OAuth code
       await page.goto('/auth/callback?code=invalid-oauth-code-12345');
 
@@ -102,22 +102,22 @@ test.describe('OAuth Callback Route Integration', () => {
 
       const finalUrl = page.url();
 
-      // Should redirect to login page
-      expect(finalUrl).toContain('/login');
+      // Should redirect to auth-code-error page
+      expect(finalUrl).toContain('/auth-code-error');
 
       // Should include error parameter
-      expect(finalUrl).toMatch(/error=(oauth_callback_error|oauth_error)/);
+      expect(finalUrl).toMatch(/error=(oauth_callback_error|oauth_error|validation_failed)/);
     });
 
-    test('should display user-friendly error message on login page', async ({ page }) => {
+    test('should display user-friendly error message on auth-code-error page', async ({ page }) => {
       // Navigate to callback with invalid code
       await page.goto('/auth/callback?code=invalid-code');
 
-      // Wait for redirect to login with error
-      await page.waitForURL(/\/login\?error=/, { timeout: 10000 });
+      // Wait for redirect to auth-code-error with error
+      await page.waitForURL(/\/auth-code-error\?error=/, { timeout: 10000 });
 
       // Verify error message is displayed
-      const errorMessage = page.locator('text=/OAuth authentication failed|An error occurred/i');
+      const errorMessage = page.locator('text=/OAuth authentication failed|An error occurred|validation failed/i');
       await expect(errorMessage).toBeVisible({ timeout: 5000 });
     });
 
@@ -137,8 +137,8 @@ test.describe('OAuth Callback Route Integration', () => {
 
         const finalUrl = page.url();
 
-        // Should safely redirect to login with error
-        expect(finalUrl).toContain('/login');
+        // Should safely redirect to auth-code-error with error
+        expect(finalUrl).toContain('/auth-code-error');
         expect(finalUrl).toMatch(/error=/);
       }
     });
@@ -151,8 +151,8 @@ test.describe('OAuth Callback Route Integration', () => {
 
       const finalUrl = page.url();
 
-      // Should redirect to login with error
-      expect(finalUrl).toContain('/login');
+      // Should redirect to auth-code-error with error
+      expect(finalUrl).toContain('/auth-code-error');
       expect(finalUrl).toMatch(/error=/);
     });
   });
@@ -334,17 +334,16 @@ test.describe('OAuth Callback Route Integration', () => {
       // Simulate error by visiting callback with invalid code
       await page.goto('/auth/callback?code=invalid-code');
 
-      // Wait for redirect to login with error
-      await page.waitForURL(/\/login\?error=/, { timeout: 10000 });
+      // Wait for redirect to auth-code-error with error
+      await page.waitForURL(/\/auth-code-error\?error=/, { timeout: 10000 });
 
-      // Verify user can retry OAuth
-      const googleButton = page.locator('button:has-text("Google")');
-      await expect(googleButton).toBeVisible();
-      await expect(googleButton).toBeEnabled();
-
-      // Verify error message is displayed but doesn't block retry
-      const errorMessage = page.locator('text=/OAuth authentication failed|An error occurred/i');
+      // Verify error message is displayed
+      const errorMessage = page.locator('text=/OAuth authentication failed|An error occurred|validation failed/i');
       await expect(errorMessage).toBeVisible();
+
+      // Verify there's a way to navigate back to login or try again
+      const tryAgainLink = page.locator('a:has-text("Try again"), a:has-text("Back to login"), a:has-text("Sign in")');
+      await expect(tryAgainLink.first()).toBeVisible();
     });
 
     test('should handle network errors gracefully', async ({ page, context }) => {

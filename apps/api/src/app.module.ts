@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { join } from 'path';
 import { Request, Response } from 'express';
@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ContactModule } from './contact/contact.module';
+import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 
 /**
  * Main Application Module
@@ -49,11 +50,27 @@ import { ContactModule } from './contact/contact.module';
       }),
     }),
     // Global rate limiting to prevent abuse
+    // Note: Can be disabled in development/test environments with DISABLE_RATE_LIMIT=true
+    // SECURITY: Rate limiting is ALWAYS enforced in production, regardless of environment variables
     ThrottlerModule.forRoot([
       {
         name: 'default',
         ttl: 60000, // 60 seconds
         limit: 10, // 10 requests per minute per IP
+        skipIf: () => {
+          // NEVER allow rate limit bypass in production
+          if (process.env.NODE_ENV === 'production') {
+            return false;
+          }
+          // Only allow bypass in development/test environments
+          const shouldSkip = process.env.DISABLE_RATE_LIMIT === 'true';
+          if (shouldSkip) {
+            console.warn(
+              '⚠️  WARNING: Rate limiting is DISABLED. This should only be used in development/test environments.',
+            );
+          }
+          return shouldSkip;
+        },
       },
     ]),
     AuthModule,
@@ -63,10 +80,10 @@ import { ContactModule } from './contact/contact.module';
   controllers: [AppController],
   providers: [
     AppService,
-    // Apply rate limiting globally to all routes
+    // Apply rate limiting globally to all routes (including GraphQL)
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: GqlThrottlerGuard,
     },
   ],
 })

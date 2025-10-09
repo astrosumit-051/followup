@@ -48,15 +48,22 @@ test.describe('Contact List Page', () => {
     });
 
     test('should display filter controls', async ({ page }) => {
+      // Click Show filters button to reveal filter controls
+      const showFiltersButton = page.getByRole('button', { name: /show filters/i });
+      await showFiltersButton.click();
+
+      // Wait for filters to expand
+      await page.waitForTimeout(300);
+
       // Verify filter dropdowns exist
-      // Priority filter
-      const priorityFilter = page.locator('select, [role="combobox"]').filter({ hasText: /priority/i }).first();
+      // Priority filter should now be visible
+      const priorityFilter = page.getByRole('combobox', { name: /priority/i });
       await expect(priorityFilter).toBeVisible();
     });
 
     test('should display sort dropdown', async ({ page }) => {
       // Verify sort dropdown exists
-      const sortDropdown = page.locator('select, [role="combobox"]').filter({ hasText: /sort/i }).first();
+      const sortDropdown = page.getByRole('combobox', { name: /sort/i });
       await expect(sortDropdown).toBeVisible();
     });
   });
@@ -121,8 +128,13 @@ test.describe('Contact List Page', () => {
 
   test.describe('Filter Functionality', () => {
     test('should filter contacts by priority', async ({ page }) => {
+      // Click Show filters button to reveal filter controls
+      const showFiltersButton = page.getByRole('button', { name: /show filters/i });
+      await showFiltersButton.click();
+      await page.waitForTimeout(300);
+
       // Select HIGH priority filter
-      const priorityFilter = page.locator('select, [role="combobox"]').filter({ hasText: /priority/i }).first();
+      const priorityFilter = page.getByRole('combobox', { name: /priority/i });
 
       // Click to open dropdown (if it's a custom component)
       await priorityFilter.click();
@@ -176,17 +188,10 @@ test.describe('Contact List Page', () => {
 
   test.describe('Sort Functionality', () => {
     test('should sort contacts by name', async ({ page }) => {
-      const sortDropdown = page.locator('select, [role="combobox"]').filter({ hasText: /sort/i }).first();
+      const sortDropdown = page.getByRole('combobox', { name: /sort/i });
 
-      // Select "Name" sort option
-      await sortDropdown.click();
-      const nameOption = page.locator('option:has-text("Name"), [role="option"]:has-text("Name")').first();
-
-      if (await nameOption.isVisible()) {
-        await nameOption.click();
-      } else {
-        await sortDropdown.selectOption({ label: 'Name' });
-      }
+      // Select "Name (A-Z)" sort option
+      await sortDropdown.selectOption({ label: 'Name (A-Z)' });
 
       await page.waitForTimeout(500);
 
@@ -195,17 +200,10 @@ test.describe('Contact List Page', () => {
     });
 
     test('should sort contacts by priority', async ({ page }) => {
-      const sortDropdown = page.locator('select, [role="combobox"]').filter({ hasText: /sort/i }).first();
+      const sortDropdown = page.getByRole('combobox', { name: /sort/i });
 
-      // Select "Priority" sort option
-      await sortDropdown.click();
-      const priorityOption = page.locator('option:has-text("Priority"), [role="option"]:has-text("Priority")').first();
-
-      if (await priorityOption.isVisible()) {
-        await priorityOption.click();
-      } else {
-        await sortDropdown.selectOption({ label: 'Priority' });
-      }
+      // Select "Priority (High to Low)" sort option
+      await sortDropdown.selectOption({ label: 'Priority (High to Low)' });
 
       await page.waitForTimeout(500);
 

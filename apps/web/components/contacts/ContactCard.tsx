@@ -63,21 +63,25 @@ export function ContactCard({ contact }: ContactCardProps) {
   return (
     <Link
       href={`/contacts/${contact.id}`}
-      className="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm
+      data-testid={`contact-card-${contact.id}`}
+      className="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm
                  hover:shadow-md transition-shadow duration-200
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                 sm:p-6"
     >
-      <div className="flex items-start justify-between mb-4">
-        {/* Profile Picture / Initials */}
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col space-y-3 mb-4
+                      sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+        {/* Profile Picture / Initials and Name */}
+        <div className="flex items-center space-x-3 flex-1 min-w-0
+                        sm:space-x-4">
           {contact.profilePicture ? (
             <img
               src={contact.profilePicture}
               alt={contact.name}
-              className="w-12 h-12 rounded-full object-cover"
+              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
               <span className="text-white font-semibold text-sm">
                 {initials}
               </span>
@@ -85,8 +89,9 @@ export function ContactCard({ contact }: ContactCardProps) {
           )}
 
           {/* Name and Company */}
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-gray-900 line-clamp-1
+                           sm:text-lg">
               {contact.name}
             </h3>
             {contact.company && (
@@ -97,7 +102,8 @@ export function ContactCard({ contact }: ContactCardProps) {
 
         {/* Priority Badge */}
         <span
-          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityColor}`}
+          className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityColor} self-start flex-shrink-0
+                      sm:ml-2`}
         >
           {contact.priority}
         </span>
@@ -123,9 +129,10 @@ export function ContactCard({ contact }: ContactCardProps) {
       </div>
 
       {/* Industry and Last Contacted */}
-      <div className="flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
-        <span>{contact.industry || 'No industry'}</span>
-        <span>Last contact: {formattedDate}</span>
+      <div className="flex flex-col space-y-1 text-xs text-gray-500 pt-3 border-t border-gray-100
+                      sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
+        <span className="truncate">{contact.industry || 'No industry'}</span>
+        <span className="truncate">Last contact: {formattedDate}</span>
       </div>
     </Link>
   );

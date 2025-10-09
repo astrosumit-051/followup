@@ -71,18 +71,19 @@ Guide: `~/.agent-os/instructions/execute-tasks.md`
 
 All MCP server details including full tool lists, usage patterns, and workflows are documented in the comprehensive guide. Below is a quick reference of available servers:
 
-### Quick Reference - 8 MCP Servers Available
+### Quick Reference - 9 MCP Servers Available
 
 | # | Server | Primary Purpose | Key Tools |
 |---|--------|-----------------|-----------|
 | 1 | **Ref** | Token-efficient documentation search (USE FIRST) | `ref_search_documentation`, `ref_read_url` |
 | 2 | **Brave Search** | Web search for tutorials, examples, community content | `brave_web_search`, `brave_local_search` |
-| 3 | **Playwright** | Browser automation & E2E testing | 20 tools for navigation, interaction, testing |
-| 4 | **Semgrep** | Security scanning & static analysis | 7 tools for vulnerability detection |
-| 5 | **GitHub** | Repository management & PR automation | 30+ tools for code, issues, PRs, workflows |
-| 6 | **Sequential Thinking** | Complex multi-step problem solving | `sequentialthinking` |
-| 7 | **PostgreSQL** | Read-only database queries for debugging | `query` |
-| 8 | **Notion** | Documentation & specs management | 14 tools for pages, databases, search |
+| 3 | **Playwright** | Broad E2E testing & workflow validation | 20 tools for navigation, interaction, testing |
+| 4 | **Chrome DevTools** | Deep performance profiling & debugging | 25+ tools for performance, network, emulation |
+| 5 | **Semgrep** | Security scanning & static analysis | 7 tools for vulnerability detection |
+| 6 | **GitHub** | Repository management & PR automation | 30+ tools for code, issues, PRs, workflows |
+| 7 | **Sequential Thinking** | Complex multi-step problem solving | `sequentialthinking` |
+| 8 | **PostgreSQL** | Read-only database queries for debugging | `query` |
+| 9 | **Notion** | Documentation & specs management | 14 tools for pages, databases, search |
 
 ### Priority Rules
 
@@ -93,9 +94,10 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 2. 🛠️ **Implement**: Follow tech-stack.md with continuous Ref lookups
 3. 🔒 **Security**: Semgrep scan on auth/database/API code
 4. 🗄️ **Database**: PostgreSQL to verify schema after migrations
-5. 🧪 **Testing**: Playwright E2E tests for user flows
-6. 📝 **Document**: Notion for architectural decisions
-7. 🚀 **Deploy**: GitHub PR creation
+5. 🧪 **Testing**: Playwright E2E tests (broad validation)
+6. ⚡ **Performance**: Chrome DevTools profiling (deep analysis)
+7. 📝 **Document**: Notion for architectural decisions
+8. 🚀 **Deploy**: GitHub PR creation
 
 **📚 See `/context/mcp-instructions.md` for:**
 - Complete tool lists for each server
@@ -103,6 +105,53 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 - Tool chaining workflows and patterns
 - Security scanning requirements
 - Best practices and integration strategies
+
+### Auto-Approved MCP Tools
+
+The following MCP tools can be used without requiring user approval for automated testing and development workflows:
+
+**Playwright MCP:**
+- `mcp__playwright__browser_navigate` - Navigate to URLs
+- `mcp__playwright__browser_snapshot` - Capture page snapshots
+- `mcp__playwright__browser_take_screenshot` - Take screenshots
+- `mcp__playwright__browser_click` - Click elements
+- `mcp__playwright__browser_fill` - Fill form fields
+- `mcp__playwright__browser_type` - Type text
+- `mcp__playwright__browser_console_messages` - Get console messages
+- `mcp__playwright__browser_wait_for` - Wait for conditions
+- `mcp__playwright__browser_install` - Install browser
+
+**Chrome DevTools MCP:**
+- `mcp__chrome-devtools__navigate_page` - Navigate to URLs
+- `mcp__chrome-devtools__take_screenshot` - Take screenshots
+- `mcp__chrome-devtools__resize_page` - Resize viewport
+- `mcp__chrome-devtools__list_console_messages` - Get console messages
+- `mcp__chrome-devtools__list_network_requests` - Get network requests
+- `mcp__chrome-devtools__list_pages` - List open pages
+- `mcp__chrome-devtools__performance_start_trace` - Start performance trace
+- `mcp__chrome-devtools__performance_stop_trace` - Stop performance trace
+- `mcp__chrome-devtools__performance_analyze_insight` - Analyze performance
+
+**PostgreSQL MCP:**
+- `mcp__postgres__query` - Read-only database queries for debugging
+
+**Ref MCP:**
+- `mcp__Ref__ref_search_documentation` - Search documentation
+- `mcp__Ref__ref_read_url` - Read documentation URLs
+
+**Brave Search MCP:**
+- `mcp__brave-search__brave_web_search` - Web search
+- `mcp__brave-search__brave_local_search` - Local business search
+
+**Sequential Thinking MCP:**
+- `mcp__sequential-thinking__sequentialthinking` - Complex problem solving
+
+**Semgrep MCP:**
+- `mcp__semgrep__semgrep_scan` - Security scanning
+- `mcp__semgrep__semgrep_findings` - Get security findings
+- `mcp__semgrep__semgrep_scan_with_custom_rule` - Custom rule scanning
+
+**Note:** These tools are pre-approved for automated workflows. For destructive operations or changes to production systems, explicit user approval is still required.
 
 ---
 
@@ -126,11 +175,12 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 4. Never hallucinate - always verify with Ref
 ```
 
-#### Step 3: Security & Testing
+#### Step 3: Security, Testing & Performance
 ```
 1. Run Semgrep on all security-critical code
-2. Create Playwright E2E tests for user flows
-3. Verify test coverage meets 80% minimum
+2. Create Playwright E2E tests for user flows (broad validation)
+3. Profile with Chrome DevTools for performance (deep analysis)
+4. Verify test coverage meets 80% minimum
 ```
 
 #### Step 4: Review & Deploy
@@ -151,25 +201,26 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 #### Contact Management Features
 ```
 Ref (Prisma) → Sequential Thinking → Ref (Next.js) → Implement →
-Semgrep → PostgreSQL → Playwright
+Semgrep → PostgreSQL → Playwright → Chrome DevTools
 ```
 
 #### AI Email Generation Features
 ```
 Sequential Thinking → Ref (LangChain + OpenAI) → Brave Search →
-Implement → Semgrep (prompt injection) → PostgreSQL → Playwright
+Implement → Semgrep (prompt injection) → PostgreSQL → Playwright →
+Chrome DevTools (performance testing)
 ```
 
 #### Calendar Integration Features
 ```
 Sequential Thinking → Ref (Calendar APIs + OAuth) → Brave Search →
-Implement → Semgrep (OAuth) → Playwright
+Implement → Semgrep (OAuth) → Playwright → Chrome DevTools
 ```
 
 #### Dashboard & Analytics Features
 ```
 Ref (Recharts + TanStack Query) → Implement → PostgreSQL (query testing) →
-Playwright
+Playwright → Chrome DevTools (Core Web Vitals optimization)
 ```
 
 **💡 For complete workflows with detailed steps, see the comprehensive workflow patterns in `/context/mcp-instructions.md`**
@@ -325,16 +376,19 @@ When conflicts arise, follow this priority hierarchy:
 ✅ **ALWAYS:**
 - Use **Ref FIRST** for all technical documentation (PRIMARY - never hallucinate APIs)
 - Run **Semgrep** on authentication, database, and API code
-- Create **Playwright** tests for critical user flows (80% coverage minimum)
+- Create **Playwright** tests for critical user flows (broad validation, 80% coverage minimum)
+- Profile with **Chrome DevTools** for performance optimization (deep analysis)
 - Use **Sequential Thinking** for complex feature planning
 - Verify with **Ref** before implementing any API/library
 - Check **PostgreSQL** schema before and after migrations
 - Document architectural decisions in **Notion**
+- Use **Playwright + Chrome DevTools** together for comprehensive testing
 
 ❌ **NEVER:**
 - Hallucinate API signatures, methods, or configurations
 - Skip security scanning on auth or data handling code
 - Implement features without E2E tests
+- Skip performance profiling for user-facing features
 - Make assumptions about library usage without checking Ref
 - Run destructive queries with PostgreSQL MCP (READ-ONLY - use Prisma for writes)
 - Skip documentation of important implementation decisions
@@ -354,11 +408,11 @@ When conflicts arise, follow this priority hierarchy:
 
 **Action:** Run Semgrep scan and address all findings before committing.
 
-### Testing Requirements
+### Testing & Performance Requirements
 
 **Minimum Coverage:** 80% across all code
 
-**Required E2E Tests:**
+**Required E2E Tests (Playwright):**
 - Contact CRUD operations
 - Email composition and sending
 - AI template generation
@@ -366,6 +420,14 @@ When conflicts arise, follow this priority hierarchy:
 - Calendar synchronization
 - Authentication flows
 - Import/export functionality
+
+**Required Performance Profiling (Chrome DevTools):**
+- Dashboard page load and Core Web Vitals
+- Contact list rendering performance
+- Email composition interface responsiveness
+- Calendar sync operations
+- AI generation response times
+- Slow network/device testing (3G, 4G, CPU throttling)
 
 ---
 
@@ -386,8 +448,9 @@ When conflicts arise, follow this priority hierarchy:
 3. Implement with continuous Ref lookups (never hallucinate)
 4. Scan with Semgrep (security-critical code)
 5. Verify with PostgreSQL (schema changes)
-6. Test with Playwright (E2E user flows)
-7. Document with Notion (architectural decisions)
+6. Test with Playwright (E2E user flows - broad validation)
+7. Profile with Chrome DevTools (performance - deep analysis)
+8. Document with Notion (architectural decisions)
 ```
 
 ### Visual Changes

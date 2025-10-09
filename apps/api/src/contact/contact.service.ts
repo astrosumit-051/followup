@@ -51,7 +51,7 @@ export class ContactService {
    * @returns Contact if found and owned by user, null otherwise
    */
   async findOne(id: string, userId: string) {
-    return this.prisma.contact.findUnique({
+    return this.prisma.contact.findFirst({
       where: {
         id,
         userId,

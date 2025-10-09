@@ -12,7 +12,8 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:performance": "playwright test e2e/contacts/performance.spec.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -44,6 +45,7 @@
     "postcss": "^8.5.6",
     "tailwindcss": "3",
     "ts-jest": "^29.1.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
 }

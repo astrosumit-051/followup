@@ -188,7 +188,7 @@ export function ContactDeleteDialog({
                   Deleting...
                 </>
               ) : (
-                'Delete'
+                'Confirm'
               )}
             </button>
             <button

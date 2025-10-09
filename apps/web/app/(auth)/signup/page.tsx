@@ -5,11 +5,16 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { createBrowserClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function SignUpPage() {
   const supabase = createBrowserClient();
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+
+  useEffect(() => {
+    document.title = 'Sign Up | RelationHub';
+  }, []);
 
   const getErrorMessage = (errorCode: string) => {
     switch (errorCode) {
