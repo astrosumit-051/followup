@@ -76,28 +76,29 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 | # | Server | Primary Purpose | Key Tools |
 |---|--------|-----------------|-----------|
 | 1 | **Ref** | Token-efficient documentation search (USE FIRST) | `ref_search_documentation`, `ref_read_url` |
-| 2 | **Brave Search** | Web search for tutorials, examples, community content | `brave_web_search`, `brave_local_search` |
+| 2 | **Linear** | Issue tracking & project management | Issue/project CRUD, search, comments, batch ops |
 | 3 | **Playwright** | Broad E2E testing & workflow validation | 20 tools for navigation, interaction, testing |
 | 4 | **Chrome DevTools** | Deep performance profiling & debugging | 25+ tools for performance, network, emulation |
 | 5 | **Semgrep** | Security scanning & static analysis | 7 tools for vulnerability detection |
 | 6 | **GitHub** | Repository management & PR automation | 30+ tools for code, issues, PRs, workflows |
 | 7 | **Sequential Thinking** | Complex multi-step problem solving | `sequentialthinking` |
 | 8 | **PostgreSQL** | Read-only database queries for debugging | `query` |
-| 9 | **Notion** | Documentation & specs management | 14 tools for pages, databases, search |
+| 9 | **shadcn** | UI component registry & installation | Browse/search/install components, examples |
 
 ### Priority Rules
 
 **ALWAYS start with Ref** for any technical documentation lookup - never hallucinate API signatures.
 
 **For every feature:**
-1. 🔍 **Research**: Ref → Sequential Thinking → Brave Search
-2. 🛠️ **Implement**: Follow tech-stack.md with continuous Ref lookups
-3. 🔒 **Security**: Semgrep scan on auth/database/API code
-4. 🗄️ **Database**: PostgreSQL to verify schema after migrations
-5. 🧪 **Testing**: Playwright E2E tests (broad validation)
-6. ⚡ **Performance**: Chrome DevTools profiling (deep analysis)
-7. 📝 **Document**: Notion for architectural decisions
-8. 🚀 **Deploy**: GitHub PR creation
+1. 🔍 **Research**: Ref → Sequential Thinking → Linear (check existing issues)
+2. 🎨 **UI Components**: shadcn for pre-built components
+3. 🛠️ **Implement**: Follow tech-stack.md with continuous Ref lookups
+4. 🔒 **Security**: Semgrep scan on auth/database/API code
+5. 🗄️ **Database**: PostgreSQL to verify schema after migrations
+6. 🧪 **Testing**: Playwright E2E tests (broad validation)
+7. ⚡ **Performance**: Chrome DevTools profiling (deep analysis)
+8. 📋 **Track**: Linear to update issue status and document decisions
+9. 🚀 **Deploy**: GitHub PR creation linked to Linear issue
 
 **📚 See `/context/mcp-instructions.md` for:**
 - Complete tool lists for each server
@@ -139,9 +140,17 @@ The following MCP tools can be used without requiring user approval for automate
 - `mcp__Ref__ref_search_documentation` - Search documentation
 - `mcp__Ref__ref_read_url` - Read documentation URLs
 
-**Brave Search MCP:**
-- `mcp__brave-search__brave_web_search` - Web search
-- `mcp__brave-search__brave_local_search` - Local business search
+**Linear MCP:**
+- Linear tools (issue tracking) - Used with explicit user permission
+
+**shadcn MCP:**
+- `mcp__shadcn__get_project_registries` - Get configured registries
+- `mcp__shadcn__list_items_in_registries` - List components
+- `mcp__shadcn__search_items_in_registries` - Search components
+- `mcp__shadcn__view_items_in_registries` - View component details
+- `mcp__shadcn__get_item_examples_from_registries` - Get usage examples
+- `mcp__shadcn__get_add_command_for_items` - Get install command
+- `mcp__shadcn__get_audit_checklist` - Post-install checklist
 
 **Sequential Thinking MCP:**
 - `mcp__sequential-thinking__sequentialthinking` - Complex problem solving
@@ -162,9 +171,10 @@ The following MCP tools can be used without requiring user approval for automate
 #### Step 1: Research & Planning
 ```
 1. Check .agent-os/product/roadmap.md for current priorities
-2. Use Ref to research required APIs and frameworks
-3. Use Sequential Thinking for complex feature planning
-4. Use Brave Search to find real-world implementation examples
+2. Check Linear for existing issues and feature specs
+3. Use Ref to research required APIs and frameworks
+4. Use Sequential Thinking for complex feature planning
+5. Use shadcn to find UI components for the feature
 ```
 
 #### Step 2: Implementation
@@ -200,27 +210,32 @@ The following MCP tools can be used without requiring user approval for automate
 
 #### Contact Management Features
 ```
-Ref (Prisma) → Sequential Thinking → Ref (Next.js) → Implement →
-Semgrep → PostgreSQL → Playwright → Chrome DevTools
+Linear (check issues) → Ref (Prisma) → Sequential Thinking →
+shadcn (forms/tables) → Ref (Next.js) → Implement →
+Semgrep → PostgreSQL → Playwright → Chrome DevTools →
+Linear (update issue)
 ```
 
 #### AI Email Generation Features
 ```
-Sequential Thinking → Ref (LangChain + OpenAI) → Brave Search →
-Implement → Semgrep (prompt injection) → PostgreSQL → Playwright →
-Chrome DevTools (performance testing)
+Linear (check issues) → Sequential Thinking → Ref (LangChain + OpenAI) →
+shadcn (email editor components) → Implement →
+Semgrep (prompt injection) → PostgreSQL → Playwright →
+Chrome DevTools (performance testing) → Linear (update issue)
 ```
 
 #### Calendar Integration Features
 ```
-Sequential Thinking → Ref (Calendar APIs + OAuth) → Brave Search →
-Implement → Semgrep (OAuth) → Playwright → Chrome DevTools
+Linear (check issues) → Sequential Thinking → Ref (Calendar APIs + OAuth) →
+shadcn (calendar UI) → Implement → Semgrep (OAuth) →
+Playwright → Chrome DevTools → Linear (update issue)
 ```
 
 #### Dashboard & Analytics Features
 ```
-Ref (Recharts + TanStack Query) → Implement → PostgreSQL (query testing) →
-Playwright → Chrome DevTools (Core Web Vitals optimization)
+Linear (check issues) → Ref (Recharts + TanStack Query) →
+shadcn (charts/cards) → Implement → PostgreSQL (query testing) →
+Playwright → Chrome DevTools (Core Web Vitals) → Linear (update issue)
 ```
 
 **💡 For complete workflows with detailed steps, see the comprehensive workflow patterns in `/context/mcp-instructions.md`**
@@ -379,19 +394,38 @@ When conflicts arise, follow this priority hierarchy:
 - Create **Playwright** tests for critical user flows (broad validation, 80% coverage minimum)
 - Profile with **Chrome DevTools** for performance optimization (deep analysis)
 - Use **Sequential Thinking** for complex feature planning
+- Use **shadcn** to find UI components before building from scratch
 - Verify with **Ref** before implementing any API/library
 - Check **PostgreSQL** schema before and after migrations
-- Document architectural decisions in **Notion**
+- Track work with **Linear** issues and link to PRs
 - Use **Playwright + Chrome DevTools** together for comprehensive testing
 
 ❌ **NEVER:**
 - Hallucinate API signatures, methods, or configurations
 - Skip security scanning on auth or data handling code
 - Implement features without E2E tests
+- Build custom UI components before checking shadcn registry
 - Skip performance profiling for user-facing features
 - Make assumptions about library usage without checking Ref
 - Run destructive queries with PostgreSQL MCP (READ-ONLY - use Prisma for writes)
-- Skip documentation of important implementation decisions
+- Forget to link Linear issues to PRs
+
+**🚨 CRITICAL: When Stuck or Encountering Problems**
+
+**You MUST use the appropriate MCP server BEFORE attempting to proceed when you encounter:**
+
+1. **Stuck on implementation** → **Sequential Thinking** (break down problem)
+2. **Unsure about API usage** → **Ref** (look up exact documentation)
+3. **Debugging errors** → **Ref** (error messages) + **Sequential Thinking** (root cause)
+4. **Need UI component** → **shadcn** (find existing components)
+5. **Database issues** → **PostgreSQL** (inspect actual schema/data)
+6. **Security concerns** → **Semgrep** (scan for vulnerabilities)
+7. **Performance problems** → **Chrome DevTools** (profile performance)
+8. **Code examples needed** → **Ref** → **GitHub** (search code)
+9. **Project context unclear** → **Linear** (check related issues)
+10. **Testing approach unclear** → **Sequential Thinking** (plan test strategy)
+
+**Never guess, assume, or hallucinate solutions when an MCP server can provide accurate information.**
 
 **🔗 See `/context/mcp-instructions.md` for detailed usage patterns, tool chaining workflows, and integration best practices**
 
@@ -445,12 +479,14 @@ When conflicts arise, follow this priority hierarchy:
 ```
 1. Follow: ~/.agent-os/instructions/execute-tasks.md
 2. Reference: /context/mcp-instructions.md for MCP workflows and tool lists
-3. Implement with continuous Ref lookups (never hallucinate)
-4. Scan with Semgrep (security-critical code)
-5. Verify with PostgreSQL (schema changes)
-6. Test with Playwright (E2E user flows - broad validation)
-7. Profile with Chrome DevTools (performance - deep analysis)
-8. Document with Notion (architectural decisions)
+3. Check Linear for existing issues
+4. Find UI components with shadcn
+5. Implement with continuous Ref lookups (never hallucinate)
+6. Scan with Semgrep (security-critical code)
+7. Verify with PostgreSQL (schema changes)
+8. Test with Playwright (E2E user flows - broad validation)
+9. Profile with Chrome DevTools (performance - deep analysis)
+10. Update Linear issue with status and decisions
 ```
 
 ### Visual Changes
@@ -579,7 +615,7 @@ pnpm dev  # Starts both frontend (3000) and backend (4000)
 **📖 PRIMARY REFERENCE:** `/context/mcp-instructions.md`
 
 This comprehensive guide contains:
-- **Complete tool lists** for all 8 MCP servers (70+ tools total)
+- **Complete tool lists** for all 9 MCP servers (80+ tools total)
 - **Detailed usage patterns** and when to trigger each server
 - **Tool chaining workflows** for common development patterns
 - **Security scanning requirements** and best practices

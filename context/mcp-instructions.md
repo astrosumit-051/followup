@@ -91,37 +91,60 @@ CRITICAL: Always use Ref instead of relying on memory for:
 
 ---
 
-### 2. **Brave Search** (`brave-search`)
-**Purpose:** Real-time web search for current information, documentation, and technical references
+### 2. **Linear** (`linear-server`)
+**Purpose:** Issue tracking and project management integration with Linear's API
 
 **Tools Available:**
-- `mcp__brave-search__brave_web_search`: General web search with pagination
-- `mcp__brave-search__brave_local_search`: Local business and places search
+- Issue Management: Create, update, delete, search issues
+- Project Management: Create projects, get project info, associate issues
+- Team Operations: Get team information, workflow states, labels
+- Comments: Create and read issue comments (including threaded)
+- Batch Operations: Bulk issue creation and deletion
+- Relationships: Create parent/child issue hierarchies
+
+**Key Features:**
+- **Rich Text Support**: Proper handling of Linear's document content format
+- **Batch Processing**: Parallel operations for better performance
+- **Team Integration**: Access to workflow states and team configurations
+- **Type Safety**: Full TypeScript support across all operations
+- **API Key Auth**: Secure authentication with Personal API keys
 
 **Use Cases:**
-- Finding latest library versions and API documentation
-- Researching current best practices and design patterns
-- Verifying compatibility between technologies
-- Looking up error messages and solutions
-- Finding code examples from real-world implementations
-- Looking for blog posts, tutorials, or community solutions
+- Creating Linear issues from code TODOs or bug reports
+- Tracking feature implementation progress
+- Managing sprint planning and project workflows
+- Linking code changes to Linear issues
+- Automating issue status updates
+- Searching and filtering issues by team, project, or state
+- Creating issue hierarchies for epic tracking
 
 **When to Trigger:**
-- User asks about "latest", "current", or "recent" information (but Ref can't answer)
-- Need to verify framework versions or breaking changes beyond docs
-- Looking for blog posts, tutorials, or community solutions
-- Debugging issues that require Stack Overflow context
-- Finding news, announcements, or release notes
-- Finding real-world implementation examples from production codebases
+- User mentions "issue", "Linear", "ticket", or "task"
+- Creating work items from conversations or code analysis
+- Need to track implementation progress
+- Sprint planning or project management activities
+- Linking development work to project tracking
+- Searching for existing issues or projects
+- Updating issue status or priority
 
-**Note:** Prefer **Ref** for official documentation. Use Brave for broader web search, community content, and real-time information.
+**Best Practice:**
+```
+Use Linear for project management workflow:
+1. Create issues for planned features from specs
+2. Link commits/PRs to Linear issues
+3. Update issue status as work progresses
+4. Use batch operations for bulk updates
+5. Maintain issue hierarchies for epics
+```
 
 **Example Prompts:**
 ```
-"Search for the latest Next.js 15 App Router authentication patterns"
-"Find current React Server Components best practices"
-"Look up TypeScript 5.4 new features and migration guide"
-"Find Stripe integration examples with TypeScript and Next.js"
+"Create a Linear issue for implementing user authentication"
+"Search for open issues in the frontend team"
+"Update issue status to 'In Progress' for AUTH-123"
+"Create a project for Q1 2025 roadmap items"
+"Show me all high priority issues assigned to me"
+"Create parent issue for email generation feature with subtasks"
 ```
 
 ---
@@ -527,74 +550,66 @@ CRITICAL RULES:
 
 ---
 
-### 9. **Notion** (`notion`)
-**Purpose:** Notion workspace integration for product documentation, specifications, and project management
+### 9. **shadcn** (`shadcn`)
+**Purpose:** UI component registry for browsing, searching, and installing shadcn/ui components and blocks
 
 **Tools Available:**
-- `mcp__notion__notion-search`: Semantic search across Notion workspace (internal/user search)
-- `mcp__notion__notion-fetch`: Retrieve page or database contents by URL/ID
-- `mcp__notion__notion-create-pages`: Create one or more new pages with properties and content
-- `mcp__notion__notion-update-page`: Update page properties or content (replace/insert/update)
-- `mcp__notion__notion-move-pages`: Move pages or databases to new parent
-- `mcp__notion__notion-duplicate-page`: Duplicate an existing page
-- `mcp__notion__notion-create-database`: Create new database with schema and properties
-- `mcp__notion__notion-update-database`: Update database schema, properties, or configuration
-- `mcp__notion__notion-create-comment`: Add comments to pages
-- `mcp__notion__notion-get-comments`: Retrieve all comments from a page
-- `mcp__notion__notion-get-teams`: List workspace teams (teamspaces)
-- `mcp__notion__notion-get-users`: List all workspace users
-- `mcp__notion__notion-get-self`: Get current bot user information
-- `mcp__notion__notion-get-user`: Retrieve specific user details
+- `mcp__shadcn__get_project_registries`: Get configured registry names from components.json
+- `mcp__shadcn__list_items_in_registries`: List all components, blocks, templates from registries
+- `mcp__shadcn__search_items_in_registries`: Fuzzy search for components by name/description
+- `mcp__shadcn__view_items_in_registries`: View detailed component information and files
+- `mcp__shadcn__get_item_examples_from_registries`: Find usage examples and demos with code
+- `mcp__shadcn__get_add_command_for_items`: Get CLI command to install components
+- `mcp__shadcn__get_audit_checklist`: Post-installation verification checklist
 
 **Key Features:**
-- **Semantic Search**: Natural language search across all workspace content
-- **Database Integration**: Create and manage Notion databases
-- **Rich Formatting**: Full Notion-flavored Markdown support
-- **Page Management**: Create, read, update, and organize pages
-- **Team Collaboration**: Comments, mentions, and user management
-- **Spec Management**: Ideal for storing technical specifications
+- **Registry Support**: Works with shadcn/ui, third-party, and private registries
+- **Natural Language**: Install components using conversational prompts
+- **Fuzzy Search**: Find components even with approximate names
+- **Example Code**: Access complete implementation examples with dependencies
+- **Namespace Support**: Work with multiple registries using @namespace syntax
+- **Authentication**: Support for private registries with token-based auth
 
 **Use Cases:**
-- Creating and managing product specifications
-- Documenting feature requirements
-- Maintaining decision logs and ADRs
-- Creating project roadmaps and timelines
-- Collaborating on technical documentation
-- Searching existing documentation
-- Managing team wikis and knowledge bases
-- Linking specs to database views
+- Discovering and browsing available UI components
+- Installing shadcn/ui components to your project
+- Finding component usage examples and demos
+- Building consistent UI with pre-built components
+- Integrating design system components
+- Searching across multiple component registries
+- Accessing private company component libraries
+- Getting installation commands for components
 
 **When to Trigger:**
-- Need to document architectural decisions
-- Creating feature specifications
-- Searching for existing documentation
-- Need to reference product requirements
-- Creating project roadmaps or timelines
-- Want to collaborate with team on specs
-- Organizing technical documentation
-- Creating knowledge base articles
+- User mentions "shadcn", "component", "UI", or "install"
+- Building user interface features
+- Need pre-built UI components
+- Implementing design patterns
+- User asks "show me components" or "add component"
+- Creating forms, dialogs, cards, or common UI elements
+- Need to find component examples
 
 **Best Practice:**
 ```
-1. Use semantic search to avoid duplicate documentation
-2. Create database views for organized specs
-3. Link related pages for context
-4. Use mentions to notify team members
-5. Keep decision logs updated
-6. Reference specs in code via comments
-7. Use Notion as single source of truth for specs
+Component discovery workflow:
+1. Search for components by functionality (e.g., "login form")
+2. View component details to understand structure
+3. Check examples to see usage patterns
+4. Get add command for installation
+5. Use audit checklist after installation
+6. Integrate component following examples
 ```
 
 **Example Prompts:**
 ```
-"Search Notion for AI email generation specifications"
-"Create new feature spec page in product docs database"
-"Update contact management roadmap in Notion"
-"Document OAuth integration architectural decisions"
-"Link calendar sync spec to technical database view"
-"Search for existing LLM integration documentation"
-"Create new database for tracking implementation tasks"
-"Fetch the authentication spec page from Notion"
+"Show me all available components in the shadcn registry"
+"Add the button, dialog and card components to my project"
+"Find me a login form from the shadcn registry"
+"Search for table components with pagination"
+"Get usage examples for the accordion component"
+"Install @acme/auth-form from the company registry"
+"Build a landing page using hero and features components"
+"What's the command to add the data-table component?"
 ```
 
 ---
@@ -604,21 +619,38 @@ CRITICAL RULES:
 ### 1. **Proactive Tool Usage**
 Don't wait for explicit permission to use MCP tools. If the task clearly benefits from a specific server, use it:
 - Ref: For ANY technical documentation (PRIMARY - use this first)
-- Brave: For broader web search and research
+- Linear: For issue tracking and project management
 - Playwright: For broad E2E testing and workflow validation
 - Chrome DevTools: For deep performance profiling and debugging
 - Semgrep: For all security-sensitive code
 - GitHub: For repository operations
 - Sequential Thinking: For complex planning
 - PostgreSQL: For database debugging and verification
-- Notion: For documentation and specs management
+- shadcn: For UI component discovery and installation
+
+**CRITICAL: When Stuck or Encountering Problems**
+
+If you encounter ANY of the following situations, you MUST use the appropriate MCP server BEFORE attempting to proceed:
+
+1. **Stuck on implementation** → Use **Sequential Thinking** to break down the problem
+2. **Unsure about API usage** → Use **Ref** to look up exact documentation
+3. **Debugging errors** → Use **Ref** for error messages + **Sequential Thinking** for root cause analysis
+4. **Need UI component** → Use **shadcn** to find existing components
+5. **Database issues** → Use **PostgreSQL** to inspect actual schema/data
+6. **Security concerns** → Use **Semgrep** to scan for vulnerabilities
+7. **Performance problems** → Use **Chrome DevTools** to profile
+8. **Code examples needed** → Use **Ref** → **GitHub** search
+9. **Project context unclear** → Use **Linear** to check related issues
+10. **Testing approach unclear** → Use **Sequential Thinking** to plan test strategy
+
+**Never guess, assume, or hallucinate solutions when an MCP server can provide accurate information.**
 
 ### 2. **Documentation Priority**
 When looking up technical information, follow this hierarchy:
 ```
 1. Ref (Official docs, APIs, frameworks) ← START HERE
-2. Brave (Community content, tutorials, blog posts)
-3. Notion (Internal specs and documentation)
+2. shadcn (UI component documentation and examples)
+3. Linear (Project specs and issue tracking)
 ```
 **Never hallucinate API signatures or configuration options - always check Ref first.**
 
@@ -627,18 +659,18 @@ Combine multiple MCP servers for comprehensive solutions:
 
 ```
 Example: Building a new authenticated feature with Stripe
-1. Notion → Check for existing auth specs
+1. Linear → Check for existing auth issues and tasks
 2. Ref → Look up Stripe API subscription documentation
 3. Sequential Thinking → Plan architecture
 4. Ref → Check Next.js auth patterns documentation
-5. Brave → Find real Stripe + Next.js integration examples
+5. shadcn → Find auth form components
 6. GitHub → Check existing auth implementation in repo
 7. [Generate Code]
 8. Semgrep → Scan for vulnerabilities
 9. PostgreSQL → Verify database schema
 10. Playwright → Create E2E tests
 11. Chrome DevTools → Profile performance and Core Web Vitals
-12. Notion → Document implementation decisions
+12. Linear → Update issue status and document decisions
 ```
 
 ### 4. **Context Preservation**
@@ -690,46 +722,46 @@ For database work:
 
 ### Pattern 1: New Feature Development
 ```
-1. Notion: Check for existing specs and documentation
+1. Linear: Check for existing issues and feature specs
 2. Ref: Look up relevant API documentation
 3. Sequential Thinking: Plan feature architecture
-4. Brave: Research implementation patterns from real codebases
+4. shadcn: Find UI components for the feature
 5. GitHub: Check for similar features in current codebase
 6. [Generate Implementation]
 7. PostgreSQL: Verify database schema if DB changes
 8. Semgrep: Security scan
 9. Playwright: E2E tests (broad validation)
 10. Chrome DevTools: Performance profiling (deep analysis)
-11. Notion: Document implementation decisions
-12. GitHub: Create PR
+11. Linear: Update issue status and document decisions
+12. GitHub: Create PR and link to Linear issue
 ```
 
 ### Pattern 2: Bug Investigation & Performance Debugging
 ```
-1. Notion: Search for known issues or related docs
+1. Linear: Search for existing bug reports or related issues
 2. Chrome DevTools: Profile page performance and inspect network
 3. PostgreSQL: Check database state if data-related
 4. Ref: Search official docs for expected behavior
-5. Brave: Search for similar issues and community solutions
-6. GitHub: Analyze recent commits and related code
-7. Sequential Thinking: Reason through root cause
-8. [Implement Fix]
-9. Playwright: Add regression test
-10. Chrome DevTools: Verify performance improvements
-11. Notion: Document the bug and fix
-12. GitHub: Create PR with fix
+5. GitHub: Analyze recent commits and related code
+6. Sequential Thinking: Reason through root cause
+7. [Implement Fix]
+8. Playwright: Add regression test
+9. Chrome DevTools: Verify performance improvements
+10. Linear: Update bug issue with root cause and fix details
+11. GitHub: Create PR with fix and link to Linear issue
 ```
 
-### Pattern 3: Design Implementation
+### Pattern 3: UI Component Implementation
 ```
-1. Figma: Extract design tokens and specifications
-2. Figma: Generate base code for components
+1. shadcn: Search for existing components that match design
+2. shadcn: View component examples and usage patterns
 3. Ref: Look up component library documentation
-4. [Refine Implementation]
-5. Playwright: Visual regression tests
-6. Chrome DevTools: Test responsive design at various viewports
-7. Chrome DevTools: Profile rendering performance
-8. GitHub: Create PR
+4. shadcn: Install required components
+5. [Customize and Integrate Components]
+6. Playwright: Visual regression tests
+7. Chrome DevTools: Test responsive design at various viewports
+8. Chrome DevTools: Profile rendering performance
+9. GitHub: Create PR
 ```
 
 ### Pattern 4: Security Review
@@ -744,28 +776,27 @@ For database work:
 
 ### Pattern 5: API Integration
 ```
-1. Notion: Check for existing API integrations
+1. Linear: Check for existing API integration issues
 2. Ref: Search for API documentation (PRIMARY)
 3. Ref: Read specific endpoint documentation
-4. Brave: Find real-world implementation examples
+4. Sequential Thinking: Plan integration architecture
 5. [Generate Integration Code]
 6. Semgrep: Scan for security issues
 7. Playwright: Create integration tests
-8. Notion: Document API integration details
+8. Linear: Document API integration details and close issue
 ```
 
 ### Pattern 6: Database Migration
 ```
-1. Notion: Check migration plans and decisions
+1. Linear: Check migration issues and plans
 2. Sequential Thinking: Plan migration strategy
 3. Ref: Look up Prisma migration documentation
-4. Supabase: Create database branch for testing
-5. [Generate Migration]
-6. PostgreSQL: Verify schema changes on branch
-7. Supabase: Test on branch
-8. Supabase: Merge branch to production
-9. PostgreSQL: Verify production schema
-10. Notion: Document migration completion
+4. [Generate Migration]
+5. PostgreSQL: Verify schema changes in development
+6. Semgrep: Scan migration code for security issues
+7. Playwright: Test affected features after migration
+8. PostgreSQL: Verify production schema after deployment
+9. Linear: Update migration issue with completion details
 ```
 
 ---
@@ -781,16 +812,20 @@ Ensure these MCP servers are configured in `.claude.json`:
       "type": "http",
       "url": "https://api.ref.tools/mcp?apiKey=${REF_API_KEY}"
     },
-    "brave-search": {
-      "command": "npx",
-      "args": ["-y", "@brave/brave-search-mcp-server"],
+    "linear-server": {
+      "type": "sse",
+      "url": "https://mcp.linear.app/sse",
       "env": {
-        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
       }
     },
     "playwright": {
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"]
     },
     "semgrep": {
       "command": "uvx",
@@ -810,9 +845,13 @@ Ensure these MCP servers are configured in `.claude.json`:
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
-    "figma": {
-      "type": "http",
-      "url": "http://127.0.0.1:3845/mcp"
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["-y", "shadcn@latest", "mcp"]
     }
   }
 }
@@ -820,12 +859,11 @@ Ensure these MCP servers are configured in `.claude.json`:
 
 **Get API Keys:**
 - Ref: Sign up at https://ref.tools
-- Brave: https://brave.com/search/api/
+- Linear: Get Personal API key from Linear Settings → Security & access
 - Semgrep: https://semgrep.dev/
 - GitHub: https://github.com/settings/tokens
-- Figma: Enable in Figma Desktop app preferences
 - PostgreSQL: Use connection string from your database provider
-- Notion: Get integration token from https://www.notion.so/my-integrations
+- shadcn: No API key needed (uses project's components.json)
 
 ---
 
@@ -834,8 +872,10 @@ Ensure these MCP servers are configured in `.claude.json`:
 | Need to... | Use Server | Tool |
 |------------|------------|------|
 | Look up API documentation | **Ref** | mcp__Ref__ref_search_documentation |
-| Research current best practices | Ref → Brave | mcp__Ref__ref_search_documentation, mcp__brave-search__brave_web_search |
-| Find code examples | Ref → Brave | mcp__Ref__ref_search_documentation, mcp__brave-search__brave_web_search |
+| Research current best practices | Ref | mcp__Ref__ref_search_documentation |
+| Find code examples | Ref → GitHub | mcp__Ref__ref_search_documentation, mcp__github__search_code |
+| Find UI components | shadcn | mcp__shadcn__search_items_in_registries |
+| Install UI components | shadcn | mcp__shadcn__get_add_command_for_items |
 | Scan for security issues | Semgrep | mcp__semgrep__semgrep_scan |
 | Test user flows (broad) | Playwright | mcp__playwright__browser_* |
 | Profile performance (deep) | Chrome DevTools | mcp__chrome-devtools__performance_* |
@@ -843,16 +883,17 @@ Ensure these MCP servers are configured in `.claude.json`:
 | Test slow network/device | Chrome DevTools | mcp__chrome-devtools__emulate_* |
 | Debug network requests | Chrome DevTools | mcp__chrome-devtools__list_network_requests |
 | Manage repository | GitHub | mcp__github__* |
+| Track issues/tasks | Linear | mcp__linear__create_issue, mcp__linear__search_issues |
+| Update project status | Linear | mcp__linear__update_issue |
 | Plan complex feature | Sequential Thinking | mcp__sequential-thinking__sequentialthinking |
-| Implement design | Figma | mcp__figma__* |
 | Read documentation page | Ref | mcp__Ref__ref_read_url |
 | Create PR | GitHub | mcp__github__create_pull_request |
 | Generate tests | Playwright | mcp__playwright__browser_snapshot |
 | Analyze vulnerabilities | Semgrep | mcp__semgrep__semgrep_scan |
 | Check library syntax | **Ref** | mcp__Ref__ref_search_documentation |
 | Query database | PostgreSQL | mcp__postgres__query |
-| Document decisions | Notion | mcp__notion__notion-create-pages |
-| Search internal docs | Notion | mcp__notion__notion-search |
+| Browse components | shadcn | mcp__shadcn__list_items_in_registries |
+| View component details | shadcn | mcp__shadcn__view_items_in_registries |
 
 ---
 
@@ -864,21 +905,23 @@ Ensure these MCP servers are configured in `.claude.json`:
 - Chain multiple servers for comprehensive solutions
 - Always scan security-critical code with Semgrep
 - Use Sequential Thinking for complex planning
-- Extract design tokens before implementing from Figma
+- Use shadcn to find and install UI components before building from scratch
 - Create E2E tests with Playwright for critical flows (broad validation)
 - Profile with Chrome DevTools for performance optimization (deep analysis)
 - Use Playwright + Chrome DevTools together for comprehensive testing
+- Track work with Linear issues and link to PRs
 - Verify documentation with Ref before making assumptions
 
 ❌ **DON'T:**
 - Hallucinate API signatures or parameters (check Ref first)
 - Skip security scanning for auth code
-- Implement designs without checking Figma first
+- Build custom UI components before checking shadcn registry
 - Make assumptions about libraries without searching Ref
 - Forget to create tests for critical user flows
 - Ignore existing code patterns in the repository
 - Use outdated documentation (Ref always has latest)
 - Skip performance profiling for user-facing features
+- Forget to link Linear issues to PRs
 
 ---
 
