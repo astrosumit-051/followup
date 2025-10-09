@@ -471,6 +471,44 @@ When conflicts arise, follow this priority hierarchy:
 4. Document in decision history if architectural
 ```
 
+### Contact Management (CRUD Operations)
+```
+# Create a new contact
+1. Navigate to /contacts
+2. Click "Create Contact" button
+3. Fill in required fields (name, email)
+4. Add optional fields (phone, LinkedIn, company, industry, role, priority)
+5. Submit form
+
+# View and search contacts
+1. Navigate to /contacts
+2. Use search bar for text search (debounced)
+3. Apply filters (priority, company, industry)
+4. Sort by name, priority, or creation date
+5. Load more contacts with pagination
+
+# Edit a contact
+1. Click on contact card to view details
+2. Click "Edit" button
+3. Modify fields
+4. Save changes (with optimistic UI updates)
+
+# Delete a contact
+1. View contact detail page
+2. Click "Delete" button
+3. Confirm deletion in dialog
+4. Contact removed with redirect to list
+
+# GraphQL API Access
+- Endpoint: http://localhost:4000/graphql
+- Authentication: JWT token required (from Supabase session)
+- Query: contact(id: String!): Contact
+- Query: contacts(filters, pagination, sortBy, sortOrder): ContactConnection
+- Mutation: createContact(input: CreateContactInput!): Contact
+- Mutation: updateContact(id: String!, input: UpdateContactInput!): Contact
+- Mutation: deleteContact(id: String!): Boolean
+```
+
 ---
 
 ## Local Development Setup
