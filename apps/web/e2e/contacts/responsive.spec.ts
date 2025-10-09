@@ -51,8 +51,9 @@ test.describe('Contact List Page - Responsive Design', () => {
       });
 
       // Check grid layout - should be single column on mobile
-      const grid = page.locator('div').filter({ hasText: /grid grid-cols-1/ }).first();
+      const grid = page.locator('[data-testid="contact-grid"]');
       await expect(grid).toBeVisible();
+      await expect(grid).toHaveClass(/grid-cols-1/);
 
       // Verify cards stack vertically
       const cards = page.locator('[data-testid="contact-card"]');

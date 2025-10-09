@@ -258,7 +258,9 @@ function ContactsPageContent() {
         {/* Contact Grid */}
         {contacts.length > 0 && (
           <>
-            <div className="grid grid-cols-1 gap-6
+            <div
+              data-testid="contact-grid"
+              className="grid grid-cols-1 gap-6
                             sm:grid-cols-2
                             lg:grid-cols-3
                             xl:grid-cols-4">

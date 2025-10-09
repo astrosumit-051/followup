@@ -360,6 +360,12 @@ export function ContactForm({
       </div>
 
       {/* Form Actions */}
+      {/*
+        Mobile layout uses flex-col-reverse to visually place Submit button above Cancel,
+        while maintaining semantic DOM order (Cancel first, Submit second).
+        space-y-reverse applies reverse spacing to match the reversed flex direction.
+        On desktop (sm:), switches to horizontal layout with normal spacing (space-x-3).
+      */}
       <div className="flex flex-col-reverse space-y-3 space-y-reverse pt-4 border-t border-gray-200
                       sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-3">
         {onCancel && (

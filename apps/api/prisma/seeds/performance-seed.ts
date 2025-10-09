@@ -2,7 +2,14 @@
  * Performance Testing Seed Script
  *
  * This script creates 1000+ test contacts for performance testing.
- * Use: pnpm prisma db seed:performance
+ *
+ * Environment Variables:
+ * - PERFORMANCE_TEST_USER_EMAIL: Email of the test user (default: performance.test@relationhub.com)
+ *
+ * Usage:
+ *   pnpm db:seed:performance
+ *   # Or with custom user:
+ *   PERFORMANCE_TEST_USER_EMAIL=custom@example.com pnpm db:seed:performance
  */
 
 import { PrismaClient, Priority, Gender } from '@relationhub/database';
@@ -70,20 +77,22 @@ function generatePhone(): string {
 async function main() {
   console.log('🌱 Starting performance test data seeding...');
 
-  // Note: You need to create the test user manually via Supabase Auth
-  // Email: performance.test@relationhub.com
+  // Get test user email from environment or use default
+  const testUserEmail = process.env.PERFORMANCE_TEST_USER_EMAIL || 'performance.test@relationhub.com';
+  console.log(`📧 Using test user email: ${testUserEmail}`);
 
   // Try to find existing user in database
   let testUser = await prisma.user.findUnique({
-    where: { email: 'performance.test@relationhub.com' },
+    where: { email: testUserEmail },
   });
 
   if (!testUser) {
     console.log('⚠️  Test user not found in database.');
     console.log('📝 Please create user via Supabase Auth:');
-    console.log('   Email: performance.test@relationhub.com');
+    console.log(`   Email: ${testUserEmail}`);
     console.log('   Then re-run this seed script.');
     console.log('\n💡 Tip: Visit http://localhost:3000/signup to create the user');
+    console.log('\n🔧 Or set a different email: PERFORMANCE_TEST_USER_EMAIL=your@email.com pnpm db:seed:performance');
     process.exit(1);
   }
 
@@ -146,7 +155,7 @@ async function main() {
   console.log(`\n🎉 Performance test data seeding complete!`);
   console.log(`📊 Total contacts for performance testing: ${finalCount}`);
   console.log(`\n👤 Test User Credentials:`);
-  console.log(`   Email: performance.test@relationhub.com`);
+  console.log(`   Email: ${testUserEmail}`);
   console.log(`   Note: Use Supabase Auth to authenticate this user`);
 }
 
