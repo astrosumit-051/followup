@@ -12,6 +12,9 @@ import { ContactListEmpty } from '@/components/contacts/ContactListEmpty';
 import { ContactSearchBar } from '@/components/contacts/ContactSearchBar';
 import { ContactFilters } from '@/components/contacts/ContactFilters';
 import { ContactSortDropdown } from '@/components/contacts/ContactSortDropdown';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Plus, Loader2 } from 'lucide-react';
 import type { ContactFilterInput, ContactSortField, SortOrder } from '@/lib/graphql/contacts';
 
 /**
@@ -176,28 +179,12 @@ function ContactsPageContent() {
                 Manage your professional network ({contacts.length} contact{contacts.length !== 1 ? 's' : ''})
               </p>
             </div>
-            <Link
-              href="/contacts/new"
-              className="inline-flex items-center justify-center px-4 py-2
-                         bg-blue-600 text-white font-medium rounded-md shadow-sm
-                         hover:bg-blue-700 focus:outline-none focus:ring-2
-                         focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-            >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Create Contact
-            </Link>
+            <Button asChild>
+              <Link href="/contacts/new">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Contact
+              </Link>
+            </Button>
           </div>
         </div>
 
