@@ -15,12 +15,15 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Contact List Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Note: In real tests, you would need to:
-    // 1. Authenticate the user (use auth helper)
-    // 2. Seed test database with contacts
-    // For now, we'll test the UI structure assuming auth is handled by middleware
+    // Navigate to contacts page and wait for initial load
+    // Note: Backend readiness is ensured by backend-ready.setup.ts
+    // Authentication is handled by auth.setup.ts (reuses saved session)
+    // Database is seeded by seed.setup.ts
 
-    await page.goto('/contacts');
+    await page.goto('/contacts', { waitUntil: 'domcontentloaded' });
+
+    // Wait for the page heading to appear (indicates page has loaded)
+    await page.waitForSelector('h1:has-text("Contacts")', { timeout: 10000 });
   });
 
   test.describe('Page Layout and Structure', () => {

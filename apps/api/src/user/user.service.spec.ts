@@ -306,5 +306,187 @@ describe('UserService', () => {
         },
       });
     });
+
+    it('should throw error when user not found', async () => {
+      mockPrismaClient.user.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.updateProfile('non-existent-id', { name: 'Test' })
+      ).rejects.toThrow('User not found. Please log in again.');
+    });
+
+    it('should handle database connection errors', async () => {
+      const existingUser = {
+        id: 'user-123',
+        supabaseId: 'supabase-uuid-456',
+        email: 'test@example.com',
+        name: 'Old Name',
+        profilePicture: null,
+        provider: 'google',
+        settings: null,
+        lastLoginAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
+      mockPrismaClient.user.update.mockRejectedValue(
+        new Error('connect ECONNREFUSED')
+      );
+
+      await expect(
+        service.updateProfile('supabase-uuid-456', { name: 'Test' })
+      ).rejects.toThrow('Database connection failed. Please try again later.');
+    });
+
+    it('should handle Prisma record not found error', async () => {
+      const existingUser = {
+        id: 'user-123',
+        supabaseId: 'supabase-uuid-456',
+        email: 'test@example.com',
+        name: 'Old Name',
+        profilePicture: null,
+        provider: 'google',
+        settings: null,
+        lastLoginAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
+      mockPrismaClient.user.update.mockRejectedValue(
+        new Error('Record to update not found')
+      );
+
+      await expect(
+        service.updateProfile('supabase-uuid-456', { name: 'Test' })
+      ).rejects.toThrow('User profile not found. Please log in again.');
+    });
+
+    it('should handle generic database errors', async () => {
+      const existingUser = {
+        id: 'user-123',
+        supabaseId: 'supabase-uuid-456',
+        email: 'test@example.com',
+        name: 'Old Name',
+        profilePicture: null,
+        provider: 'google',
+        settings: null,
+        lastLoginAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
+      mockPrismaClient.user.update.mockRejectedValue(
+        new Error('Unknown database error')
+      );
+
+      await expect(
+        service.updateProfile('supabase-uuid-456', { name: 'Test' })
+      ).rejects.toThrow('Failed to update profile: Unknown database error');
+    });
+
+    it('should handle non-Error exceptions', async () => {
+      const existingUser = {
+        id: 'user-123',
+        supabaseId: 'supabase-uuid-456',
+        email: 'test@example.com',
+        name: 'Old Name',
+        profilePicture: null,
+        provider: 'google',
+        settings: null,
+        lastLoginAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
+      mockPrismaClient.user.update.mockRejectedValue('string error');
+
+      await expect(
+        service.updateProfile('supabase-uuid-456', { name: 'Test' })
+      ).rejects.toThrow('An unexpected error occurred while updating your profile. Please try again.');
+    });
+  });
+
+  describe('syncUserFromSupabase error handling', () => {
+    const mockSupabaseUser = {
+      id: 'supabase-uuid-789',
+      email: 'newuser@example.com',
+      user_metadata: {
+        full_name: 'New User',
+        avatar_url: 'https://example.com/avatar.jpg',
+      },
+      app_metadata: {
+        provider: 'google',
+      },
+    };
+
+    it('should handle unique constraint violation on create', async () => {
+      mockPrismaClient.user.findUnique.mockResolvedValue(null);
+      mockPrismaClient.user.create.mockRejectedValue(
+        new Error('Unique constraint failed on the fields: (`email`)')
+      );
+
+      await expect(
+        service.syncUserFromSupabase(mockSupabaseUser)
+      ).rejects.toThrow('A user with this email already exists. Please contact support.');
+    });
+
+    it('should handle database connection errors on create', async () => {
+      mockPrismaClient.user.findUnique.mockResolvedValue(null);
+      mockPrismaClient.user.create.mockRejectedValue(
+        new Error('connect ECONNREFUSED')
+      );
+
+      await expect(
+        service.syncUserFromSupabase(mockSupabaseUser)
+      ).rejects.toThrow('Database connection failed. Please try again later.');
+    });
+
+    it('should handle database connection errors on update', async () => {
+      const existingUser = {
+        id: 'existing-user-id',
+        supabaseId: 'supabase-uuid-789',
+        email: 'newuser@example.com',
+        name: 'Old Name',
+        profilePicture: null,
+        provider: 'google',
+        settings: null,
+        lastLoginAt: new Date('2025-01-01'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockPrismaClient.user.findUnique.mockResolvedValue(existingUser);
+      mockPrismaClient.user.update.mockRejectedValue(
+        new Error('connect ECONNREFUSED')
+      );
+
+      await expect(
+        service.syncUserFromSupabase(mockSupabaseUser)
+      ).rejects.toThrow('Database connection failed. Please try again later.');
+    });
+
+    it('should handle generic database errors on create', async () => {
+      mockPrismaClient.user.findUnique.mockResolvedValue(null);
+      mockPrismaClient.user.create.mockRejectedValue(
+        new Error('Database constraint violation')
+      );
+
+      await expect(
+        service.syncUserFromSupabase(mockSupabaseUser)
+      ).rejects.toThrow('Failed to sync user profile: Database constraint violation');
+    });
+
+    it('should handle non-Error exceptions in syncUserFromSupabase', async () => {
+      mockPrismaClient.user.findUnique.mockResolvedValue(null);
+      mockPrismaClient.user.create.mockRejectedValue('string error');
+
+      await expect(
+        service.syncUserFromSupabase(mockSupabaseUser)
+      ).rejects.toThrow('An unexpected error occurred while syncing your profile. Please try again.');
+    });
   });
 });

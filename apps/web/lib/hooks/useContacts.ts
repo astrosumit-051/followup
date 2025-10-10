@@ -164,7 +164,7 @@ export function useContacts(
 ) {
   return useInfiniteQuery<ContactConnection, Error>({
     queryKey: contactKeys.list(variables),
-    queryFn: ({ pageParam }) => {
+    queryFn: async ({ pageParam }) => {
       // Transform the variables to match GraphQL schema
       const graphqlVariables: GetContactsVariables = {
         filters: variables?.filter,
@@ -184,7 +184,8 @@ export function useContacts(
         };
       }
 
-      return getContacts(graphqlVariables);
+      const result = await getContacts(graphqlVariables);
+      return result;
     },
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => {

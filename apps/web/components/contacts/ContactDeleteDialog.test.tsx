@@ -54,10 +54,10 @@ describe('ContactDeleteDialog', () => {
       expect(screen.getByText(/This action cannot be undone/i)).toBeInTheDocument();
     });
 
-    it('renders delete button', () => {
+    it('renders confirm button', () => {
       render(<ContactDeleteDialog {...defaultProps} />);
 
-      expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
     });
 
     it('renders cancel button', () => {
@@ -75,13 +75,13 @@ describe('ContactDeleteDialog', () => {
   });
 
   describe('Interactions', () => {
-    it('calls onConfirm when delete button is clicked', async () => {
+    it('calls onConfirm when confirm button is clicked', async () => {
       const user = userEvent.setup();
 
       render(<ContactDeleteDialog {...defaultProps} />);
 
-      const deleteButton = screen.getByRole('button', { name: 'Delete' });
-      await user.click(deleteButton);
+      const confirmButton = screen.getByRole('button', { name: 'Confirm' });
+      await user.click(confirmButton);
 
       expect(mockOnConfirm).toHaveBeenCalledTimes(1);
     });
@@ -150,10 +150,10 @@ describe('ContactDeleteDialog', () => {
       expect(cancelButton).toBeDisabled();
     });
 
-    it('shows "Delete" text when not deleting', () => {
+    it('shows "Confirm" text when not deleting', () => {
       render(<ContactDeleteDialog {...defaultProps} isDeleting={false} />);
 
-      expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
     });
   });
 
