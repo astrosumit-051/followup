@@ -7,71 +7,71 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 ## Tasks
 
-- [ ] 1. Foundation Setup & Component Installation
-  - [ ] 1.1 Write tests for shadcn/ui initialization
-  - [ ] 1.2 Run `npx shadcn@latest init` in apps/web/
-  - [ ] 1.3 Verify components.json created with correct configuration
-  - [ ] 1.4 Install core primitives (Button, Input, Label, Textarea, Select)
-  - [ ] 1.5 Install form components (Form, Alert)
-  - [ ] 1.6 Install layout components (Card, Separator, Badge, Avatar)
-  - [ ] 1.7 Install dialogs (Dialog, AlertDialog, Sheet, DropdownMenu, Popover)
-  - [ ] 1.8 Install feedback components (Skeleton, Progress, Toast)
-  - [ ] 1.9 Install data display components (Table, Tabs)
-  - [ ] 1.10 Install dependencies (tailwindcss-animate, class-variance-authority, clsx, tailwind-merge)
-  - [ ] 1.11 Configure design tokens in apps/web/app/globals.css
-  - [ ] 1.12 Update tailwind.config.ts with shadcn color mappings
-  - [ ] 1.13 Verify all tests pass
+- [x] 1. Foundation Setup & Component Installation
+  - [x] 1.1 Write tests for shadcn/ui initialization
+  - [x] 1.2 Run `npx shadcn@latest init` in apps/web/
+  - [x] 1.3 Verify components.json created with correct configuration
+  - [x] 1.4 Install core primitives (Button, Input, Label, Textarea, Select)
+  - [x] 1.5 Install form components (Form, Alert)
+  - [x] 1.6 Install layout components (Card, Separator, Badge, Avatar)
+  - [x] 1.7 Install dialogs (Dialog, AlertDialog, Sheet, DropdownMenu, Popover)
+  - [x] 1.8 Install feedback components (Skeleton, Progress, Toast)
+  - [x] 1.9 Install data display components (Table, Tabs)
+  - [x] 1.10 Install dependencies (tailwindcss-animate, class-variance-authority, clsx, tailwind-merge)
+  - [x] 1.11 Configure design tokens in apps/web/app/globals.css
+  - [x] 1.12 Update tailwind.config.ts with shadcn color mappings
+  - [x] 1.13 Verify all tests pass
 
-- [ ] 2. Dark Mode Implementation
-  - [ ] 2.1 Write tests for ThemeProvider and theme toggle
-  - [ ] 2.2 Install next-themes package
-  - [ ] 2.3 Create ThemeProvider wrapper component
-  - [ ] 2.4 Integrate ThemeProvider in apps/web/app/layout.tsx
-  - [ ] 2.5 Create ThemeToggle component with dropdown menu
-  - [ ] 2.6 Add theme toggle to navigation/header
-  - [ ] 2.7 Test theme persistence across sessions
-  - [ ] 2.8 Verify dark mode CSS variables apply correctly
-  - [ ] 2.9 Test system theme preference detection
-  - [ ] 2.10 Verify all tests pass
+- [x] 2. Dark Mode Implementation
+  - [x] 2.1 Write tests for ThemeProvider and theme toggle
+  - [x] 2.2 Install next-themes package
+  - [x] 2.3 Create ThemeProvider wrapper component
+  - [x] 2.4 Integrate ThemeProvider in apps/web/app/layout.tsx
+  - [x] 2.5 Create ThemeToggle component with dropdown menu
+  - [x] 2.6 Add theme toggle to navigation/header
+  - [x] 2.7 Test theme persistence across sessions
+  - [x] 2.8 Verify dark mode CSS variables apply correctly
+  - [x] 2.9 Test system theme preference detection
+  - [x] 2.10 Verify all tests pass
 
-- [ ] 3. Refactor ContactForm Component
-  - [ ] 3.1 Write tests for refactored ContactForm with shadcn components
-  - [ ] 3.2 Replace custom input styling with shadcn Input component
-  - [ ] 3.3 Replace custom label styling with shadcn Label component
-  - [ ] 3.4 Replace custom select with shadcn Select component
-  - [ ] 3.5 Replace custom textarea with shadcn Textarea component
-  - [ ] 3.6 Wrap all fields with shadcn Form, FormField, FormItem, FormControl
-  - [ ] 3.7 Replace error message styling with FormMessage component
-  - [ ] 3.8 Update submit button to use shadcn Button component
-  - [ ] 3.9 Test form validation with React Hook Form + Zod
-  - [ ] 3.10 Test keyboard navigation through form fields
-  - [ ] 3.11 Run jest-axe accessibility tests
-  - [ ] 3.12 Verify all tests pass
+- [x] 3. Refactor ContactForm Component
+  - [x] 3.1 Write tests for refactored ContactForm with shadcn components
+  - [x] 3.2 Replace custom input styling with shadcn Input component
+  - [x] 3.3 Replace custom label styling with shadcn Label component
+  - [x] 3.4 Replace custom select with shadcn Select component
+  - [x] 3.5 Replace custom textarea with shadcn Textarea component
+  - [x] 3.6 Wrap all fields with shadcn Form, FormField, FormItem, FormControl
+  - [x] 3.7 Replace error message styling with FormMessage component
+  - [x] 3.8 Update submit button to use shadcn Button component
+  - [x] 3.9 Test form validation with React Hook Form + Zod
+  - [x] 3.10 Test keyboard navigation through form fields
+  - [x] 3.11 Run jest-axe accessibility tests
+  - [x] 3.12 Verify all tests pass
 
-- [ ] 4. Refactor ContactCard Component
-  - [ ] 4.1 Write tests for refactored ContactCard with shadcn components
-  - [ ] 4.2 Replace custom card container with shadcn Card component
-  - [ ] 4.3 Use CardHeader for card title section
-  - [ ] 4.4 Replace custom avatar styling with shadcn Avatar component
-  - [ ] 4.5 Replace priority badge styling with shadcn Badge component
-  - [ ] 4.6 Use semantic color tokens (destructive, default, secondary) for priority
-  - [ ] 4.7 Remove all manual Tailwind dark mode classes
-  - [ ] 4.8 Test card rendering in light and dark modes
-  - [ ] 4.9 Run jest-axe accessibility tests
-  - [ ] 4.10 Verify all tests pass
+- [x] 4. Refactor ContactCard Component
+  - [x] 4.1 Write tests for refactored ContactCard with shadcn components
+  - [x] 4.2 Replace custom card container with shadcn Card component
+  - [x] 4.3 Use CardHeader for card title section
+  - [x] 4.4 Replace custom avatar styling with shadcn Avatar component
+  - [x] 4.5 Replace priority badge styling with shadcn Badge component
+  - [x] 4.6 Use semantic color tokens (destructive, default, secondary) for priority
+  - [x] 4.7 Remove all manual Tailwind dark mode classes
+  - [x] 4.8 Test card rendering in light and dark modes
+  - [x] 4.9 Run jest-axe accessibility tests
+  - [x] 4.10 Verify all tests pass
 
-- [ ] 5. Refactor ContactDeleteDialog Component
-  - [ ] 5.1 Write tests for refactored ContactDeleteDialog with shadcn AlertDialog
-  - [ ] 5.2 Replace custom modal with shadcn AlertDialog component
-  - [ ] 5.3 Use AlertDialogContent for dialog wrapper
-  - [ ] 5.4 Use AlertDialogTitle for accessible heading
-  - [ ] 5.5 Use AlertDialogDescription for warning message
-  - [ ] 5.6 Replace Cancel button with AlertDialogCancel
-  - [ ] 5.7 Replace Delete button with AlertDialogAction (destructive variant)
-  - [ ] 5.8 Test focus trap and Escape key handling
-  - [ ] 5.9 Test backdrop click to close
-  - [ ] 5.10 Run jest-axe accessibility tests
-  - [ ] 5.11 Verify all tests pass
+- [x] 5. Refactor ContactDeleteDialog Component
+  - [x] 5.1 Write tests for refactored ContactDeleteDialog with shadcn AlertDialog
+  - [x] 5.2 Replace custom modal with shadcn AlertDialog component
+  - [x] 5.3 Use AlertDialogContent for dialog wrapper
+  - [x] 5.4 Use AlertDialogTitle for accessible heading
+  - [x] 5.5 Use AlertDialogDescription for warning message
+  - [x] 5.6 Replace Cancel button with AlertDialogCancel
+  - [x] 5.7 Replace Delete button with AlertDialogAction (destructive variant)
+  - [x] 5.8 Test focus trap and Escape key handling
+  - [x] 5.9 Test backdrop click to close
+  - [x] 5.10 Run jest-axe accessibility tests
+  - [x] 5.11 Verify all tests pass
 
 - [ ] 6. Refactor Contact List Page
   - [ ] 6.1 Write tests for refactored contact list layout
