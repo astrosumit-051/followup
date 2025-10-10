@@ -9,6 +9,24 @@ import {
   type CreateContactInput,
   type UpdateContactInput,
 } from '@/lib/validations/contact';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface ContactFormProps {
   /**
@@ -41,10 +59,12 @@ interface ContactFormProps {
  * ContactForm Component
  *
  * Comprehensive form for creating and editing contacts.
- * Uses react-hook-form with Zod validation.
+ * Uses react-hook-form with Zod validation and shadcn/ui components.
  *
  * Features:
  * - Full field validation with Zod schemas
+ * - shadcn/ui form components for consistent styling
+ * - Dark mode support via design tokens
  * - Client-side validation with error messages
  * - Loading/disabled state during submission
  * - Cancel button for edit mode
@@ -78,322 +98,338 @@ export function ContactForm({
 }: ContactFormProps) {
   const schema = mode === 'create' ? createContactSchema : updateContactSchema;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues || { priority: 'HIGH' },
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      linkedInUrl: '',
+      company: '',
+      industry: '',
+      role: '',
+      priority: 'HIGH',
+      gender: undefined,
+      birthday: '',
+      profilePicture: '',
+      notes: '',
+      lastContactedAt: '',
+      ...defaultValues,
+    },
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Name - Required */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Name <span className="text-red-500">*</span>
-        </label>
-        <input
-          {...register('name')}
-          type="text"
-          id="name"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="John Doe"
-          disabled={isSubmitting}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Name - Required */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Name <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="John Doe"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-        )}
-      </div>
 
-      {/* Email */}
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email
-        </label>
-        <input
-          {...register('email')}
-          type="email"
-          id="email"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="john@example.com"
-          disabled={isSubmitting}
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="email"
+                  placeholder="john@example.com"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-        )}
-      </div>
 
-      {/* Phone */}
-      <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-          Phone
-        </label>
-        <input
-          {...register('phone')}
-          type="tel"
-          id="phone"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="+1-234-567-8900"
-          disabled={isSubmitting}
+        {/* Phone */}
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="tel"
+                  placeholder="+1-234-567-8900"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.phone && (
-          <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-        )}
-      </div>
 
-      {/* LinkedIn URL */}
-      <div>
-        <label htmlFor="linkedInUrl" className="block text-sm font-medium text-gray-700">
-          LinkedIn Profile
-        </label>
-        <input
-          {...register('linkedInUrl')}
-          type="url"
-          id="linkedInUrl"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="https://linkedin.com/in/johndoe"
-          disabled={isSubmitting}
+        {/* LinkedIn URL */}
+        <FormField
+          control={form.control}
+          name="linkedInUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>LinkedIn Profile</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="url"
+                  placeholder="https://linkedin.com/in/johndoe"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.linkedInUrl && (
-          <p className="mt-1 text-sm text-red-600">{errors.linkedInUrl.message}</p>
-        )}
-      </div>
 
-      {/* Company */}
-      <div>
-        <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-          Company
-        </label>
-        <input
-          {...register('company')}
-          type="text"
-          id="company"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="Acme Corp"
-          disabled={isSubmitting}
+        {/* Company */}
+        <FormField
+          control={form.control}
+          name="company"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Acme Corp"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.company && (
-          <p className="mt-1 text-sm text-red-600">{errors.company.message}</p>
-        )}
-      </div>
 
-      {/* Industry */}
-      <div>
-        <label htmlFor="industry" className="block text-sm font-medium text-gray-700">
-          Industry
-        </label>
-        <input
-          {...register('industry')}
-          type="text"
-          id="industry"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="Technology"
-          disabled={isSubmitting}
+        {/* Industry */}
+        <FormField
+          control={form.control}
+          name="industry"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Industry</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Technology"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.industry && (
-          <p className="mt-1 text-sm text-red-600">{errors.industry.message}</p>
-        )}
-      </div>
 
-      {/* Role */}
-      <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-          Role
-        </label>
-        <input
-          {...register('role')}
-          type="text"
-          id="role"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="Software Engineer"
-          disabled={isSubmitting}
+        {/* Role */}
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Software Engineer"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.role && (
-          <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
-        )}
-      </div>
 
-      {/* Priority */}
-      <div>
-        <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
-          Priority <span className="text-red-500">*</span>
-        </label>
-        <select
-          {...register('priority')}
-          id="priority"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          disabled={isSubmitting}
-        >
-          <option value="HIGH">High</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="LOW">Low</option>
-        </select>
-        {errors.priority && (
-          <p className="mt-1 text-sm text-red-600">{errors.priority.message}</p>
-        )}
-      </div>
-
-      {/* Gender */}
-      <div>
-        <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-          Gender
-        </label>
-        <select
-          {...register('gender')}
-          id="gender"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          disabled={isSubmitting}
-        >
-          <option value="">Not specified</option>
-          <option value="MALE">Male</option>
-          <option value="FEMALE">Female</option>
-          <option value="OTHER">Other</option>
-          <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
-        </select>
-        {errors.gender && (
-          <p className="mt-1 text-sm text-red-600">{errors.gender.message}</p>
-        )}
-      </div>
-
-      {/* Birthday */}
-      <div>
-        <label htmlFor="birthday" className="block text-sm font-medium text-gray-700">
-          Birthday
-        </label>
-        <input
-          {...register('birthday')}
-          type="date"
-          id="birthday"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          disabled={isSubmitting}
+        {/* Priority */}
+        <FormField
+          control={form.control}
+          name="priority"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Priority <span className="text-destructive">*</span>
+              </FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={isSubmitting}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="LOW">Low</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.birthday && (
-          <p className="mt-1 text-sm text-red-600">{errors.birthday.message}</p>
-        )}
-      </div>
 
-      {/* Profile Picture URL */}
-      <div>
-        <label
-          htmlFor="profilePicture"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Profile Picture URL
-        </label>
-        <input
-          {...register('profilePicture')}
-          type="url"
-          id="profilePicture"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="https://example.com/photo.jpg"
-          disabled={isSubmitting}
+        {/* Gender */}
+        <FormField
+          control={form.control}
+          name="gender"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Gender</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value || undefined}
+                disabled={isSubmitting}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Not specified" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="MALE">Male</SelectItem>
+                  <SelectItem value="FEMALE">Female</SelectItem>
+                  <SelectItem value="OTHER">Other</SelectItem>
+                  <SelectItem value="PREFER_NOT_TO_SAY">Prefer not to say</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.profilePicture && (
-          <p className="mt-1 text-sm text-red-600">{errors.profilePicture.message}</p>
-        )}
-      </div>
 
-      {/* Notes */}
-      <div>
-        <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-          Notes
-        </label>
-        <textarea
-          {...register('notes')}
-          id="notes"
-          rows={4}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="Add any notes about this contact..."
-          disabled={isSubmitting}
+        {/* Birthday */}
+        <FormField
+          control={form.control}
+          name="birthday"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Birthday</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="date"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.notes && (
-          <p className="mt-1 text-sm text-red-600">{errors.notes.message}</p>
-        )}
-      </div>
 
-      {/* Last Contacted Date */}
-      <div>
-        <label
-          htmlFor="lastContactedAt"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Last Contacted
-        </label>
-        <input
-          {...register('lastContactedAt')}
-          type="datetime-local"
-          id="lastContactedAt"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                     focus:border-blue-500 focus:ring-blue-500 sm:text-sm
-                     disabled:bg-gray-100 disabled:cursor-not-allowed"
-          disabled={isSubmitting}
+        {/* Profile Picture URL */}
+        <FormField
+          control={form.control}
+          name="profilePicture"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile Picture URL</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="url"
+                  placeholder="https://example.com/photo.jpg"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.lastContactedAt && (
-          <p className="mt-1 text-sm text-red-600">{errors.lastContactedAt.message}</p>
-        )}
-      </div>
 
-      {/* Form Actions */}
-      {/*
-        Mobile layout uses flex-col-reverse to visually place Submit button above Cancel,
-        while maintaining semantic DOM order (Cancel first, Submit second).
-        space-y-reverse applies reverse spacing to match the reversed flex direction.
-        On desktop (sm:), switches to horizontal layout with normal spacing (space-x-3).
-      */}
-      <div className="flex flex-col-reverse space-y-3 space-y-reverse pt-4 border-t border-gray-200
-                      sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-3">
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
+        {/* Notes */}
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  rows={4}
+                  placeholder="Add any notes about this contact..."
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Last Contacted Date */}
+        <FormField
+          control={form.control}
+          name="lastContactedAt"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last Contacted</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="datetime-local"
+                  disabled={isSubmitting}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Form Actions */}
+        <div className="flex flex-col-reverse space-y-3 space-y-reverse pt-4 border-t
+                        sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-3">
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+          )}
+          <Button
+            type="submit"
             disabled={isSubmitting}
-            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium
-                       text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
-                       focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                       disabled:opacity-50 disabled:cursor-not-allowed
-                       sm:w-auto sm:py-2"
+            className="w-full sm:w-auto"
           >
-            Cancel
-          </button>
-        )}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium
-                     text-white bg-blue-600 hover:bg-blue-700 focus:outline-none
-                     focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     sm:w-auto sm:py-2"
-        >
-          {isSubmitting ? 'Saving...' : mode === 'create' ? 'Create Contact' : 'Update Contact'}
-        </button>
-      </div>
-    </form>
+            {isSubmitting ? 'Saving...' : mode === 'create' ? 'Create Contact' : 'Update Contact'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
