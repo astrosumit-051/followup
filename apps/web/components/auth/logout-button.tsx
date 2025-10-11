@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 interface LogoutButtonProps {
   className?: string;
@@ -20,7 +22,7 @@ interface LogoutButtonProps {
  * Usage:
  * ```tsx
  * <LogoutButton>Sign Out</LogoutButton>
- * <LogoutButton className="btn-primary">Logout</LogoutButton>
+ * <LogoutButton className="w-full">Logout</LogoutButton>
  * ```
  */
 export function LogoutButton({ className, children }: LogoutButtonProps) {
@@ -67,13 +69,15 @@ export function LogoutButton({ className, children }: LogoutButtonProps) {
   };
 
   return (
-    <button
+    <Button
       onClick={handleLogout}
       disabled={isLoading}
+      variant="destructive"
       className={className}
       aria-label="Sign out"
     >
+      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {isLoading ? 'Signing out...' : children || 'Sign Out'}
-    </button>
+    </Button>
   );
 }

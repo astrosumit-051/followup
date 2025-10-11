@@ -109,16 +109,16 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 8.9 Run jest-axe accessibility tests
   - [ ] 8.10 Verify all tests pass - Tests created but may have same router mock issues as login
 
-- [ ] 9. Refactor Dashboard Layout
-  - [ ] 9.1 Write tests for refactored dashboard layout
-  - [ ] 9.2 Wrap dashboard cards in shadcn Card components
-  - [ ] 9.3 Use CardHeader, CardTitle, CardContent for structure
-  - [ ] 9.4 Use Separator component between sections
-  - [ ] 9.5 Update "Quick Add" button to use shadcn Button
-  - [ ] 9.6 Test card layout in light and dark modes
-  - [ ] 9.7 Test responsive layout on mobile/tablet/desktop
-  - [ ] 9.8 Run jest-axe accessibility tests
-  - [ ] 9.9 Verify all tests pass
+- [x] 9. Refactor Dashboard Layout
+  - [x] 9.1 Write tests for refactored dashboard layout
+  - [x] 9.2 Wrap dashboard cards in shadcn Card components
+  - [x] 9.3 Use CardHeader, CardTitle, CardContent for structure
+  - [x] 9.4 Use Separator component between sections
+  - [x] 9.5 Update "Quick Add" button to use shadcn Button
+  - [x] 9.6 Test card layout in light and dark modes
+  - [x] 9.7 Test responsive layout on mobile/tablet/desktop
+  - [x] 9.8 Run jest-axe accessibility tests
+  - [x] 9.9 Verify all tests pass
 
 - [ ] 10. Visual Regression Test Suite
   - [ ] 10.1 Write Playwright screenshot tests for all components
