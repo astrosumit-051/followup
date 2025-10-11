@@ -43,6 +43,20 @@ export default defineConfig({
     viewport: { width: 1280, height: 720 },
   },
 
+  /* Visual regression testing configuration */
+  expect: {
+    toHaveScreenshot: {
+      // Maximum number of pixels that can differ
+      maxDiffPixels: 100,
+      // Maximum percentage of pixels that can differ (0-1)
+      maxDiffPixelRatio: 0.01,
+      // Threshold for pixel comparison (0-1)
+      threshold: 0.2,
+      // Animation settings
+      animations: 'disabled',
+    },
+  },
+
   /* Configure projects for major browsers */
   projects: [
     // Setup project #0 - Wait for backend API (runs first)
