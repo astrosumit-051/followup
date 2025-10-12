@@ -3,11 +3,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
+import { ThemeProvider } from '@/components/theme-provider';
 
 /**
  * Providers Component
  *
  * Wraps the application with necessary providers:
+ * - ThemeProvider: next-themes for dark mode support
  * - QueryClientProvider: TanStack Query for data fetching and caching
  * - ReactQueryDevtools: Development tools for debugging queries (dev only)
  */
@@ -33,12 +35,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      {/* Show React Query Devtools in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <ReactQueryDevtools initialIsOpen={false} position="bottom" />
-      )}
-    </QueryClientProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <QueryClientProvider client={queryClient}>
+        {children}
+        {/* Show React Query Devtools in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} position="bottom" />
+        )}
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

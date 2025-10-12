@@ -19,6 +19,9 @@ export default defineConfig({
   /* Opt out of parallel tests on CI */
   workers: process.env.CI ? 1 : undefined,
 
+  /* Test timeout - increase for backend startup wait */
+  timeout: 90 * 1000, // 90 seconds to allow backend-ready setup to complete
+
   /* Reporter to use */
   reporter: 'html',
 
@@ -40,12 +43,33 @@ export default defineConfig({
     viewport: { width: 1280, height: 720 },
   },
 
+  /* Visual regression testing configuration */
+  expect: {
+    toHaveScreenshot: {
+      // Maximum number of pixels that can differ
+      maxDiffPixels: 100,
+      // Maximum percentage of pixels that can differ (0-1)
+      maxDiffPixelRatio: 0.01,
+      // Threshold for pixel comparison (0-1)
+      threshold: 0.2,
+      // Animation settings
+      animations: 'disabled',
+    },
+  },
+
   /* Configure projects for major browsers */
   projects: [
-    // Setup project #1 - Authentication (runs first)
+    // Setup project #0 - Wait for backend API (runs first)
+    {
+      name: 'backend-ready',
+      testMatch: /backend-ready\.setup\.ts/,
+    },
+
+    // Setup project #1 - Authentication (runs after backend is ready)
     {
       name: 'auth-setup',
       testMatch: /auth\.setup\.ts/,
+      dependencies: ['backend-ready'],
     },
 
     // Setup project #2 - Database seeding (runs after auth)
@@ -55,14 +79,14 @@ export default defineConfig({
       dependencies: ['auth-setup'],
     },
 
-    // Authenticated tests (require login and seeded data)
+    // Authenticated tests (require backend ready, login, and seeded data)
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['auth-setup', 'seed-setup'],
+      dependencies: ['backend-ready', 'auth-setup', 'seed-setup'],
     },
 
     {
@@ -71,7 +95,7 @@ export default defineConfig({
         ...devices['Desktop Firefox'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['auth-setup', 'seed-setup'],
+      dependencies: ['backend-ready', 'auth-setup', 'seed-setup'],
     },
 
     {
@@ -80,7 +104,7 @@ export default defineConfig({
         ...devices['Desktop Safari'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['auth-setup', 'seed-setup'],
+      dependencies: ['backend-ready', 'auth-setup', 'seed-setup'],
     },
 
     /* Test against mobile viewports */
@@ -90,7 +114,7 @@ export default defineConfig({
         ...devices['Pixel 5'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['auth-setup', 'seed-setup'],
+      dependencies: ['backend-ready', 'auth-setup', 'seed-setup'],
     },
     {
       name: 'Mobile Safari',
@@ -98,7 +122,7 @@ export default defineConfig({
         ...devices['iPhone 12'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['auth-setup', 'seed-setup'],
+      dependencies: ['backend-ready', 'auth-setup', 'seed-setup'],
     },
   ],
 
@@ -111,5 +135,8 @@ export default defineConfig({
     env: {
       DISABLE_RATE_LIMIT: 'true', // Disable API rate limiting for E2E tests
     },
+    // Important: pnpm dev starts both frontend (3000) and backend (3001) via Turbo
+    // The URL check only verifies frontend is ready. Backend readiness is ensured
+    // by the 'backend-ready' setup project which polls http://localhost:3001/health
   },
 });

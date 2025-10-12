@@ -52,7 +52,7 @@ describe('GraphQL Client', () => {
       const result = await graphqlRequest(mockQuery, mockVariables, mockSupabaseClient);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:4000/graphql',
+        'http://localhost:3001/graphql',
         {
           method: 'POST',
           headers: {
@@ -130,7 +130,7 @@ describe('GraphQL Client', () => {
       const result = await graphqlRequest(mockQuery, undefined, mockSupabaseClient);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:4000/graphql',
+        'http://localhost:3001/graphql',
         expect.objectContaining({
           body: JSON.stringify({
             query: mockQuery,
@@ -171,7 +171,7 @@ describe('GraphQL Client', () => {
       await graphqlMutation(mockMutation, undefined, mockSupabaseClient);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:4000/graphql',
+        'http://localhost:3001/graphql',
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockAccessToken}`,

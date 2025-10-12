@@ -12,11 +12,11 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  * - Token automatically included from Supabase auth session
  *
  * Base URL:
- * - Development: http://localhost:4000/graphql
+ * - Development: http://localhost:3001/graphql
  * - Production: Configured via NEXT_PUBLIC_API_URL environment variable
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/graphql';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/graphql';
 
 /**
  * GraphQL request function with automatic authentication

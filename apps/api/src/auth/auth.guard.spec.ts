@@ -51,6 +51,7 @@ describe('AuthGuard', () => {
 
   const createMockExecutionContext = (authHeader?: string): ExecutionContext => {
     return {
+      getType: () => 'http',
       switchToHttp: () => ({
         getRequest: () => ({
           headers: {
@@ -200,6 +201,7 @@ describe('AuthGuard', () => {
       mockUserService.syncUserFromSupabase.mockResolvedValue(mockDbUser);
 
       const context = {
+        getType: () => 'http',
         switchToHttp: () => ({
           getRequest: () => mockRequest,
         }),

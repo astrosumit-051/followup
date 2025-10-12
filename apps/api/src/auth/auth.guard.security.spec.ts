@@ -53,6 +53,7 @@ describe('AuthGuard Security Tests', () => {
 
   const createMockExecutionContext = (authHeader?: string): ExecutionContext => {
     return {
+      getType: () => 'http',
       switchToHttp: () => ({
         getRequest: () => ({
           headers: {

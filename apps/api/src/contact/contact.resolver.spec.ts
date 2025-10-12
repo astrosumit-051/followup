@@ -671,5 +671,107 @@ describe('ContactResolver', () => {
         resolver.deleteContact(mockUser, 'nonexistent-id'),
       ).rejects.toThrow('Contact not found');
     });
+
+    it('should handle database errors on findAll', async () => {
+      const dbError = new Error('Database connection failed');
+      mockContactService.findAll.mockRejectedValue(dbError);
+
+      await expect(
+        resolver.findAll(mockUser),
+      ).rejects.toThrow('Database connection failed');
+    });
+
+    it('should handle duplicate email errors on create', async () => {
+      const duplicateError = new Error('Email already exists for this user');
+      mockContactService.create.mockRejectedValue(duplicateError);
+
+      const duplicateInput: CreateContactDto = {
+        name: 'John Doe',
+        email: 'existing@example.com',
+      };
+
+      await expect(
+        resolver.createContact(mockUser, duplicateInput),
+      ).rejects.toThrow('Email already exists for this user');
+    });
+
+    it('should handle duplicate email errors on update', async () => {
+      const duplicateError = new Error('Email already exists for this user');
+      mockContactService.update.mockRejectedValue(duplicateError);
+
+      await expect(
+        resolver.updateContact(mockUser, 'contact-456', { email: 'duplicate@example.com' }),
+      ).rejects.toThrow('Email already exists for this user');
+    });
+
+    it('should handle database errors on delete', async () => {
+      const dbError = new Error('Database error during deletion');
+      mockContactService.delete.mockRejectedValue(dbError);
+
+      await expect(
+        resolver.deleteContact(mockUser, 'contact-456'),
+      ).rejects.toThrow('Database error during deletion');
+    });
+
+    it('should handle undefined filters in findAll', async () => {
+      const mockConnection = {
+        nodes: [mockContact],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+        totalCount: 1,
+      };
+      mockContactService.findAll.mockResolvedValue(mockConnection);
+
+      const result = await resolver.findAll(
+        mockUser,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
+
+      expect(service.findAll).toHaveBeenCalledWith(
+        'user-123',
+        {},
+        {},
+        undefined,
+        'desc',
+      );
+      expect(result).toEqual(mockConnection);
+    });
+
+    it('should handle null sortOrder and use default', async () => {
+      const mockConnection = {
+        nodes: [mockContact],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+        totalCount: 1,
+      };
+      mockContactService.findAll.mockResolvedValue(mockConnection);
+
+      await resolver.findAll(
+        mockUser,
+        undefined,
+        undefined,
+        ContactSortField.NAME,
+        null as any,
+      );
+
+      expect(service.findAll).toHaveBeenCalledWith(
+        'user-123',
+        {},
+        {},
+        ContactSortField.NAME,
+        'desc',
+      );
+    });
   });
 });

@@ -13,6 +13,7 @@ describe('ContactService', () => {
   const mockPrismaClient = {
     contact: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
       count: jest.fn(),
       create: jest.fn(),
@@ -64,12 +65,12 @@ describe('ContactService', () => {
     };
 
     it('should return contact when user owns it', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(mockContact);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(mockContact);
 
       const result = await service.findOne(contactId, userId);
 
       expect(result).toEqual(mockContact);
-      expect(prisma.contact.findUnique).toHaveBeenCalledWith({
+      expect(prisma.contact.findFirst).toHaveBeenCalledWith({
         where: {
           id: contactId,
           userId,
@@ -78,12 +79,12 @@ describe('ContactService', () => {
     });
 
     it('should return null when contact does not exist', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(null);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(null);
 
       const result = await service.findOne('nonexistent-id', userId);
 
       expect(result).toBeNull();
-      expect(prisma.contact.findUnique).toHaveBeenCalledWith({
+      expect(prisma.contact.findFirst).toHaveBeenCalledWith({
         where: {
           id: 'nonexistent-id',
           userId,
@@ -92,12 +93,12 @@ describe('ContactService', () => {
     });
 
     it('should return null when contact belongs to different user', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(null);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(null);
 
       const result = await service.findOne(contactId, 'different-user-id');
 
       expect(result).toBeNull();
-      expect(prisma.contact.findUnique).toHaveBeenCalledWith({
+      expect(prisma.contact.findFirst).toHaveBeenCalledWith({
         where: {
           id: contactId,
           userId: 'different-user-id',
@@ -107,7 +108,7 @@ describe('ContactService', () => {
 
     it('should handle database errors gracefully', async () => {
       const dbError = new Error('Database connection failed');
-      mockPrismaClient.contact.findUnique.mockRejectedValue(dbError);
+      mockPrismaClient.contact.findFirst.mockRejectedValue(dbError);
 
       await expect(service.findOne(contactId, userId)).rejects.toThrow(
         'Database connection failed',
@@ -589,7 +590,7 @@ describe('ContactService', () => {
     };
 
     it('should update contact when user owns it', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(existingContact);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(existingContact);
       mockPrismaClient.contact.update.mockResolvedValue({
         ...existingContact,
         ...updateDto,
@@ -608,7 +609,7 @@ describe('ContactService', () => {
 
     it('should update only provided fields', async () => {
       const partialUpdate = { email: 'newemail@example.com' };
-      mockPrismaClient.contact.findUnique.mockResolvedValue(existingContact);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(existingContact);
       mockPrismaClient.contact.update.mockResolvedValue({
         ...existingContact,
         email: 'newemail@example.com',
@@ -624,7 +625,7 @@ describe('ContactService', () => {
     });
 
     it('should throw NotFoundException when contact does not exist', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(null);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(null);
 
       await expect(
         service.update('nonexistent-id', updateDto, userId),
@@ -632,7 +633,7 @@ describe('ContactService', () => {
     });
 
     it('should throw NotFoundException when user does not own contact', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(null);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(null);
 
       await expect(
         service.update(contactId, updateDto, 'different-user-id'),
@@ -665,7 +666,7 @@ describe('ContactService', () => {
     };
 
     it('should delete contact when user owns it', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(existingContact);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(existingContact);
       mockPrismaClient.contact.delete.mockResolvedValue(existingContact);
 
       const result = await service.delete(contactId, userId);
@@ -677,7 +678,7 @@ describe('ContactService', () => {
     });
 
     it('should return true on successful deletion', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(existingContact);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(existingContact);
       mockPrismaClient.contact.delete.mockResolvedValue(existingContact);
 
       const result = await service.delete(contactId, userId);
@@ -686,7 +687,7 @@ describe('ContactService', () => {
     });
 
     it('should throw NotFoundException when contact does not exist', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(null);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(null);
 
       await expect(service.delete('nonexistent-id', userId)).rejects.toThrow(
         'Contact with ID nonexistent-id not found',
@@ -694,7 +695,7 @@ describe('ContactService', () => {
     });
 
     it('should throw NotFoundException when user does not own contact', async () => {
-      mockPrismaClient.contact.findUnique.mockResolvedValue(null);
+      mockPrismaClient.contact.findFirst.mockResolvedValue(null);
 
       await expect(
         service.delete(contactId, 'different-user-id'),

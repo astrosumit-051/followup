@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 interface LogoutButtonProps {
   className?: string;
@@ -20,26 +22,52 @@ interface LogoutButtonProps {
  * Usage:
  * ```tsx
  * <LogoutButton>Sign Out</LogoutButton>
- * <LogoutButton className="btn-primary">Logout</LogoutButton>
+ * <LogoutButton className="w-full">Logout</LogoutButton>
  * ```
  */
 export function LogoutButton({ className, children }: LogoutButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createBrowserClient();
 
   const handleLogout = async () => {
     try {
       setIsLoading(true);
+      setError(null);
 
-      // Sign out from Supabase (client-side)
-      const { error } = await supabase.auth.signOut();
+      // Attempt logout with retries to handle transient failures
+      let retries = 3;
+      let signOutError = null;
 
-      if (error) {
-        console.error('Logout error:', error.message);
+      while (retries > 0) {
+        const { error } = await supabase.auth.signOut();
+
+        if (!error) {
+          // Logout successful
+          signOutError = null;
+          break;
+        }
+
+        signOutError = error;
+        retries--;
+
+        if (retries > 0) {
+          // Wait 1 second before retry with exponential backoff
+          await new Promise(resolve => setTimeout(resolve, 1000 * (4 - retries)));
+        }
       }
 
-      // Clear all Supabase-related items from local storage
+      // Only proceed if logout succeeded
+      if (signOutError) {
+        // Show error to user - DO NOT redirect
+        console.error('Logout failed after retries:', signOutError.message);
+        setError('Failed to log out. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Clear all Supabase-related items from local storage ONLY after successful logout
       if (typeof window !== 'undefined') {
         const keysToRemove: string[] = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -51,29 +79,34 @@ export function LogoutButton({ className, children }: LogoutButtonProps) {
         keysToRemove.forEach(key => localStorage.removeItem(key));
       }
 
-      // Always redirect to login, even if logout had an error
-      // This ensures user is logged out from the UI
-      router.push('/login');
-      router.refresh(); // Force router refresh to clear any cached auth state
-    } catch (error) {
-      console.error('Unexpected logout error:', error);
-
-      // Still redirect to login for safety
+      // Redirect only after successful logout
       router.push('/login');
       router.refresh();
+    } catch (error) {
+      console.error('Unexpected logout error:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      disabled={isLoading}
-      className={className}
-      aria-label="Sign out"
-    >
-      {isLoading ? 'Signing out...' : children || 'Sign Out'}
-    </button>
+    <div className="space-y-2">
+      {error && (
+        <div className="rounded-md bg-destructive/10 border border-destructive/20 p-2">
+          <p className="text-xs text-destructive">{error}</p>
+        </div>
+      )}
+      <Button
+        onClick={handleLogout}
+        disabled={isLoading}
+        variant="destructive"
+        className={className}
+        aria-label="Sign out"
+      >
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {isLoading ? 'Signing out...' : children || 'Sign Out'}
+      </Button>
+    </div>
   );
 }
