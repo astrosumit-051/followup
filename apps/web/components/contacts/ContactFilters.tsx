@@ -1,6 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { X } from 'lucide-react';
 
 interface ContactFiltersProps {
   /**
@@ -99,160 +111,180 @@ export function ContactFilters({
   ).length;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
-      {/* Filter Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <h3 className="text-sm font-medium text-gray-900">Filters</h3>
-          {hasActiveFilters && (
-            <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-              {activeFilterCount} active
-            </span>
-          )}
-        </div>
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-sm font-medium">Filters</h3>
+            {hasActiveFilters && (
+              <Badge variant="secondary" className="text-xs">
+                {activeFilterCount} active
+              </Badge>
+            )}
+          </div>
 
-        <div className="flex items-center space-x-2">
-          {hasActiveFilters && (
-            <button
-              onClick={handleClearFilters}
-              className="text-xs text-gray-600 hover:text-gray-900 font-medium"
+          <div className="flex items-center space-x-2">
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearFilters}
+                className="h-7 text-xs"
+              >
+                Clear all
+              </Button>
+            )}
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="h-7 text-xs"
+              aria-expanded={isExpanded}
             >
-              Clear all
-            </button>
-          )}
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium
-                       focus:outline-none focus:underline"
-            aria-expanded={isExpanded}
-          >
-            {isExpanded ? 'Hide' : 'Show'} filters
-          </button>
+              {isExpanded ? 'Hide' : 'Show'} filters
+            </Button>
+          </div>
         </div>
-      </div>
+      </CardHeader>
 
       {/* Filter Controls */}
       {isExpanded && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {/* Priority Filter */}
-          <div>
-            <label
-              htmlFor="filter-priority"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Priority
-            </label>
-            <select
-              id="filter-priority"
-              value={filters.priority || ''}
-              onChange={handlePriorityChange}
-              className="block w-full rounded-md border-gray-300 shadow-sm
-                         focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="">All priorities</option>
-              <option value="HIGH">High</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="LOW">Low</option>
-            </select>
-          </div>
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {/* Priority Filter */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-priority">Priority</Label>
+              <Select
+                value={filters.priority || ''}
+                onValueChange={(value) =>
+                  onFiltersChange({
+                    ...filters,
+                    priority: value ? (value as 'HIGH' | 'MEDIUM' | 'LOW') : undefined,
+                  })
+                }
+              >
+                <SelectTrigger id="filter-priority">
+                  <SelectValue placeholder="All priorities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All priorities</SelectItem>
+                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="LOW">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Company Filter */}
-          <div>
-            <label
-              htmlFor="filter-company"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Company
-            </label>
-            <select
-              id="filter-company"
-              value={filters.company || ''}
-              onChange={handleCompanyChange}
-              className="block w-full rounded-md border-gray-300 shadow-sm
-                         focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="">All companies</option>
-              {companies.map((company) => (
-                <option key={company} value={company}>
-                  {company}
-                </option>
-              ))}
-            </select>
-          </div>
+            {/* Company Filter */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-company">Company</Label>
+              <Select
+                value={filters.company || ''}
+                onValueChange={(value) =>
+                  onFiltersChange({
+                    ...filters,
+                    company: value || undefined,
+                  })
+                }
+              >
+                <SelectTrigger id="filter-company">
+                  <SelectValue placeholder="All companies" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All companies</SelectItem>
+                  {companies.map((company) => (
+                    <SelectItem key={company} value={company}>
+                      {company}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Industry Filter */}
-          <div>
-            <label
-              htmlFor="filter-industry"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Industry
-            </label>
-            <select
-              id="filter-industry"
-              value={filters.industry || ''}
-              onChange={handleIndustryChange}
-              className="block w-full rounded-md border-gray-300 shadow-sm
-                         focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="">All industries</option>
-              {industries.map((industry) => (
-                <option key={industry} value={industry}>
-                  {industry}
-                </option>
-              ))}
-            </select>
+            {/* Industry Filter */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-industry">Industry</Label>
+              <Select
+                value={filters.industry || ''}
+                onValueChange={(value) =>
+                  onFiltersChange({
+                    ...filters,
+                    industry: value || undefined,
+                  })
+                }
+              >
+                <SelectTrigger id="filter-industry">
+                  <SelectValue placeholder="All industries" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All industries</SelectItem>
+                  {industries.map((industry) => (
+                    <SelectItem key={industry} value={industry}>
+                      {industry}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
+        </CardContent>
       )}
 
       {/* Active Filters Summary (when collapsed) */}
       {!isExpanded && hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {filters.priority && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-              Priority: {filters.priority}
-              <button
-                onClick={() =>
-                  onFiltersChange({ ...filters, priority: undefined })
-                }
-                className="ml-1 text-gray-600 hover:text-gray-900 focus:outline-none"
-                aria-label="Remove priority filter"
-              >
-                ×
-              </button>
-            </span>
-          )}
-          {filters.company && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-              Company: {filters.company}
-              <button
-                onClick={() =>
-                  onFiltersChange({ ...filters, company: undefined })
-                }
-                className="ml-1 text-gray-600 hover:text-gray-900 focus:outline-none"
-                aria-label="Remove company filter"
-              >
-                ×
-              </button>
-            </span>
-          )}
-          {filters.industry && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-              Industry: {filters.industry}
-              <button
-                onClick={() =>
-                  onFiltersChange({ ...filters, industry: undefined })
-                }
-                className="ml-1 text-gray-600 hover:text-gray-900 focus:outline-none"
-                aria-label="Remove industry filter"
-              >
-                ×
-              </button>
-            </span>
-          )}
-        </div>
+        <CardContent className="pt-0 pb-4">
+          <div className="flex flex-wrap gap-2">
+            {filters.priority && (
+              <Badge variant="secondary" className="gap-1">
+                Priority: {filters.priority}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    onFiltersChange({ ...filters, priority: undefined })
+                  }
+                  className="h-auto w-auto p-0 hover:bg-transparent"
+                  aria-label="Remove priority filter"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+            {filters.company && (
+              <Badge variant="secondary" className="gap-1">
+                Company: {filters.company}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    onFiltersChange({ ...filters, company: undefined })
+                  }
+                  className="h-auto w-auto p-0 hover:bg-transparent"
+                  aria-label="Remove company filter"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+            {filters.industry && (
+              <Badge variant="secondary" className="gap-1">
+                Industry: {filters.industry}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    onFiltersChange({ ...filters, industry: undefined })
+                  }
+                  className="h-auto w-auto p-0 hover:bg-transparent"
+                  aria-label="Remove industry filter"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+          </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 }

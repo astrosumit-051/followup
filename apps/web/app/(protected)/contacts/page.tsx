@@ -12,6 +12,17 @@ import { ContactListEmpty } from '@/components/contacts/ContactListEmpty';
 import { ContactSearchBar } from '@/components/contacts/ContactSearchBar';
 import { ContactFilters } from '@/components/contacts/ContactFilters';
 import { ContactSortDropdown } from '@/components/contacts/ContactSortDropdown';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Plus, Loader2 } from 'lucide-react';
 import type { ContactFilterInput, ContactSortField, SortOrder } from '@/lib/graphql/contacts';
 
 /**
@@ -102,9 +113,8 @@ function ContactsPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2
-                          border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Checking authentication...</p>
         </div>
       </div>
     );
@@ -113,7 +123,7 @@ function ContactsPageContent() {
   // Loading skeleton state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4
+      <div className="min-h-screen bg-background py-8 px-4
                       sm:px-6
                       lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -122,19 +132,19 @@ function ContactsPageContent() {
             <div className="flex flex-col space-y-4
                             sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <div className="space-y-2">
-                <div className="h-9 bg-gray-300 rounded w-32 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded w-48 animate-pulse"></div>
+                <Skeleton className="h-9 w-32" />
+                <Skeleton className="h-4 w-48" />
               </div>
-              <div className="h-10 bg-gray-300 rounded w-40 animate-pulse"></div>
+              <Skeleton className="h-10 w-40" />
             </div>
           </div>
 
           {/* Search and Filters Skeleton */}
           <div className="mb-6 space-y-4">
-            <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+            <Skeleton className="h-10 w-full" />
             <div className="flex space-x-4">
-              <div className="h-10 bg-gray-200 rounded flex-1 animate-pulse"></div>
-              <div className="h-10 bg-gray-200 rounded w-40 animate-pulse"></div>
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="h-10 w-40" />
             </div>
           </div>
 
@@ -149,11 +159,11 @@ function ContactsPageContent() {
   if (isError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center bg-red-50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold text-red-800 mb-2">
+        <div className="text-center bg-destructive/10 p-6 rounded-lg border border-destructive/20">
+          <h2 className="text-xl font-semibold text-destructive mb-2">
             Error Loading Contacts
           </h2>
-          <p className="text-red-600">
+          <p className="text-destructive/90">
             {error instanceof Error ? error.message : 'An unexpected error occurred'}
           </p>
         </div>
@@ -162,7 +172,7 @@ function ContactsPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4
+    <div className="min-h-screen bg-background py-8 px-4
                     sm:px-6
                     lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -171,33 +181,17 @@ function ContactsPageContent() {
           <div className="flex flex-col space-y-4
                           sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Contacts</h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <h1 className="text-3xl font-bold text-foreground">Contacts</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Manage your professional network ({contacts.length} contact{contacts.length !== 1 ? 's' : ''})
               </p>
             </div>
-            <Link
-              href="/contacts/new"
-              className="inline-flex items-center justify-center px-4 py-2
-                         bg-blue-600 text-white font-medium rounded-md shadow-sm
-                         hover:bg-blue-700 focus:outline-none focus:ring-2
-                         focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-            >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Create Contact
-            </Link>
+            <Button asChild>
+              <Link href="/contacts/new">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Contact
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -217,22 +211,23 @@ function ContactsPageContent() {
             <div className="flex space-x-4">
               {/* Page Size Selector */}
               <div className="flex items-center space-x-2">
-                <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="pageSize" className="text-sm font-medium">
                   Show:
-                </label>
-                <select
-                  id="pageSize"
-                  value={pageSize}
-                  onChange={(e) => setPageSize(Number(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-md shadow-sm
-                             focus:outline-none focus:ring-2 focus:ring-blue-500
-                             focus:border-blue-500 text-sm"
+                </Label>
+                <Select
+                  value={pageSize.toString()}
+                  onValueChange={(value) => setPageSize(Number(value))}
                 >
-                  <option value={12}>12</option>
-                  <option value={24}>24</option>
-                  <option value={48}>48</option>
-                  <option value={96}>96</option>
-                </select>
+                  <SelectTrigger id="pageSize" className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="12">12</SelectItem>
+                    <SelectItem value="24">24</SelectItem>
+                    <SelectItem value="48">48</SelectItem>
+                    <SelectItem value="96">96</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <ContactSortDropdown
@@ -272,44 +267,20 @@ function ContactsPageContent() {
             {/* Load More Button */}
             {hasNextPage && (
               <div className="mt-8 flex justify-center">
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => fetchNextPage()}
                   disabled={isFetchingNextPage}
-                  className="px-6 py-3 bg-white border border-gray-300 rounded-md
-                             shadow-sm text-sm font-medium text-gray-700
-                             hover:bg-gray-50 focus:outline-none focus:ring-2
-                             focus:ring-offset-2 focus:ring-blue-500
-                             disabled:opacity-50 disabled:cursor-not-allowed
-                             transition-colors"
                 >
                   {isFetchingNextPage ? (
-                    <span className="flex items-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Loading more...
-                    </span>
+                    </>
                   ) : (
                     'Load More'
                   )}
-                </button>
+                </Button>
               </div>
             )}
           </>
