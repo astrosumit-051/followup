@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Loader2 } from 'lucide-react';
+import { validateRedirectOrigin, validatePasswordStrength, calculatePasswordStrength as calcStrength } from '@/lib/security';
 
 export function SignupForm() {
   const [email, setEmail] = useState('');
@@ -20,18 +21,8 @@ export function SignupForm() {
   const router = useRouter();
   const supabase = createBrowserClient();
 
-  // Calculate password strength (0-100)
-  const calculatePasswordStrength = (pwd: string): number => {
-    let strength = 0;
-    if (pwd.length >= 8) strength += 25;
-    if (pwd.length >= 12) strength += 15;
-    if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) strength += 20;
-    if (/[0-9]/.test(pwd)) strength += 20;
-    if (/[^a-zA-Z0-9]/.test(pwd)) strength += 20;
-    return Math.min(strength, 100);
-  };
-
-  const passwordStrength = calculatePasswordStrength(password);
+  // Use centralized password strength calculation
+  const passwordStrength = calcStrength(password);
 
   const getStrengthColor = (strength: number): string => {
     if (strength < 40) return 'bg-destructive';
@@ -55,19 +46,24 @@ export function SignupForm() {
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+    // Enhanced password validation using security utility
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.valid) {
+      setError(passwordValidation.reason || 'Password does not meet security requirements');
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Validate redirect origin to prevent open redirect attacks
+      const validatedOrigin = validateRedirectOrigin(window.location.origin);
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: email.trim(),
         password: password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${validatedOrigin}/auth/callback`,
         },
       });
 
@@ -99,10 +95,13 @@ export function SignupForm() {
     setIsLoading(true);
 
     try {
+      // Validate redirect origin to prevent open redirect attacks
+      const validatedOrigin = validateRedirectOrigin(window.location.origin);
+
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${validatedOrigin}/auth/callback`,
         },
       });
 

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Loader2 } from 'lucide-react';
+import { validateRedirectOrigin } from '@/lib/security';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -62,10 +63,13 @@ export function LoginForm() {
     setIsLoading(true);
 
     try {
+      // Validate redirect origin to prevent open redirect attacks
+      const validatedOrigin = validateRedirectOrigin(window.location.origin);
+
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${validatedOrigin}/auth/callback`,
         },
       });
 
