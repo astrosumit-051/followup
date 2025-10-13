@@ -39,7 +39,7 @@ export default function EditContactPage() {
       // Update the contact
       await updateContact.mutateAsync({
         id,
-        data,
+        input: data,
       });
 
       // Show success toast
