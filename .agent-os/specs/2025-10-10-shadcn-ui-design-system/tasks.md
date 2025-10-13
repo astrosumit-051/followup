@@ -150,17 +150,17 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 11.11 Test focus indicators visible on all interactive elements - Verified via E2E tests
   - [x] 11.12 Verify all accessibility tests pass - All components WCAG 2.1 AA compliant (see ACCESSIBILITY_AUDIT.md)
 
-- [ ] 12. Component Documentation
-  - [ ] 12.1 Create component usage guide (README.md in apps/web/components/)
-  - [ ] 12.2 Document Button variants and when to use each
-  - [ ] 12.3 Document Form component patterns with React Hook Form + Zod
-  - [ ] 12.4 Document Card composition patterns (Header, Title, Content, Footer)
-  - [ ] 12.5 Document Dialog/AlertDialog usage patterns
-  - [ ] 12.6 Document design token usage (colors, spacing, typography)
-  - [ ] 12.7 Create migration guide for converting custom components to shadcn
-  - [ ] 12.8 Document dark mode implementation and theme toggle usage
-  - [ ] 12.9 Create accessibility best practices guide
-  - [ ] 12.10 Add code examples for common component compositions
+- [x] 12. Component Documentation
+  - [x] 12.1 Create component usage guide (README.md in apps/web/components/) - Comprehensive 700+ line guide created
+  - [x] 12.2 Document Button variants and when to use each - All variants documented with use cases
+  - [x] 12.3 Document Form component patterns with React Hook Form + Zod - Complete form example with validation
+  - [x] 12.4 Document Card composition patterns (Header, Title, Content, Footer) - 3 composition patterns documented
+  - [x] 12.5 Document Dialog/AlertDialog usage patterns - Examples for both with accessibility notes
+  - [x] 12.6 Document design token usage (colors, spacing, typography) - Complete token reference included
+  - [x] 12.7 Create migration guide for converting custom components to shadcn - Before/after examples for Button, Card, Form
+  - [x] 12.8 Document dark mode implementation and theme toggle usage - Implementation guide and best practices
+  - [x] 12.9 Create accessibility best practices guide - 6 key guidelines with examples
+  - [x] 12.10 Add code examples for common component compositions - Contact card, dashboard stats, search/filter patterns
 
 - [ ] 13. Performance Optimization
   - [ ] 13.1 Analyze bundle size impact of shadcn components
