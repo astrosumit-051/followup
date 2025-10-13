@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 /**
  * Contact Error State Component
@@ -40,10 +40,12 @@ export const ContactErrorState = ({ error }: { error: Error | unknown }) => {
               Error Loading Contact
             </h2>
             <p className="text-gray-600 mb-4">
-              {error instanceof Error ? error.message : 'An unexpected error occurred'}
+              {error instanceof Error
+                ? error.message
+                : "An unexpected error occurred"}
             </p>
             <button
-              onClick={() => router.push('/contacts')}
+              onClick={() => router.push("/contacts")}
               aria-label="Return to contacts list"
               className="px-4 py-2 bg-blue-600 text-white rounded-md
                          hover:bg-blue-700 focus:outline-none

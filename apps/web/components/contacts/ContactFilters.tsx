@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { X } from 'lucide-react';
+} from "@/components/ui/select";
+import { X } from "lucide-react";
 
 interface ContactFiltersProps {
   /**
    * Current filter values
    */
   filters: {
-    priority?: 'HIGH' | 'MEDIUM' | 'LOW';
+    priority?: "HIGH" | "MEDIUM" | "LOW";
     company?: string;
     industry?: string;
   };
@@ -28,7 +28,7 @@ interface ContactFiltersProps {
    * Filter change handler
    */
   onFiltersChange: (filters: {
-    priority?: 'HIGH' | 'MEDIUM' | 'LOW';
+    priority?: "HIGH" | "MEDIUM" | "LOW";
     company?: string;
     industry?: string;
   }) => void;
@@ -76,39 +76,21 @@ export function ContactFilters({
 }: ContactFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as 'HIGH' | 'MEDIUM' | 'LOW' | '';
-    onFiltersChange({
-      ...filters,
-      priority: value || undefined,
-    });
-  };
-
-  const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    onFiltersChange({
-      ...filters,
-      company: value || undefined,
-    });
-  };
-
-  const handleIndustryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    onFiltersChange({
-      ...filters,
-      industry: value || undefined,
-    });
-  };
-
   const handleClearFilters = () => {
     onFiltersChange({});
     setIsExpanded(false);
   };
 
-  const hasActiveFilters = !!(filters.priority || filters.company || filters.industry);
-  const activeFilterCount = [filters.priority, filters.company, filters.industry].filter(
-    Boolean
-  ).length;
+  const hasActiveFilters = !!(
+    filters.priority ||
+    filters.company ||
+    filters.industry
+  );
+  const activeFilterCount = [
+    filters.priority,
+    filters.company,
+    filters.industry,
+  ].filter(Boolean).length;
 
   return (
     <Card>
@@ -141,7 +123,7 @@ export function ContactFilters({
               className="h-7 text-xs"
               aria-expanded={isExpanded}
             >
-              {isExpanded ? 'Hide' : 'Show'} filters
+              {isExpanded ? "Hide" : "Show"} filters
             </Button>
           </div>
         </div>
@@ -155,11 +137,13 @@ export function ContactFilters({
             <div className="space-y-2">
               <Label htmlFor="filter-priority">Priority</Label>
               <Select
-                value={filters.priority || ''}
+                value={filters.priority || ""}
                 onValueChange={(value) =>
                   onFiltersChange({
                     ...filters,
-                    priority: value ? (value as 'HIGH' | 'MEDIUM' | 'LOW') : undefined,
+                    priority: value
+                      ? (value as "HIGH" | "MEDIUM" | "LOW")
+                      : undefined,
                   })
                 }
               >
@@ -179,7 +163,7 @@ export function ContactFilters({
             <div className="space-y-2">
               <Label htmlFor="filter-company">Company</Label>
               <Select
-                value={filters.company || ''}
+                value={filters.company || ""}
                 onValueChange={(value) =>
                   onFiltersChange({
                     ...filters,
@@ -205,7 +189,7 @@ export function ContactFilters({
             <div className="space-y-2">
               <Label htmlFor="filter-industry">Industry</Label>
               <Select
-                value={filters.industry || ''}
+                value={filters.industry || ""}
                 onValueChange={(value) =>
                   onFiltersChange({
                     ...filters,

@@ -36,6 +36,7 @@ This document provides a comprehensive performance analysis of the shad cn/ui re
 shadcn/ui uses a **copy-paste architecture**, meaning components are added to your source code rather than imported from a package. This provides several performance benefits:
 
 **Advantages:**
+
 - ✅ **Tree-shaking friendly:** Only the components you use are included
 - ✅ **No runtime overhead:** No additional library code
 - ✅ **Customizable:** Can optimize specific components as needed
@@ -43,17 +44,18 @@ shadcn/ui uses a **copy-paste architecture**, meaning components are added to yo
 
 ### Component Breakdown
 
-| Component Category | Count | Estimated Size | Tree-shakeable |
-|--------------------|-------|----------------|----------------|
-| **Core** (Button, Input, Label, Textarea) | 4 | ~2-3 KB | ✅ Yes |
-| **Forms** (Form, Select, Alert) | 3 | ~5-6 KB | ✅ Yes |
-| **Layout** (Card, Separator, Badge, Avatar) | 4 | ~3-4 KB | ✅ Yes |
-| **Dialogs** (Dialog, AlertDialog, Sheet, DropdownMenu, Popover) | 5 | ~12-15 KB | ✅ Yes |
-| **Feedback** (Skeleton, Progress, Toast) | 3 | ~2-3 KB | ✅ Yes |
-| **Data** (Table, Tabs) | 2 | ~4-5 KB | ✅ Yes |
-| **Total** | 22 | **~30-40 KB** | ✅ Yes |
+| Component Category                                              | Count | Estimated Size | Tree-shakeable |
+| --------------------------------------------------------------- | ----- | -------------- | -------------- |
+| **Core** (Button, Input, Label, Textarea)                       | 4     | ~2-3 KB        | ✅ Yes         |
+| **Forms** (Form, Select, Alert)                                 | 3     | ~5-6 KB        | ✅ Yes         |
+| **Layout** (Card, Separator, Badge, Avatar)                     | 4     | ~3-4 KB        | ✅ Yes         |
+| **Dialogs** (Dialog, AlertDialog, Sheet, DropdownMenu, Popover) | 5     | ~12-15 KB      | ✅ Yes         |
+| **Feedback** (Skeleton, Progress, Toast)                        | 3     | ~2-3 KB        | ✅ Yes         |
+| **Data** (Table, Tabs)                                          | 2     | ~4-5 KB        | ✅ Yes         |
+| **Total**                                                       | 22    | **~30-40 KB**  | ✅ Yes         |
 
 **Dependencies Added:**
+
 - `@radix-ui/*` primitives: ~50-60 KB (gzipped, tree-shakeable)
 - `class-variance-authority`: ~2 KB
 - `clsx` + `tailwind-merge`: ~3 KB
@@ -64,12 +66,12 @@ shadcn/ui uses a **copy-paste architecture**, meaning components are added to yo
 
 ### Comparison with Alternatives
 
-| Library | Bundle Size | Tree-shakeable | Customizable |
-|---------|-------------|----------------|--------------|
-| **shadcn/ui** | ~30-35 KB (gzipped) | ✅ Yes | ✅ Yes |
-| Material-UI | ~300-400 KB | ⚠️ Partial | ❌ Limited |
-| Ant Design | ~500-600 KB | ⚠️ Partial | ❌ Limited |
-| Chakra UI | ~150-200 KB | ⚠️ Partial | ✅ Yes |
+| Library       | Bundle Size         | Tree-shakeable | Customizable |
+| ------------- | ------------------- | -------------- | ------------ |
+| **shadcn/ui** | ~30-35 KB (gzipped) | ✅ Yes         | ✅ Yes       |
+| Material-UI   | ~300-400 KB         | ⚠️ Partial     | ❌ Limited   |
+| Ant Design    | ~500-600 KB         | ⚠️ Partial     | ❌ Limited   |
+| Chakra UI     | ~150-200 KB         | ⚠️ Partial     | ✅ Yes       |
 
 **Winner:** shadcn/ui provides the smallest bundle size while maintaining full customization.
 
@@ -80,20 +82,26 @@ shadcn/ui uses a **copy-paste architecture**, meaning components are added to yo
 ### 1. Component-Level Optimizations
 
 #### ✅ React.memo() on ContactCard
+
 **Location:** `components/contacts/ContactCard.tsx`
 
 **Why:** ContactCard is rendered in lists with potentially 100+ items. Memoization prevents unnecessary re-renders when parent state changes (e.g., search filters).
 
 **Impact:**
+
 - Reduces re-renders by ~60-70% in large lists
 - Improves scroll performance
 - Reduces CPU usage during filtering
 
 **Implementation:**
-```typescript
-import { memo } from 'react';
 
-const ContactCard = memo(function ContactCard({ contact, onClick }: ContactCardProps) {
+```typescript
+import { memo } from "react";
+
+const ContactCard = memo(function ContactCard({
+  contact,
+  onClick,
+}: ContactCardProps) {
   // Component implementation
 });
 
@@ -101,6 +109,7 @@ export { ContactCard };
 ```
 
 **Benchmark (100 contacts):**
+
 - **Before:** ~150ms render time on filter change
 - **After:** ~50ms render time (67% improvement)
 
@@ -109,11 +118,13 @@ export { ContactCard };
 ### 2. Lazy Loading for Dialogs
 
 #### ✅ Dialog Components Lazy Loaded
+
 **Dialogs:** AlertDialog, Sheet, Dialog (heavy components with portals)
 
 **Why:** Dialogs are not needed on initial page load and add ~10-12 KB to the bundle. Lazy loading defers this cost until the dialog is actually opened.
 
 **Implementation:**
+
 ```typescript
 import { lazy, Suspense } from 'react';
 
@@ -144,14 +155,16 @@ function ContactActions() {
 **Next.js Image Component:** Used throughout the application for profile pictures and avatars.
 
 **Benefits:**
+
 - Automatic responsive images
 - Lazy loading by default
 - WebP/AVIF format support
 - Blur placeholder support
 
 **Example:**
+
 ```tsx
-import Image from 'next/image';
+import Image from "next/image";
 
 <Avatar>
   <Image
@@ -161,7 +174,7 @@ import Image from 'next/image';
     height={40}
     loading="lazy"
   />
-</Avatar>
+</Avatar>;
 ```
 
 ---
@@ -171,6 +184,7 @@ import Image from 'next/image';
 Next.js **automatic code splitting** ensures each route only loads the JavaScript it needs.
 
 **Route Chunks:**
+
 - `/login` → ~50 KB
 - `/dashboard` → ~80 KB
 - `/contacts` → ~120 KB (includes ContactCard, filters)
@@ -191,6 +205,7 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 **No Dark Mode Class Bloat:** Using CSS variables means no duplicate classes for light/dark modes.
 
 **Before shadcn (custom components):**
+
 ```css
 /* Duplicated classes for dark mode */
 .button {
@@ -204,6 +219,7 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 ```
 
 **After shadcn (design tokens):**
+
 ```css
 /* Single class, CSS variables handle theme */
 .button {
@@ -241,21 +257,21 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 
 #### Dashboard Page (Authenticated)
 
-| Metric | Score | Target | Status |
-|--------|-------|--------|--------|
-| **Performance** | 92 | 90+ | ✅ Pass |
-| **Accessibility** | 100 | 100 | ✅ Pass |
-| **Best Practices** | 95 | 90+ | ✅ Pass |
-| **SEO** | 100 | 90+ | ✅ Pass |
+| Metric             | Score | Target | Status  |
+| ------------------ | ----- | ------ | ------- |
+| **Performance**    | 92    | 90+    | ✅ Pass |
+| **Accessibility**  | 100   | 100    | ✅ Pass |
+| **Best Practices** | 95    | 90+    | ✅ Pass |
+| **SEO**            | 100   | 90+    | ✅ Pass |
 
 #### Contact List Page (100+ contacts)
 
-| Metric | Score | Target | Status |
-|--------|-------|--------|--------|
-| **Performance** | 88 | 90+ | ⚠️ Near |
-| **Accessibility** | 100 | 100 | ✅ Pass |
-| **Best Practices** | 95 | 90+ | ✅ Pass |
-| **SEO** | 100 | 90+ | ✅ Pass |
+| Metric             | Score | Target | Status  |
+| ------------------ | ----- | ------ | ------- |
+| **Performance**    | 88    | 90+    | ⚠️ Near |
+| **Accessibility**  | 100   | 100    | ✅ Pass |
+| **Best Practices** | 95    | 90+    | ✅ Pass |
+| **SEO**            | 100   | 90+    | ✅ Pass |
 
 **Note:** Contact list performance slightly below target due to large data set. Implementing virtualization (react-window) would improve this to 95+.
 
@@ -267,11 +283,11 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 
 **Test:** Render 100 ContactCard components and measure time
 
-| Scenario | Before Optimization | After React.memo() | Improvement |
-|----------|---------------------|-------------------|-------------|
-| **Initial Render** | 180ms | 175ms | 3% (minimal) |
-| **Re-render (filter)** | 150ms | 50ms | **67%** |
-| **Re-render (sort)** | 140ms | 45ms | **68%** |
+| Scenario               | Before Optimization | After React.memo() | Improvement  |
+| ---------------------- | ------------------- | ------------------ | ------------ |
+| **Initial Render**     | 180ms               | 175ms              | 3% (minimal) |
+| **Re-render (filter)** | 150ms               | 50ms               | **67%**      |
+| **Re-render (sort)**   | 140ms               | 45ms               | **68%**      |
 
 **Conclusion:** React.memo() provides **significant** benefit for list re-renders.
 
@@ -293,14 +309,14 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 
 ### Current Metrics
 
-| Metric | Value | Target | Status |
-|--------|-------|--------|--------|
-| **Largest Contentful Paint (LCP)** | 1.8s | < 2.5s | ✅ Good |
-| **First Input Delay (FID)** | 45ms | < 100ms | ✅ Good |
-| **Cumulative Layout Shift (CLS)** | 0.02 | < 0.1 | ✅ Good |
-| **First Contentful Paint (FCP)** | 1.2s | < 1.8s | ✅ Good |
-| **Time to Interactive (TTI)** | 2.5s | < 3.8s | ✅ Good |
-| **Total Blocking Time (TBT)** | 180ms | < 300ms | ✅ Good |
+| Metric                             | Value | Target  | Status  |
+| ---------------------------------- | ----- | ------- | ------- |
+| **Largest Contentful Paint (LCP)** | 1.8s  | < 2.5s  | ✅ Good |
+| **First Input Delay (FID)**        | 45ms  | < 100ms | ✅ Good |
+| **Cumulative Layout Shift (CLS)**  | 0.02  | < 0.1   | ✅ Good |
+| **First Contentful Paint (FCP)**   | 1.2s  | < 1.8s  | ✅ Good |
+| **Time to Interactive (TTI)**      | 2.5s  | < 3.8s  | ✅ Good |
+| **Total Blocking Time (TBT)**      | 180ms | < 300ms | ✅ Good |
 
 ### Metric Breakdown
 
@@ -311,6 +327,7 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 **Current LCP element:** ContactCard or Dashboard stats card
 
 **Optimization strategies:**
+
 - ✅ Server-side rendering (Next.js default)
 - ✅ Image optimization with Next.js Image
 - ✅ Preload critical fonts
@@ -325,6 +342,7 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 **What it measures:** Time from user interaction to browser response
 
 **Optimization strategies:**
+
 - ✅ Minimize JavaScript execution on main thread
 - ✅ Code splitting with Next.js
 - ✅ Defer non-critical JavaScript
@@ -339,6 +357,7 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 **What it measures:** Visual stability during page load
 
 **Optimization strategies:**
+
 - ✅ Reserve space for images with width/height
 - ✅ Avoid inserting content above existing content
 - ✅ Use CSS variables for theme (no class changes)
@@ -364,6 +383,7 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 ### 🔄 Future Optimizations (Phase 2)
 
 #### 1. **Virtualization for Long Lists**
+
 **Library:** `@tanstack/react-virtual` or `react-window`
 
 **Impact:** Render only visible items in large contact lists (1000+)
@@ -371,8 +391,9 @@ Next.js **automatic code splitting** ensures each route only loads the JavaScrip
 **Expected Improvement:** 70-80% rendering performance boost
 
 **Implementation:**
+
 ```tsx
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 function ContactList({ contacts }: { contacts: Contact[] }) {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -384,16 +405,21 @@ function ContactList({ contacts }: { contacts: Contact[] }) {
   });
 
   return (
-    <div ref={parentRef} style={{ height: '600px', overflow: 'auto' }}>
-      <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
+    <div ref={parentRef} style={{ height: "600px", overflow: "auto" }}>
+      <div
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          position: "relative",
+        }}
+      >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => (
           <div
             key={virtualRow.key}
             style={{
-              position: 'absolute',
+              position: "absolute",
               top: 0,
               left: 0,
-              width: '100%',
+              width: "100%",
               height: `${virtualRow.size}px`,
               transform: `translateY(${virtualRow.start}px)`,
             }}
@@ -410,6 +436,7 @@ function ContactList({ contacts }: { contacts: Contact[] }) {
 ---
 
 #### 2. **Lazy Load Dialog Components**
+
 **Impact:** Reduce initial bundle by ~10-12 KB
 
 **Implementation:** Use `React.lazy()` + `Suspense` for dialogs
@@ -417,13 +444,15 @@ function ContactList({ contacts }: { contacts: Contact[] }) {
 ---
 
 #### 3. **Prefetch Contact Details**
+
 **Strategy:** Prefetch contact data on card hover
 
 **Impact:** Instant navigation to contact detail pages
 
 **Implementation:**
+
 ```tsx
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from "@tanstack/react-query";
 
 function ContactCard({ contact }: ContactCardProps) {
   const queryClient = useQueryClient();
@@ -435,20 +464,18 @@ function ContactCard({ contact }: ContactCardProps) {
     });
   };
 
-  return (
-    <Card onMouseEnter={handleMouseEnter}>
-      {/* Card content */}
-    </Card>
-  );
+  return <Card onMouseEnter={handleMouseEnter}>{/* Card content */}</Card>;
 }
 ```
 
 ---
 
 #### 4. **Service Worker for Offline Support**
+
 **Library:** `next-pwa`
 
 **Benefits:**
+
 - Offline access to cached pages
 - Background sync for form submissions
 - Faster repeat visits
@@ -456,9 +483,11 @@ function ContactCard({ contact }: ContactCardProps) {
 ---
 
 #### 5. **Image CDN**
+
 **Strategy:** Use Cloudflare Images or similar CDN for profile pictures
 
 **Benefits:**
+
 - Automatic format conversion (WebP, AVIF)
 - Responsive images on-the-fly
 - Global CDN distribution
@@ -466,16 +495,18 @@ function ContactCard({ contact }: ContactCardProps) {
 ---
 
 #### 6. **Font Optimization**
+
 **Strategy:** Use `next/font` for automatic font optimization
 
 **Current:** Google Fonts (Inter)
 **Optimization:** Self-host with next/font
 
 **Implementation:**
-```tsx
-import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+```tsx
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
   return (
@@ -487,6 +518,7 @@ export default function RootLayout({ children }) {
 ```
 
 **Benefits:**
+
 - Zero layout shift from font loading
 - Smaller font files (subsetting)
 - No external requests
@@ -498,9 +530,11 @@ export default function RootLayout({ children }) {
 ### Tools to Implement
 
 1. **Next.js Analytics**
+
    ```bash
    npm install @vercel/analytics
    ```
+
    Provides real-world Core Web Vitals data from users.
 
 2. **Sentry Performance Monitoring**
@@ -518,6 +552,7 @@ export default function RootLayout({ children }) {
 The shadcn/ui refactoring has **minimal impact** on bundle size and **improves** performance through better rendering optimizations and CSS architecture.
 
 **Key Achievements:**
+
 - ✅ 90+ Lighthouse Performance score
 - ✅ All Core Web Vitals in "Good" range
 - ✅ 67% improvement in list re-render performance
@@ -525,6 +560,7 @@ The shadcn/ui refactoring has **minimal impact** on bundle size and **improves**
 - ✅ Minimal bundle size increase (~30-35 KB gzipped)
 
 **Next Steps:**
+
 - Implement virtualization for large lists (Phase 2)
 - Add lazy loading for dialog components (Phase 2)
 - Set up performance monitoring (Lighthouse CI)
@@ -535,6 +571,7 @@ The shadcn/ui refactoring has **minimal impact** on bundle size and **improves**
 ## Appendix: Performance Testing Commands
 
 ### Run Lighthouse Audit
+
 ```bash
 # Install Lighthouse CLI
 npm install -g lighthouse
@@ -544,6 +581,7 @@ lighthouse http://localhost:3000/dashboard --view
 ```
 
 ### Analyze Bundle Size
+
 ```bash
 # Build production bundle
 pnpm run build
@@ -553,6 +591,7 @@ ANALYZE=true pnpm run build
 ```
 
 ### Test Core Web Vitals
+
 ```bash
 # Install Next.js Analytics
 pnpm add @vercel/analytics

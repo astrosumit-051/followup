@@ -1,11 +1,11 @@
-import { createServerClient } from './server';
-import { cookies } from 'next/headers';
+import { createServerClient } from "./server";
+import { cookies } from "next/headers";
 
-jest.mock('next/headers', () => ({
+jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
 
-describe('createServerClient', () => {
+describe("createServerClient", () => {
   const originalEnv = process.env;
   const mockCookieStore = {
     get: jest.fn(),
@@ -24,9 +24,9 @@ describe('createServerClient', () => {
     process.env = originalEnv;
   });
 
-  it('should create a server Supabase client with environment variables', () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  it("should create a server Supabase client with environment variables", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
     const client = createServerClient();
 
@@ -35,29 +35,29 @@ describe('createServerClient', () => {
     expect(cookies).toHaveBeenCalled();
   });
 
-  it('should throw error if NEXT_PUBLIC_SUPABASE_URL is missing', () => {
+  it("should throw error if NEXT_PUBLIC_SUPABASE_URL is missing", () => {
     delete process.env.NEXT_PUBLIC_SUPABASE_URL;
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
     expect(() => createServerClient()).toThrow(
-      'Missing required Supabase environment variables',
+      "Missing required Supabase environment variables",
     );
   });
 
-  it('should throw error if NEXT_PUBLIC_SUPABASE_ANON_KEY is missing', () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+  it("should throw error if NEXT_PUBLIC_SUPABASE_ANON_KEY is missing", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
     delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     expect(() => createServerClient()).toThrow(
-      'Missing required Supabase environment variables',
+      "Missing required Supabase environment variables",
     );
   });
 
-  it('should handle cookie get operation', () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  it("should handle cookie get operation", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
-    mockCookieStore.get.mockReturnValue({ value: 'test-cookie-value' });
+    mockCookieStore.get.mockReturnValue({ value: "test-cookie-value" });
 
     createServerClient();
 
@@ -65,9 +65,9 @@ describe('createServerClient', () => {
     expect(cookies).toHaveBeenCalled();
   });
 
-  it('should handle cookie set operation', () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  it("should handle cookie set operation", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
     createServerClient();
 
@@ -75,9 +75,9 @@ describe('createServerClient', () => {
     expect(cookies).toHaveBeenCalled();
   });
 
-  it('should create new instance on each call (no singleton for server)', () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  it("should create new instance on each call (no singleton for server)", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
 
     const client1 = createServerClient();
     const client2 = createServerClient();

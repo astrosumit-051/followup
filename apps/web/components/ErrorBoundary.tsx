@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { Component, ReactNode } from 'react';
+import React, { Component, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -46,7 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error details for debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
 
     // In production, you might want to send this to an error tracking service
     // Example: Sentry.captureException(error, { extra: errorInfo });
@@ -92,14 +92,14 @@ export class ErrorBoundary extends Component<Props, State> {
               We encountered an unexpected error. Please try again.
             </p>
 
-            {this.state.error && process.env.NODE_ENV === 'development' && (
+            {this.state.error && process.env.NODE_ENV === "development" && (
               <details className="mb-6 text-left bg-gray-50 p-4 rounded border border-gray-200">
                 <summary className="cursor-pointer font-medium text-gray-700 mb-2">
                   Error Details (Development Only)
                 </summary>
                 <pre className="text-xs text-red-600 overflow-auto">
                   {this.state.error.toString()}
-                  {'\n\n'}
+                  {"\n\n"}
                   {this.state.error.stack}
                 </pre>
               </details>
@@ -116,7 +116,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
 
               <button
-                onClick={() => (window.location.href = '/')}
+                onClick={() => (window.location.href = "/")}
                 className="w-full px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md
                            hover:bg-gray-200 focus:outline-none focus:ring-2
                            focus:ring-offset-2 focus:ring-gray-500 transition-colors"

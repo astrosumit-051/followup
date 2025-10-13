@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Loader2 } from 'lucide-react';
-import { validateRedirectOrigin } from '@/lib/security';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { createBrowserClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Loader2 } from "lucide-react";
+import { validateRedirectOrigin } from "@/lib/security";
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -24,18 +24,19 @@ export function LoginForm() {
     setError(null);
     setIsLoading(true);
 
-    console.log('Login attempt:', { email, hasPassword: !!password });
+    console.log("Login attempt:", { email, hasPassword: !!password });
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password,
-      });
+      const { data, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password,
+        });
 
-      console.log('Login response:', {
+      console.log("Login response:", {
         success: !!data.session,
         error: signInError?.message,
-        user: data.user?.email
+        user: data.user?.email,
       });
 
       if (signInError) {
@@ -44,15 +45,15 @@ export function LoginForm() {
       }
 
       if (data.session) {
-        console.log('Login successful, redirecting to dashboard...');
-        router.push('/dashboard');
+        console.log("Login successful, redirecting to dashboard...");
+        router.push("/dashboard");
         router.refresh();
       } else {
-        setError('Login failed: No session created');
+        setError("Login failed: No session created");
       }
     } catch (err) {
-      console.error('Unexpected login error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      console.error("Unexpected login error:", err);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +68,7 @@ export function LoginForm() {
       const validatedOrigin = validateRedirectOrigin(window.location.origin);
 
       const { error: signInError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${validatedOrigin}/auth/callback`,
         },
@@ -78,8 +79,8 @@ export function LoginForm() {
         setIsLoading(false);
       }
     } catch (err) {
-      console.error('Google login error:', err);
-      setError('Failed to initiate Google login');
+      console.error("Google login error:", err);
+      setError("Failed to initiate Google login");
       setIsLoading(false);
     }
   };
@@ -87,9 +88,11 @@ export function LoginForm() {
   return (
     <div className="w-full max-w-md space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-foreground">Sign in to your account</h2>
+        <h2 className="text-3xl font-bold text-foreground">
+          Sign in to your account
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
+          Don&apos;t have an account?{" "}
           <Link href="/signup" className="text-primary hover:underline">
             Sign up
           </Link>
@@ -136,13 +139,9 @@ export function LoginForm() {
         </div>
 
         <div>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full"
-          >
+          <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? 'Signing in...' : 'Sign in'}
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </div>
 
@@ -151,7 +150,9 @@ export function LoginForm() {
             <Separator />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-background text-muted-foreground">Or continue with</span>
+            <span className="px-2 bg-background text-muted-foreground">
+              Or continue with
+            </span>
           </div>
         </div>
 

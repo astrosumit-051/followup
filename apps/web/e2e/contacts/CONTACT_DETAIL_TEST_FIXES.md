@@ -9,6 +9,7 @@
 ## Overview
 
 The contact detail page is loading data correctly from the seeded database. All 19 failures are due to:
+
 1. Missing features (dynamic page title, delete dialog)
 2. Test assertion mismatches (CSS classes, date formats)
 3. Missing UI elements (data-testid attributes, profile picture rendering)
@@ -21,10 +22,12 @@ The contact detail page is loading data correctly from the seeded database. All 
 These are minor test assertion mismatches where the actual implementation is correct but tests are too strict.
 
 #### 1.1 CSS Class Pattern Too Strict
+
 **Test**: `should display contact name in header`
 **Expected**: `/text-3xl font-bold/`
 **Actual**: `"text-2xl font-bold text-gray-900 sm:text-3xl"`
 **Fix**: Update test assertion to accept responsive classes:
+
 ```typescript
 // OLD:
 await expect(nameHeading).toHaveClass(/text-3xl font-bold/);
@@ -34,32 +37,38 @@ await expect(nameHeading).toHaveClass(/font-bold/);
 await expect(nameHeading).toHaveClass(/text-gray-900/);
 // Or just verify visibility instead of exact classes
 ```
+
 **Location**: `contact-detail.spec.ts:102`
 
 #### 1.2 Birthday Timezone Issue
+
 **Test**: `should display formatted birthday`
 **Expected**: `"May 15, 2025"` (NOTE: Test has wrong year - should be 1990)
 **Actual**: `"May 14, 1990"`
 **Root Cause**: Off by 1 day due to UTC/local timezone conversion
 **Fix Option A** (Preferred - Fix Test):
+
 ```typescript
 // Update test to expect correct year and handle timezone
 await expect(birthdayValue).toHaveText(/May 1[45], 1990/); // Accept either day due to timezone
 ```
+
 **Fix Option B** (Fix Implementation):
+
 ```typescript
 // In contact-formatters.ts, format date in UTC to avoid timezone shifts
 export function formatDate(dateString: string | Date | null): string {
-  if (!dateString) return 'Not specified';
+  if (!dateString) return "Not specified";
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC' // Add this
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC", // Add this
   }).format(date);
 }
 ```
+
 **Location**: `contact-detail.spec.ts:194`
 
 ---
@@ -69,10 +78,12 @@ export function formatDate(dateString: string | Date | null): string {
 These failures indicate features that need to be implemented in the application.
 
 #### 2.1 Dynamic Page Title Not Updating
+
 **Test**: `should display page title in browser tab`
 **Expected**: `/Contact Details/i`
 **Actual**: `"RelationHub"`
 **Fix**: Add dynamic title to contact detail page:
+
 ```typescript
 // In apps/web/app/(protected)/contacts/[id]/page.tsx
 import Head from 'next/head';
@@ -101,10 +112,13 @@ export default function ContactDetailPage() {
   );
 }
 ```
+
 **Location**: `contact-detail.spec.ts:59`
 
 #### 2.2 Delete Confirmation Dialog Not Working (7 failures)
+
 **Tests**:
+
 - `should show loading state on Confirm button during deletion`
 - `should display success toast after successful deletion`
 - `should include contact name in success toast description`
@@ -117,17 +131,20 @@ export default function ContactDetailPage() {
 **Root Cause**: `ContactDeleteDialog` component not rendering properly or button text doesn't match
 
 **Fix**: Check ContactDeleteDialog component implementation:
+
 ```bash
 # Need to examine this file:
 apps/web/components/contacts/ContactDeleteDialog.tsx
 ```
 
 **Suspected Issues**:
+
 1. Dialog might use "Yes" or "Delete" instead of "Confirm"
 2. Dialog might not be rendering at all
 3. Button might be disabled initially
 
 **Solution Path**:
+
 1. Read ContactDeleteDialog.tsx
 2. Verify button text matches "Confirm" OR update test to match actual button text
 3. Ensure dialog renders when `isOpen={true}`
@@ -135,7 +152,9 @@ apps/web/components/contacts/ContactDeleteDialog.tsx
 **Location**: Multiple tests starting at `contact-detail.spec.ts:344-468`
 
 #### 2.3 Error State UI Missing (3 failures)
+
 **Tests**:
+
 - `should display error message when API fails`
 - `should display specific error message from API`
 - `should display Back to Contacts button on error`
@@ -143,12 +162,14 @@ apps/web/components/contacts/ContactDeleteDialog.tsx
 **Issue**: Error state elements not found
 **Current**: Page uses `<ContactErrorState error={error} />` component
 **Fix**: Check ContactErrorState component:
+
 ```bash
 # Need to examine:
 apps/web/components/contacts/ContactErrorState.tsx
 ```
 
 **Expected Elements** (from tests):
+
 - `<h2>Error Loading Contact</h2>`
 - Error message text display
 - `<button>Back to Contacts</button>`
@@ -162,9 +183,11 @@ apps/web/components/contacts/ContactErrorState.tsx
 ### Category 3: Missing UI Elements - Add Attributes (2 failures)
 
 #### 3.1 Contact Card Missing data-testid
+
 **Test**: `should navigate from contacts list to detail page`
 **Issue**: Timeout waiting for `[data-testid="contact-card-test-contact-123"]`
 **Fix**: Add data-testid to contact cards in contacts list page:
+
 ```typescript
 // In apps/web/app/(protected)/contacts/page.tsx
 // Find the contact card Link component and add:
@@ -174,18 +197,23 @@ apps/web/components/contacts/ContactErrorState.tsx
   // ... existing props
 >
 ```
+
 **Location**: `contact-detail.spec.ts:65`
 
 #### 3.2 Responsive Header Element Not Found
+
 **Test**: `should display properly on mobile viewport (375px)`
 **Issue**: `.flex.justify-between.items-start` not found
 **Current Implementation** (page.tsx:118-119):
+
 ```typescript
 <div className="mb-6 flex flex-col space-y-4
                 sm:flex-row sm:justify-between sm:items-start sm:space-y-0">
 ```
+
 **Root Cause**: On mobile (375px), element has `flex flex-col` not `flex justify-between items-start`
 **Fix**: Update test to check for the mobile class OR add a data-testid:
+
 ```typescript
 // Option A: Update test
 const header = page.locator('[data-testid="contact-header"]');
@@ -196,6 +224,7 @@ const header = page.locator('[data-testid="contact-header"]');
   className="mb-6 flex flex-col space-y-4
              sm:flex-row sm:justify-between sm:items-start sm:space-y-0">
 ```
+
 **Location**: `contact-detail.spec.ts:644-645`
 
 ---
@@ -203,7 +232,9 @@ const header = page.locator('[data-testid="contact-header"]');
 ### Category 4: Data/Schema Issues - Seed Script or Schema Changes (3 failures)
 
 #### 4.1 Profile Picture Not Rendering (2 failures)
+
 **Tests**:
+
 - `should display profile picture if available`
 - `should have proper alt text for profile picture`
 
@@ -211,6 +242,7 @@ const header = page.locator('[data-testid="contact-header"]');
 **Issue**: Component renders profile picture conditionally but element not found
 
 **Current Implementation** (page.tsx:288-299):
+
 ```typescript
 {contact.profilePicture && (
   <div className="mt-8 pt-8 border-t border-gray-200">
@@ -227,11 +259,13 @@ const header = page.locator('[data-testid="contact-header"]');
 ```
 
 **Possible Causes**:
+
 1. `contact.profilePicture` is null/undefined in fetched data
 2. GraphQL query doesn't include profilePicture field
 3. Seed data not persisting profilePicture field
 
 **Fix Path**:
+
 1. Check GraphQL query in `useContact` hook
 2. Verify Prisma schema includes profilePicture field
 3. Confirm seed data includes profilePicture
@@ -240,7 +274,9 @@ const header = page.locator('[data-testid="contact-header"]');
 **Location**: `contact-detail.spec.ts:209-215, 700-707`
 
 #### 4.2 Created/Updated Timestamps Using Current Time (2 failures)
+
 **Tests**:
+
 - `should display formatted created date`
 - `should display formatted updated date`
 
@@ -248,6 +284,7 @@ const header = page.locator('[data-testid="contact-header"]');
 **Actual**: `"Oct 7, 2025, 8:46 PM"` (current timestamp)
 
 **Root Cause**: Prisma schema decorators overriding seed data
+
 ```prisma
 // Suspected schema:
 model Contact {
@@ -258,6 +295,7 @@ model Contact {
 ```
 
 **Fix Option A** (Preferred - Update Test):
+
 ```typescript
 // Tests should accept any recent timestamp, not specific dates
 await expect(createdValue).toBeVisible();
@@ -267,18 +305,20 @@ await expect(createdValue).toMatch(/\w+ \d+, \d{4}/); // e.g., "Oct 7, 2025, 8:4
 ```
 
 **Fix Option B** (Change Seed Script):
+
 ```typescript
 // After creating contact with seed data, manually update timestamps:
 await prisma.contact.update({
   where: { id: contactId },
   data: {
-    createdAt: new Date('2024-12-01'),
-    updatedAt: new Date('2025-01-05'),
+    createdAt: new Date("2024-12-01"),
+    updatedAt: new Date("2025-01-05"),
   },
 });
 ```
 
 **Fix Option C** (Remove Default from Schema - NOT RECOMMENDED):
+
 ```prisma
 // This would break production behavior
 createdAt DateTime  // No @default(now())
@@ -293,15 +333,18 @@ createdAt DateTime  // No @default(now())
 ## Implementation Priority
 
 ### High Priority (Block Other Tests)
+
 1. **Add data-testid to contact cards** (3.1) - Blocks navigation test
 2. **Fix ContactDeleteDialog** (2.2) - Blocks 7 deletion tests
 3. **Dynamic page title** (2.1) - Basic feature expectation
 
 ### Medium Priority (Feature Completeness)
+
 4. **Update ContactErrorState** (2.3) - Error handling UX
 5. **Fix profile picture rendering** (4.1) - Core feature
 
 ### Low Priority (Test Adjustments)
+
 6. **Update CSS class assertions** (1.1) - Test cleanup
 7. **Fix birthday timezone** (1.2) - Minor date formatting
 8. **Update timestamp assertions** (4.2) - Test expectations
@@ -325,6 +368,7 @@ createdAt DateTime  // No @default(now())
 ## Files to Modify
 
 ### Application Code (9 files)
+
 1. `apps/web/app/(protected)/contacts/[id]/page.tsx` - Add dynamic page title
 2. `apps/web/app/(protected)/contacts/page.tsx` - Add data-testid to contact cards
 3. `apps/web/components/contacts/ContactDeleteDialog.tsx` - Fix/verify dialog implementation
@@ -334,6 +378,7 @@ createdAt DateTime  // No @default(now())
 7. `apps/api/src/contact/contact.resolver.ts` - Verify profilePicture in GraphQL schema (if needed)
 
 ### Test Code (1 file)
+
 8. `apps/web/e2e/contacts/contact-detail.spec.ts` - Update assertions for:
    - CSS classes (line 102)
    - Birthday date (line 194)
@@ -341,6 +386,7 @@ createdAt DateTime  // No @default(now())
    - Responsive header selector (line 644)
 
 ### Database Seed (1 file - if needed)
+
 9. `apps/web/e2e/helpers/seed-contacts.ts` - Add manual timestamp updates (if choosing Fix Option B for 4.2)
 
 ---
@@ -348,6 +394,7 @@ createdAt DateTime  // No @default(now())
 ## Success Criteria
 
 After fixes, expect:
+
 - **62/62 tests passing** (100%)
 - All features working as designed
 - Tests accurately reflecting actual UI/UX

@@ -6,7 +6,8 @@ import {
   type UseQueryOptions,
   type UseInfiniteQueryOptions,
   type UseMutationOptions,
-} from '@tanstack/react-query';
+  type InfiniteData,
+} from "@tanstack/react-query";
 import {
   getContact,
   getContacts,
@@ -21,7 +22,7 @@ import {
   type ContactFilterInput,
   type ContactSortField,
   type SortOrder,
-} from '@/lib/graphql/contacts';
+} from "@/lib/graphql/contacts";
 
 /**
  * TanStack Query Hooks for Contact CRUD Operations
@@ -54,11 +55,11 @@ import {
  * Ensures consistent cache keys across the application
  */
 export const contactKeys = {
-  all: ['contacts'] as const,
-  lists: () => [...contactKeys.all, 'list'] as const,
+  all: ["contacts"] as const,
+  lists: () => [...contactKeys.all, "list"] as const,
   list: (filters?: GetContactsVariables) =>
     [...contactKeys.lists(), filters] as const,
-  details: () => [...contactKeys.all, 'detail'] as const,
+  details: () => [...contactKeys.all, "detail"] as const,
   detail: (id: string) => [...contactKeys.details(), id] as const,
 };
 
@@ -90,8 +91,8 @@ export function useContact(
   id: string,
   options?: Omit<
     UseQueryOptions<Contact | null, Error>,
-    'queryKey' | 'queryFn'
-  >
+    "queryKey" | "queryFn"
+  >,
 ) {
   return useQuery<Contact | null, Error>({
     queryKey: contactKeys.detail(id),
@@ -158,11 +159,11 @@ export interface UseContactsVariables {
 export function useContacts(
   variables?: UseContactsVariables,
   options?: Omit<
-    UseInfiniteQueryOptions<ContactConnection, Error>,
-    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
-  >
+    UseInfiniteQueryOptions<ContactConnection, Error, InfiniteData<ContactConnection>, readonly unknown[], unknown>,
+    "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+  >,
 ) {
-  return useInfiniteQuery<ContactConnection, Error>({
+  return useInfiniteQuery<ContactConnection, Error, InfiniteData<ContactConnection>, readonly unknown[], unknown>({
     queryKey: contactKeys.list(variables),
     queryFn: async ({ pageParam }) => {
       // Transform the variables to match GraphQL schema
@@ -173,7 +174,7 @@ export function useContacts(
           cursor: pageParam as string | undefined,
         },
         sortBy: variables?.sortBy,
-        sortOrder: variables?.sortOrder || 'asc', // Use provided sortOrder or default to 'asc'
+        sortOrder: variables?.sortOrder || "asc", // Use provided sortOrder or default to 'asc'
       };
 
       // Add search to filters if provided
@@ -190,7 +191,9 @@ export function useContacts(
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => {
       // Return the endCursor if there's a next page, undefined otherwise
-      return lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined;
+      return lastPage.pageInfo.hasNextPage
+        ? lastPage.pageInfo.endCursor
+        : undefined;
     },
     ...options,
   });
@@ -235,7 +238,7 @@ export function useContacts(
  * ```
  */
 export function useCreateContact(
-  options?: UseMutationOptions<Contact, Error, CreateContactInput>
+  options?: UseMutationOptions<Contact, Error, CreateContactInput>,
 ) {
   const queryClient = useQueryClient();
 
@@ -293,48 +296,62 @@ export function useUpdateContact(
   options?: UseMutationOptions<
     Contact,
     Error,
-    { id: string; input: UpdateContactInput }
-  >
+    { id: string; input: UpdateContactInput },
+    { previousContact?: Contact }
+  >,
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation<Contact, Error, { id: string; input: UpdateContactInput }>({
-    mutationFn: ({ id, input }) => updateContact(id, input),
-    onMutate: async ({ id, input }) => {
-      // Cancel outgoing refetches to prevent overwriting optimistic update
-      await queryClient.cancelQueries({ queryKey: contactKeys.detail(id) });
+  return useMutation<Contact, Error, { id: string; input: UpdateContactInput }, { previousContact?: Contact }>(
+    {
+      mutationFn: ({ id, input }) => updateContact(id, input),
+      onMutate: async ({ id, input }) => {
+        // Cancel outgoing refetches to prevent overwriting optimistic update
+        await queryClient.cancelQueries({ queryKey: contactKeys.detail(id) });
 
-      // Snapshot previous value for rollback
-      const previousContact = queryClient.getQueryData<Contact>(
-        contactKeys.detail(id)
-      );
+        // Snapshot previous value for rollback
+        const previousContact = queryClient.getQueryData<Contact>(
+          contactKeys.detail(id),
+        );
 
-      // Optimistically update contact detail
-      if (previousContact) {
-        queryClient.setQueryData<Contact>(contactKeys.detail(id), {
-          ...previousContact,
-          ...input,
-        });
-      }
+        // Optimistically update contact detail
+        if (previousContact) {
+          // Convert Date fields to string for Contact type
+          const optimisticUpdate: Contact = {
+            ...previousContact,
+            ...input,
+            // Ensure required fields maintain their types
+            priority: input.priority ?? previousContact.priority,
+            // Convert birthday Date to ISO string if present
+            birthday: input.birthday instanceof Date
+              ? input.birthday.toISOString()
+              : (input.birthday ?? previousContact.birthday),
+          };
+          queryClient.setQueryData<Contact>(contactKeys.detail(id), optimisticUpdate);
+        }
 
-      // Return context with snapshot for rollback
-      return { previousContact };
+        // Return context with snapshot for rollback
+        return { previousContact };
+      },
+      onError: (error, { id }, context) => {
+        // Rollback to previous value on error
+        if (context?.previousContact) {
+          queryClient.setQueryData(
+            contactKeys.detail(id),
+            context.previousContact,
+          );
+        }
+      },
+      onSuccess: (updatedContact, { id }) => {
+        // Update cache with server response
+        queryClient.setQueryData(contactKeys.detail(id), updatedContact);
+
+        // Invalidate lists to reflect updated contact
+        queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
+      },
+      ...options,
     },
-    onError: (error, { id }, context) => {
-      // Rollback to previous value on error
-      if (context?.previousContact) {
-        queryClient.setQueryData(contactKeys.detail(id), context.previousContact);
-      }
-    },
-    onSuccess: (updatedContact, { id }) => {
-      // Update cache with server response
-      queryClient.setQueryData(contactKeys.detail(id), updatedContact);
-
-      // Invalidate lists to reflect updated contact
-      queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
-    },
-    ...options,
-  });
+  );
 }
 
 /**
@@ -376,7 +393,7 @@ export function useUpdateContact(
  * ```
  */
 export function useDeleteContact(
-  options?: UseMutationOptions<boolean, Error, string>
+  options?: UseMutationOptions<boolean, Error, string>,
 ) {
   const queryClient = useQueryClient();
 

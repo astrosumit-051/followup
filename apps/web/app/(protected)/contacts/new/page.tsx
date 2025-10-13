@@ -1,10 +1,13 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { ContactForm } from '@/components/contacts/ContactForm';
-import { useCreateContact } from '@/lib/hooks/useContacts';
-import type { CreateContactInput } from '@/lib/validations/contact';
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { ContactForm } from "@/components/contacts/ContactForm";
+import { useCreateContact } from "@/lib/hooks/useContacts";
+import type {
+  CreateContactInput,
+  UpdateContactInput,
+} from "@/lib/validations/contact";
 
 /**
  * Create Contact Page
@@ -26,13 +29,15 @@ export default function CreateContactPage() {
   const router = useRouter();
   const createContact = useCreateContact();
 
-  const handleSubmit = async (data: CreateContactInput) => {
+  const handleSubmit = async (
+    data: CreateContactInput | UpdateContactInput,
+  ) => {
     try {
-      // Create the contact
-      const result = await createContact.mutateAsync(data);
+      // Create the contact (type assertion safe since we're in create mode)
+      const result = await createContact.mutateAsync(data as CreateContactInput);
 
       // Show success toast
-      toast.success('Contact created successfully!', {
+      toast.success("Contact created successfully!", {
         description: `${data.name} has been added to your contacts.`,
       });
 
@@ -40,21 +45,25 @@ export default function CreateContactPage() {
       router.push(`/contacts/${result.id}`);
     } catch (error) {
       // Show error toast
-      toast.error('Failed to create contact', {
+      toast.error("Failed to create contact", {
         description:
-          error instanceof Error ? error.message : 'An unexpected error occurred',
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
       });
     }
   };
 
   const handleCancel = () => {
-    router.push('/contacts');
+    router.push("/contacts");
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4
+    <div
+      className="min-h-screen bg-gray-50 py-8 px-4
                     sm:px-6
-                    lg:px-8">
+                    lg:px-8"
+    >
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -65,8 +74,10 @@ export default function CreateContactPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white shadow-sm rounded-lg p-6
-                        sm:p-8">
+        <div
+          className="bg-white shadow-sm rounded-lg p-6
+                        sm:p-8"
+        >
           <ContactForm
             mode="create"
             onSubmit={handleSubmit}

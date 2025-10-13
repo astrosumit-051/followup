@@ -75,9 +75,7 @@ export function ContactListEmpty({
       </div>
 
       {/* Message */}
-      <h3 className="text-lg font-medium text-gray-900 mb-2">
-        {message}
-      </h3>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">{message}</h3>
 
       {/* Helpful Context */}
       <p className="text-sm text-gray-600 max-w-sm mb-6">

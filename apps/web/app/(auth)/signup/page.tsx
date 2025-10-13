@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { SignupForm } from '@/components/auth/signup-form';
-import { useEffect } from 'react';
+import { SignupForm } from "@/components/auth/signup-form";
+import { useEffect } from "react";
 
 export default function SignUpPage() {
   useEffect(() => {
-    document.title = 'Sign Up | RelationHub';
+    document.title = "Sign Up | RelationHub";
   }, []);
 
   return (

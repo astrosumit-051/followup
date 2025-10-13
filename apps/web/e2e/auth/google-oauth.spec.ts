@@ -1,12 +1,14 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Google OAuth Flow', () => {
+test.describe("Google OAuth Flow", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to signup page (OAuth is available on both signup and login)
-    await page.goto('/signup');
+    await page.goto("/signup");
   });
 
-  test('should display Google OAuth button on signup page', async ({ page }) => {
+  test("should display Google OAuth button on signup page", async ({
+    page,
+  }) => {
     // Verify Google OAuth button exists and is visible
     const googleButton = page.locator('button:has-text("Google")');
     await expect(googleButton).toBeVisible();
@@ -15,9 +17,9 @@ test.describe('Google OAuth Flow', () => {
     await expect(googleButton).toBeEnabled();
   });
 
-  test('should display Google OAuth button on login page', async ({ page }) => {
+  test("should display Google OAuth button on login page", async ({ page }) => {
     // Navigate to login page
-    await page.goto('/login');
+    await page.goto("/login");
 
     // Verify Google OAuth button exists and is visible
     const googleButton = page.locator('button:has-text("Google")');
@@ -25,12 +27,14 @@ test.describe('Google OAuth Flow', () => {
     await expect(googleButton).toBeEnabled();
   });
 
-  test('should initiate Google OAuth flow when clicking Google button', async ({ page }) => {
+  test("should initiate Google OAuth flow when clicking Google button", async ({
+    page,
+  }) => {
     // Get Google OAuth button
     const googleButton = page.locator('button:has-text("Google")');
 
     // Listen for navigation to Google OAuth consent screen
-    const popupPromise = page.waitForEvent('popup', { timeout: 10000 });
+    const popupPromise = page.waitForEvent("popup", { timeout: 10000 });
 
     // Click Google button
     await googleButton.click();
@@ -43,8 +47,8 @@ test.describe('Google OAuth Flow', () => {
       const popupUrl = popup.url();
 
       // Verify redirect to Google OAuth URL
-      expect(popupUrl).toContain('accounts.google.com');
-      expect(popupUrl).toContain('oauth');
+      expect(popupUrl).toContain("accounts.google.com");
+      expect(popupUrl).toContain("oauth");
 
       await popup.close();
     } else {
@@ -52,39 +56,45 @@ test.describe('Google OAuth Flow', () => {
       await page.waitForURL(/accounts\.google\.com/, { timeout: 5000 });
 
       const currentUrl = page.url();
-      expect(currentUrl).toContain('accounts.google.com');
-      expect(currentUrl).toContain('oauth');
+      expect(currentUrl).toContain("accounts.google.com");
+      expect(currentUrl).toContain("oauth");
     }
   });
 
-  test('should redirect to callback URL after Google OAuth success', async ({ page, context }) => {
+  test("should redirect to callback URL after Google OAuth success", async ({
+    page,
+    context,
+  }) => {
     // This test simulates a successful OAuth flow
     // Note: In a real test environment, you would use OAuth test credentials
 
     // Mock the OAuth callback with a valid session
     // This would typically be done in a test database with a known user
-    await page.goto('/auth/callback?code=mock-oauth-code');
+    await page.goto("/auth/callback?code=mock-oauth-code");
 
     // Verify redirect to dashboard or home page after callback
     await expect(async () => {
       const url = page.url();
-      const isDashboard = url.includes('/dashboard');
-      const isHome = url === 'http://localhost:3000/' || url === 'http://localhost:3000';
-      const isCallback = url.includes('/auth/callback');
+      const isDashboard = url.includes("/dashboard");
+      const isHome =
+        url === "http://localhost:3000/" || url === "http://localhost:3000";
+      const isCallback = url.includes("/auth/callback");
 
       // Should redirect away from callback page
       if (isCallback) {
-        throw new Error('Still on callback page - redirect not completed');
+        throw new Error("Still on callback page - redirect not completed");
       }
 
       // Should be on dashboard or home
-      if (!isDashboard && !isHome && !url.includes('/login')) {
-        throw new Error('Not redirected to expected page after OAuth callback');
+      if (!isDashboard && !isHome && !url.includes("/login")) {
+        throw new Error("Not redirected to expected page after OAuth callback");
       }
     }).toPass({ timeout: 10000 });
   });
 
-  test('should handle Google OAuth cancellation gracefully', async ({ page }) => {
+  test("should handle Google OAuth cancellation gracefully", async ({
+    page,
+  }) => {
     // Get Google OAuth button
     const googleButton = page.locator('button:has-text("Google")');
 
@@ -105,13 +115,13 @@ test.describe('Google OAuth Flow', () => {
     await expect(emailInput).toBeVisible();
   });
 
-  test('should include correct OAuth scopes for Google', async ({ page }) => {
+  test("should include correct OAuth scopes for Google", async ({ page }) => {
     // Get Google OAuth button
     const googleButton = page.locator('button:has-text("Google")');
 
     // Listen for navigation
     const navigationPromise = Promise.race([
-      page.waitForEvent('popup', { timeout: 5000 }).catch(() => null),
+      page.waitForEvent("popup", { timeout: 5000 }).catch(() => null),
       page.waitForNavigation({ timeout: 5000 }).catch(() => null),
     ]);
 
@@ -120,9 +130,9 @@ test.describe('Google OAuth Flow', () => {
 
     const result = await navigationPromise;
 
-    let oauthUrl = '';
+    let oauthUrl = "";
 
-    if (result && 'url' in result) {
+    if (result && "url" in result) {
       // Got popup
       oauthUrl = result.url();
       await result.close();
@@ -133,21 +143,25 @@ test.describe('Google OAuth Flow', () => {
 
     // Verify OAuth URL includes proper scopes
     // Supabase typically requests email and profile scopes
-    if (oauthUrl.includes('google.com')) {
+    if (oauthUrl.includes("google.com")) {
       expect(oauthUrl).toMatch(/scope=.*email/);
       expect(oauthUrl).toMatch(/scope=.*profile|openid/);
     }
   });
 
-  test('should persist original redirect URL through OAuth flow', async ({ page }) => {
+  test("should persist original redirect URL through OAuth flow", async ({
+    page,
+  }) => {
     // Navigate to signup with a specific redirect parameter
-    await page.goto('/signup?redirect=/dashboard/contacts');
+    await page.goto("/signup?redirect=/dashboard/contacts");
 
     // Get Google OAuth button
     const googleButton = page.locator('button:has-text("Google")');
 
     // Listen for OAuth initiation
-    const popupPromise = page.waitForEvent('popup', { timeout: 5000 }).catch(() => null);
+    const popupPromise = page
+      .waitForEvent("popup", { timeout: 5000 })
+      .catch(() => null);
 
     // Click Google button
     await googleButton.click();
@@ -158,10 +172,10 @@ test.describe('Google OAuth Flow', () => {
       const redirectUrl = new URL(popup.url());
 
       // The redirect_uri should include our callback URL
-      const redirectParam = redirectUrl.searchParams.get('redirect_uri');
+      const redirectParam = redirectUrl.searchParams.get("redirect_uri");
 
       if (redirectParam) {
-        expect(redirectParam).toContain('/auth/callback');
+        expect(redirectParam).toContain("/auth/callback");
       }
 
       await popup.close();

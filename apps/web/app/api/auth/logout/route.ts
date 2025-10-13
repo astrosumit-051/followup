@@ -1,6 +1,6 @@
-import { createServerClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { createServerClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 /**
  * POST /api/auth/logout
@@ -15,7 +15,7 @@ import type { NextRequest } from 'next/server';
  * - Clears httpOnly session cookies
  * - Invalidates refresh tokens
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const supabase = createServerClient();
 
@@ -23,27 +23,27 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error('Logout error:', error.message);
+      console.error("Logout error:", error.message);
 
       // Even if sign out fails, redirect to login for security
       // This ensures user is logged out client-side
       return NextResponse.json(
-        { error: 'Logout failed', message: error.message },
-        { status: 500 }
+        { error: "Logout failed", message: error.message },
+        { status: 500 },
       );
     }
 
     // Successful logout
     return NextResponse.json(
-      { success: true, message: 'Logged out successfully' },
-      { status: 200 }
+      { success: true, message: "Logged out successfully" },
+      { status: 200 },
     );
   } catch (error) {
-    console.error('Unexpected logout error:', error);
+    console.error("Unexpected logout error:", error);
 
     return NextResponse.json(
-      { error: 'Internal server error during logout' },
-      { status: 500 }
+      { error: "Internal server error during logout" },
+      { status: 500 },
     );
   }
 }

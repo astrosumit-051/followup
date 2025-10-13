@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page, expect } from "@playwright/test";
 
 /**
  * Test helper functions for authentication flows
@@ -10,7 +10,7 @@ import { Page, expect } from '@playwright/test';
 export async function fillAuthCredentials(
   page: Page,
   email: string,
-  password: string
+  password: string,
 ): Promise<void> {
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
@@ -29,7 +29,7 @@ export async function submitAuthForm(page: Page): Promise<void> {
 export async function expectErrorMessage(
   page: Page,
   pattern: RegExp,
-  timeout: number = 5000
+  timeout: number = 5000,
 ): Promise<void> {
   const errorMessage = page.locator(`text=${pattern}`);
   await expect(errorMessage).toBeVisible({ timeout });
@@ -38,7 +38,7 @@ export async function expectErrorMessage(
 /**
  * Generate unique test email with timestamp
  */
-export function generateTestEmail(prefix: string = 'test'): string {
+export function generateTestEmail(prefix: string = "test"): string {
   const timestamp = Date.now();
   return `${prefix}-${timestamp}@example.com`;
 }
@@ -49,7 +49,7 @@ export function generateTestEmail(prefix: string = 'test'): string {
 export async function expectRedirectTo(
   page: Page,
   patterns: string[],
-  timeout: number = 10000
+  timeout: number = 10000,
 ): Promise<void> {
   await expect(async () => {
     const url = page.url();
@@ -57,7 +57,7 @@ export async function expectRedirectTo(
 
     if (!matchesAny) {
       throw new Error(
-        `Not redirected to any expected pattern. Current URL: ${url}`
+        `Not redirected to any expected pattern. Current URL: ${url}`,
       );
     }
   }).toPass({ timeout });
@@ -67,8 +67,8 @@ export async function expectRedirectTo(
  * Common test credentials
  */
 export const TEST_CREDENTIALS = {
-  validEmail: 'test@example.com',
-  validPassword: 'ValidPass123!',
-  weakPassword: 'weak',
-  invalidEmail: 'invalid-email',
+  validEmail: "test@example.com",
+  validPassword: "ValidPass123!",
+  weakPassword: "weak",
+  invalidEmail: "invalid-email",
 } as const;

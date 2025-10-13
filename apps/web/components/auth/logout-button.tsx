@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { createBrowserClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 interface LogoutButtonProps {
   className?: string;
@@ -54,37 +54,39 @@ export function LogoutButton({ className, children }: LogoutButtonProps) {
 
         if (retries > 0) {
           // Wait 1 second before retry with exponential backoff
-          await new Promise(resolve => setTimeout(resolve, 1000 * (4 - retries)));
+          await new Promise((resolve) =>
+            setTimeout(resolve, 1000 * (4 - retries)),
+          );
         }
       }
 
       // Only proceed if logout succeeded
       if (signOutError) {
         // Show error to user - DO NOT redirect
-        console.error('Logout failed after retries:', signOutError.message);
-        setError('Failed to log out. Please try again.');
+        console.error("Logout failed after retries:", signOutError.message);
+        setError("Failed to log out. Please try again.");
         setIsLoading(false);
         return;
       }
 
       // Clear all Supabase-related items from local storage ONLY after successful logout
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const keysToRemove: string[] = [];
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          if (key && key.startsWith('sb-')) {
+          if (key && key.startsWith("sb-")) {
             keysToRemove.push(key);
           }
         }
-        keysToRemove.forEach(key => localStorage.removeItem(key));
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
       }
 
       // Redirect only after successful logout
-      router.push('/login');
+      router.push("/login");
       router.refresh();
     } catch (error) {
-      console.error('Unexpected logout error:', error);
-      setError('An unexpected error occurred. Please try again.');
+      console.error("Unexpected logout error:", error);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +107,7 @@ export function LogoutButton({ className, children }: LogoutButtonProps) {
         aria-label="Sign out"
       >
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? 'Signing out...' : children || 'Sign Out'}
+        {isLoading ? "Signing out..." : children || "Sign Out"}
       </Button>
     </div>
   );

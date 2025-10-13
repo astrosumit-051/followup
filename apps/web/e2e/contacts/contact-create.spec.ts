@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
 /**
  * E2E Tests for Contact Creation Page
@@ -16,30 +16,30 @@ import { test, expect } from '@playwright/test';
  * - Responsive design across viewports
  */
 
-test.describe('Contact Creation Page', () => {
+test.describe("Contact Creation Page", () => {
   test.beforeEach(async ({ page }) => {
     // Note: In real tests, you would need to:
     // 1. Authenticate the user (use auth helper)
     // 2. Seed test database if needed
     // For now, we'll test the UI structure assuming auth is handled by middleware
 
-    await page.goto('/contacts/new');
+    await page.goto("/contacts/new");
   });
 
-  test.describe('Page Layout and Structure', () => {
-    test('should display page title and description', async ({ page }) => {
+  test.describe("Page Layout and Structure", () => {
+    test("should display page title and description", async ({ page }) => {
       // Verify page heading
       const heading = page.locator('h1:has-text("Create Contact")');
       await expect(heading).toBeVisible();
 
       // Verify page description
-      const description = page.locator('text=/add a new contact/i');
+      const description = page.locator("text=/add a new contact/i");
       await expect(description).toBeVisible();
     });
 
-    test('should display all required form fields', async ({ page }) => {
+    test("should display all required form fields", async ({ page }) => {
       // Name field (required)
-      const nameInput = page.locator('#name');
+      const nameInput = page.locator("#name");
       await expect(nameInput).toBeVisible();
 
       // Verify name field has required attribute or indicator
@@ -47,7 +47,7 @@ test.describe('Contact Creation Page', () => {
       await expect(nameLabel).toBeVisible();
     });
 
-    test('should display all optional form fields', async ({ page }) => {
+    test("should display all optional form fields", async ({ page }) => {
       // Email field
       const emailInput = page.locator('input[name="email"]');
       await expect(emailInput).toBeVisible();
@@ -85,7 +85,7 @@ test.describe('Contact Creation Page', () => {
       await expect(notesTextarea).toBeVisible();
     });
 
-    test('should display Create and Cancel buttons', async ({ page }) => {
+    test("should display Create and Cancel buttons", async ({ page }) => {
       // Create button
       const createButton = page.locator('button[type="submit"]');
       await expect(createButton).toBeVisible();
@@ -97,8 +97,10 @@ test.describe('Contact Creation Page', () => {
     });
   });
 
-  test.describe('Form Validation', () => {
-    test('should show error when submitting empty name field', async ({ page }) => {
+  test.describe("Form Validation", () => {
+    test("should show error when submitting empty name field", async ({
+      page,
+    }) => {
       // Leave name empty and submit
       const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
@@ -107,7 +109,7 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(300);
 
       // Verify error message for name field
-      const nameError = page.locator('text=/name is required/i').first();
+      const nameError = page.locator("text=/name is required/i").first();
 
       // Check if validation error appears
       const isVisible = await nameError.isVisible().catch(() => false);
@@ -117,13 +119,13 @@ test.describe('Contact Creation Page', () => {
       }
     });
 
-    test('should show error for invalid email format', async ({ page }) => {
+    test("should show error for invalid email format", async ({ page }) => {
       const nameInput = page.locator('input[name="name"]');
       const emailInput = page.locator('input[name="email"]');
 
       // Fill name (valid) and email (invalid)
-      await nameInput.fill('John Doe');
-      await emailInput.fill('invalid-email');
+      await nameInput.fill("John Doe");
+      await emailInput.fill("invalid-email");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -133,7 +135,7 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(300);
 
       // Verify email error message
-      const emailError = page.locator('text=/invalid email/i').first();
+      const emailError = page.locator("text=/invalid email/i").first();
 
       const isVisible = await emailError.isVisible().catch(() => false);
 
@@ -142,13 +144,15 @@ test.describe('Contact Creation Page', () => {
       }
     });
 
-    test('should show error for invalid LinkedIn URL format', async ({ page }) => {
+    test("should show error for invalid LinkedIn URL format", async ({
+      page,
+    }) => {
       const nameInput = page.locator('input[name="name"]');
       const linkedInInput = page.locator('input[name="linkedInUrl"]');
 
       // Fill name (valid) and LinkedIn URL (invalid)
-      await nameInput.fill('John Doe');
-      await linkedInInput.fill('not-a-url');
+      await nameInput.fill("John Doe");
+      await linkedInInput.fill("not-a-url");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -158,7 +162,7 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(300);
 
       // Verify URL error message
-      const urlError = page.locator('text=/invalid url/i').first();
+      const urlError = page.locator("text=/invalid url/i").first();
 
       const isVisible = await urlError.isVisible().catch(() => false);
 
@@ -167,11 +171,11 @@ test.describe('Contact Creation Page', () => {
       }
     });
 
-    test('should enforce maximum length for name field', async ({ page }) => {
+    test("should enforce maximum length for name field", async ({ page }) => {
       const nameInput = page.locator('input[name="name"]');
 
       // Fill name with 256 characters (exceeds 255 limit)
-      const longName = 'A'.repeat(256);
+      const longName = "A".repeat(256);
       await nameInput.fill(longName);
 
       // Submit form
@@ -182,7 +186,9 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(300);
 
       // Verify length error message
-      const lengthError = page.locator('text=/must be less than 255 characters/i').first();
+      const lengthError = page
+        .locator("text=/must be less than 255 characters/i")
+        .first();
 
       const isVisible = await lengthError.isVisible().catch(() => false);
 
@@ -191,11 +197,11 @@ test.describe('Contact Creation Page', () => {
       }
     });
 
-    test('should reject name with only whitespace', async ({ page }) => {
+    test("should reject name with only whitespace", async ({ page }) => {
       const nameInput = page.locator('input[name="name"]');
 
       // Fill name with only whitespace
-      await nameInput.fill('   ');
+      await nameInput.fill("   ");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -205,7 +211,9 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(300);
 
       // Verify whitespace error message
-      const whitespaceError = page.locator('text=/cannot be only whitespace/i').first();
+      const whitespaceError = page
+        .locator("text=/cannot be only whitespace/i")
+        .first();
 
       const isVisible = await whitespaceError.isVisible().catch(() => false);
 
@@ -215,12 +223,12 @@ test.describe('Contact Creation Page', () => {
     });
   });
 
-  test.describe('Form Submission - Success Flow', () => {
-    test('should submit form with only required fields', async ({ page }) => {
+  test.describe("Form Submission - Success Flow", () => {
+    test("should submit form with only required fields", async ({ page }) => {
       const nameInput = page.locator('input[name="name"]');
 
       // Fill only name (required field)
-      await nameInput.fill('John Doe');
+      await nameInput.fill("John Doe");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -236,18 +244,22 @@ test.describe('Contact Creation Page', () => {
       // (Button might be briefly disabled)
     });
 
-    test('should submit form with all fields filled', async ({ page }) => {
+    test("should submit form with all fields filled", async ({ page }) => {
       // Fill all form fields
-      await page.locator('input[name="name"]').fill('Jane Smith');
-      await page.locator('input[name="email"]').fill('jane.smith@example.com');
-      await page.locator('input[name="phone"]').fill('+1-555-123-4567');
-      await page.locator('input[name="linkedInUrl"]').fill('https://linkedin.com/in/janesmith');
-      await page.locator('input[name="company"]').fill('Acme Corporation');
-      await page.locator('input[name="industry"]').fill('Technology');
-      await page.locator('input[name="role"]').fill('Software Engineer');
-      await page.locator('select[name="priority"]').selectOption('HIGH');
-      await page.locator('select[name="gender"]').selectOption('FEMALE');
-      await page.locator('textarea[name="notes"]').fill('Met at tech conference 2024');
+      await page.locator('input[name="name"]').fill("Jane Smith");
+      await page.locator('input[name="email"]').fill("jane.smith@example.com");
+      await page.locator('input[name="phone"]').fill("+1-555-123-4567");
+      await page
+        .locator('input[name="linkedInUrl"]')
+        .fill("https://linkedin.com/in/janesmith");
+      await page.locator('input[name="company"]').fill("Acme Corporation");
+      await page.locator('input[name="industry"]').fill("Technology");
+      await page.locator('input[name="role"]').fill("Software Engineer");
+      await page.locator('select[name="priority"]').selectOption("HIGH");
+      await page.locator('select[name="gender"]').selectOption("FEMALE");
+      await page
+        .locator('textarea[name="notes"]')
+        .fill("Met at tech conference 2024");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -262,10 +274,12 @@ test.describe('Contact Creation Page', () => {
       // - Verify redirect to detail page
     });
 
-    test('should display success toast after contact creation', async ({ page }) => {
+    test("should display success toast after contact creation", async ({
+      page,
+    }) => {
       // This test requires backend mock or real API
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill('Test Contact');
+      await page.locator('input[name="name"]').fill("Test Contact");
 
       // Submit form
       await page.locator('button[type="submit"]').click();
@@ -274,7 +288,9 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(1500);
 
       // Check for success toast (Sonner toast)
-      const successToast = page.locator('text=/contact created successfully/i').first();
+      const successToast = page
+        .locator("text=/contact created successfully/i")
+        .first();
 
       // In real test with backend, this would be visible
       const isVisible = await successToast.isVisible().catch(() => false);
@@ -284,10 +300,12 @@ test.describe('Contact Creation Page', () => {
       }
     });
 
-    test('should redirect to contact detail page after creation', async ({ page }) => {
+    test("should redirect to contact detail page after creation", async ({
+      page,
+    }) => {
       // This test requires backend mock or real API
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill('Test Contact');
+      await page.locator('input[name="name"]').fill("Test Contact");
 
       // Submit form
       await page.locator('button[type="submit"]').click();
@@ -304,8 +322,8 @@ test.describe('Contact Creation Page', () => {
     });
   });
 
-  test.describe('Form Submission - Error Handling', () => {
-    test('should display error toast when API fails', async ({ page }) => {
+  test.describe("Form Submission - Error Handling", () => {
+    test("should display error toast when API fails", async ({ page }) => {
       // This test requires API mocking to simulate failure
       // In real test, use route interception:
       // await page.route('**/graphql', route => {
@@ -316,7 +334,7 @@ test.describe('Contact Creation Page', () => {
       // });
 
       // Fill form
-      await page.locator('input[name="name"]').fill('Test Contact');
+      await page.locator('input[name="name"]').fill("Test Contact");
 
       // Submit
       await page.locator('button[type="submit"]').click();
@@ -325,7 +343,9 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(1500);
 
       // Check for error toast
-      const errorToast = page.locator('text=/failed to create contact/i').first();
+      const errorToast = page
+        .locator("text=/failed to create contact/i")
+        .first();
 
       const isVisible = await errorToast.isVisible().catch(() => false);
 
@@ -334,10 +354,10 @@ test.describe('Contact Creation Page', () => {
       }
     });
 
-    test('should remain on page when submission fails', async ({ page }) => {
+    test("should remain on page when submission fails", async ({ page }) => {
       // This test requires API mocking to simulate failure
       // Fill form
-      await page.locator('input[name="name"]').fill('Test Contact');
+      await page.locator('input[name="name"]').fill("Test Contact");
 
       // Submit
       await page.locator('button[type="submit"]').click();
@@ -350,10 +370,12 @@ test.describe('Contact Creation Page', () => {
     });
   });
 
-  test.describe('Cancel Functionality', () => {
-    test('should navigate back to contacts list when cancel is clicked', async ({ page }) => {
+  test.describe("Cancel Functionality", () => {
+    test("should navigate back to contacts list when cancel is clicked", async ({
+      page,
+    }) => {
       // Fill some form data
-      await page.locator('input[name="name"]').fill('Test Contact');
+      await page.locator('input[name="name"]').fill("Test Contact");
 
       // Click Cancel button
       const cancelButton = page.locator('button:has-text("Cancel")');
@@ -366,10 +388,10 @@ test.describe('Contact Creation Page', () => {
       await expect(page).toHaveURL(/\/contacts$/);
     });
 
-    test('should not save data when cancel is clicked', async ({ page }) => {
+    test("should not save data when cancel is clicked", async ({ page }) => {
       // Fill form with data
-      await page.locator('input[name="name"]').fill('Test Contact');
-      await page.locator('input[name="email"]').fill('test@example.com');
+      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.locator('input[name="email"]').fill("test@example.com");
 
       // Click Cancel
       await page.locator('button:has-text("Cancel")').click();
@@ -378,18 +400,20 @@ test.describe('Contact Creation Page', () => {
       await page.waitForTimeout(500);
 
       // Go back to create page
-      await page.goto('/contacts/new');
+      await page.goto("/contacts/new");
 
       // Verify form is empty
       const nameInput = page.locator('input[name="name"]');
-      await expect(nameInput).toHaveValue('');
+      await expect(nameInput).toHaveValue("");
     });
   });
 
-  test.describe('Loading States', () => {
-    test('should disable submit button during form submission', async ({ page }) => {
+  test.describe("Loading States", () => {
+    test("should disable submit button during form submission", async ({
+      page,
+    }) => {
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill('Test Contact');
+      await page.locator('input[name="name"]').fill("Test Contact");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -402,9 +426,9 @@ test.describe('Contact Creation Page', () => {
       // In real test with network delay, this would be more reliable
     });
 
-    test('should show loading indicator on submit button', async ({ page }) => {
+    test("should show loading indicator on submit button", async ({ page }) => {
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill('Test Contact');
+      await page.locator('input[name="name"]').fill("Test Contact");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -419,70 +443,77 @@ test.describe('Contact Creation Page', () => {
     });
   });
 
-  test.describe('Form Field Interactions', () => {
-    test('should allow typing in all text inputs', async ({ page }) => {
+  test.describe("Form Field Interactions", () => {
+    test("should allow typing in all text inputs", async ({ page }) => {
       // Test all text inputs
-      await page.locator('input[name="name"]').fill('John Doe');
-      await expect(page.locator('input[name="name"]')).toHaveValue('John Doe');
+      await page.locator('input[name="name"]').fill("John Doe");
+      await expect(page.locator('input[name="name"]')).toHaveValue("John Doe");
 
-      await page.locator('input[name="email"]').fill('john@example.com');
-      await expect(page.locator('input[name="email"]')).toHaveValue('john@example.com');
+      await page.locator('input[name="email"]').fill("john@example.com");
+      await expect(page.locator('input[name="email"]')).toHaveValue(
+        "john@example.com",
+      );
 
-      await page.locator('input[name="phone"]').fill('+1-555-0100');
-      await expect(page.locator('input[name="phone"]')).toHaveValue('+1-555-0100');
+      await page.locator('input[name="phone"]').fill("+1-555-0100");
+      await expect(page.locator('input[name="phone"]')).toHaveValue(
+        "+1-555-0100",
+      );
 
-      await page.locator('input[name="company"]').fill('Tech Corp');
-      await expect(page.locator('input[name="company"]')).toHaveValue('Tech Corp');
+      await page.locator('input[name="company"]').fill("Tech Corp");
+      await expect(page.locator('input[name="company"]')).toHaveValue(
+        "Tech Corp",
+      );
     });
 
-    test('should allow selecting priority options', async ({ page }) => {
+    test("should allow selecting priority options", async ({ page }) => {
       const prioritySelect = page.locator('select[name="priority"]');
 
       // Test selecting each priority option
-      await prioritySelect.selectOption('HIGH');
-      await expect(prioritySelect).toHaveValue('HIGH');
+      await prioritySelect.selectOption("HIGH");
+      await expect(prioritySelect).toHaveValue("HIGH");
 
-      await prioritySelect.selectOption('MEDIUM');
-      await expect(prioritySelect).toHaveValue('MEDIUM');
+      await prioritySelect.selectOption("MEDIUM");
+      await expect(prioritySelect).toHaveValue("MEDIUM");
 
-      await prioritySelect.selectOption('LOW');
-      await expect(prioritySelect).toHaveValue('LOW');
+      await prioritySelect.selectOption("LOW");
+      await expect(prioritySelect).toHaveValue("LOW");
     });
 
-    test('should allow selecting gender options', async ({ page }) => {
+    test("should allow selecting gender options", async ({ page }) => {
       const genderSelect = page.locator('select[name="gender"]');
 
       // Test selecting each gender option
-      await genderSelect.selectOption('MALE');
-      await expect(genderSelect).toHaveValue('MALE');
+      await genderSelect.selectOption("MALE");
+      await expect(genderSelect).toHaveValue("MALE");
 
-      await genderSelect.selectOption('FEMALE');
-      await expect(genderSelect).toHaveValue('FEMALE');
+      await genderSelect.selectOption("FEMALE");
+      await expect(genderSelect).toHaveValue("FEMALE");
 
-      await genderSelect.selectOption('OTHER');
-      await expect(genderSelect).toHaveValue('OTHER');
+      await genderSelect.selectOption("OTHER");
+      await expect(genderSelect).toHaveValue("OTHER");
 
-      await genderSelect.selectOption('PREFER_NOT_TO_SAY');
-      await expect(genderSelect).toHaveValue('PREFER_NOT_TO_SAY');
+      await genderSelect.selectOption("PREFER_NOT_TO_SAY");
+      await expect(genderSelect).toHaveValue("PREFER_NOT_TO_SAY");
     });
 
-    test('should allow typing in notes textarea', async ({ page }) => {
+    test("should allow typing in notes textarea", async ({ page }) => {
       const notesTextarea = page.locator('textarea[name="notes"]');
 
-      const longNote = 'This is a long note about the contact. ' +
-                      'We met at a conference and discussed various topics. ' +
-                      'They seem interested in our product.';
+      const longNote =
+        "This is a long note about the contact. " +
+        "We met at a conference and discussed various topics. " +
+        "They seem interested in our product.";
 
       await notesTextarea.fill(longNote);
       await expect(notesTextarea).toHaveValue(longNote);
     });
   });
 
-  test.describe('Responsive Design', () => {
-    test('should display properly on mobile viewport', async ({ page }) => {
+  test.describe("Responsive Design", () => {
+    test("should display properly on mobile viewport", async ({ page }) => {
       // Set mobile viewport
       await page.setViewportSize({ width: 375, height: 667 });
-      await page.goto('/contacts/new');
+      await page.goto("/contacts/new");
 
       // Verify page is still functional
       const heading = page.locator('h1:has-text("Create Contact")');
@@ -497,52 +528,58 @@ test.describe('Contact Creation Page', () => {
       await expect(submitButton).toBeVisible();
     });
 
-    test('should display properly on tablet viewport', async ({ page }) => {
+    test("should display properly on tablet viewport", async ({ page }) => {
       // Set tablet viewport
       await page.setViewportSize({ width: 768, height: 1024 });
-      await page.goto('/contacts/new');
+      await page.goto("/contacts/new");
 
       // Verify page layout
       const heading = page.locator('h1:has-text("Create Contact")');
       await expect(heading).toBeVisible();
 
       // Verify form is properly sized
-      const formCard = page.locator('.bg-white').first();
+      const formCard = page.locator(".bg-white").first();
       await expect(formCard).toBeVisible();
     });
 
-    test('should display properly on desktop viewport', async ({ page }) => {
+    test("should display properly on desktop viewport", async ({ page }) => {
       // Set desktop viewport
       await page.setViewportSize({ width: 1440, height: 900 });
-      await page.goto('/contacts/new');
+      await page.goto("/contacts/new");
 
       // Verify page layout
       const heading = page.locator('h1:has-text("Create Contact")');
       await expect(heading).toBeVisible();
 
       // Verify max-width container
-      const container = page.locator('.max-w-3xl').first();
+      const container = page.locator(".max-w-3xl").first();
       await expect(container).toBeVisible();
     });
   });
 
-  test.describe('Data Persistence', () => {
-    test('should preserve form data during validation errors', async ({ page }) => {
+  test.describe("Data Persistence", () => {
+    test("should preserve form data during validation errors", async ({
+      page,
+    }) => {
       // Fill form with invalid email
-      await page.locator('input[name="name"]').fill('John Doe');
-      await page.locator('input[name="email"]').fill('invalid-email');
-      await page.locator('input[name="company"]').fill('Tech Corp');
+      await page.locator('input[name="name"]').fill("John Doe");
+      await page.locator('input[name="email"]').fill("invalid-email");
+      await page.locator('input[name="company"]').fill("Tech Corp");
 
       // Submit (should fail validation)
       await page.locator('button[type="submit"]').click();
       await page.waitForTimeout(300);
 
       // Verify name and company are still filled
-      await expect(page.locator('input[name="name"]')).toHaveValue('John Doe');
-      await expect(page.locator('input[name="company"]')).toHaveValue('Tech Corp');
+      await expect(page.locator('input[name="name"]')).toHaveValue("John Doe");
+      await expect(page.locator('input[name="company"]')).toHaveValue(
+        "Tech Corp",
+      );
 
       // Email should still be there (even if invalid)
-      await expect(page.locator('input[name="email"]')).toHaveValue('invalid-email');
+      await expect(page.locator('input[name="email"]')).toHaveValue(
+        "invalid-email",
+      );
     });
   });
 });

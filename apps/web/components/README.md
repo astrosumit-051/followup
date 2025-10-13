@@ -55,6 +55,7 @@ This guide covers all shadcn/ui components used in RelationHub. shadcn/ui is **n
 - **next-themes**: Dark mode support
 
 **Benefits:**
+
 - ✅ Full control over components (they're in your codebase)
 - ✅ Accessibility built-in (WCAG 2.1 AA compliant)
 - ✅ Type-safe with TypeScript
@@ -66,6 +67,7 @@ This guide covers all shadcn/ui components used in RelationHub. shadcn/ui is **n
 ## Design Philosophy
 
 ### 1. **Composition Over Configuration**
+
 shadcn components are designed to be composed together:
 
 ```tsx
@@ -74,9 +76,7 @@ shadcn components are designed to be composed together:
     <CardTitle>Contact Information</CardTitle>
     <CardDescription>View and edit contact details</CardDescription>
   </CardHeader>
-  <CardContent>
-    {/* Form fields here */}
-  </CardContent>
+  <CardContent>{/* Form fields here */}</CardContent>
   <CardFooter>
     <Button>Save Changes</Button>
   </CardFooter>
@@ -84,23 +84,25 @@ shadcn components are designed to be composed together:
 ```
 
 ### 2. **Semantic HTML**
+
 Components use proper semantic HTML elements with ARIA attributes for accessibility.
 
 ### 3. **Design Tokens**
+
 All colors, spacing, and typography use CSS custom properties defined in `globals.css`.
 
 ---
 
 ## Component Categories
 
-| Category | Components | Use Case |
-|----------|-----------|----------|
-| **Core** | Button, Input, Label, Textarea | Basic building blocks |
-| **Forms** | Form, Select, Alert | Form validation and feedback |
-| **Layout** | Card, Separator, Badge, Avatar | Structure and organization |
-| **Dialogs** | Dialog, AlertDialog, Sheet, DropdownMenu, Popover | Overlays and menus |
-| **Feedback** | Skeleton, Progress, Toast | Loading states and notifications |
-| **Data** | Table, Tabs | Data presentation |
+| Category     | Components                                        | Use Case                         |
+| ------------ | ------------------------------------------------- | -------------------------------- |
+| **Core**     | Button, Input, Label, Textarea                    | Basic building blocks            |
+| **Forms**    | Form, Select, Alert                               | Form validation and feedback     |
+| **Layout**   | Card, Separator, Badge, Avatar                    | Structure and organization       |
+| **Dialogs**  | Dialog, AlertDialog, Sheet, DropdownMenu, Popover | Overlays and menus               |
+| **Feedback** | Skeleton, Progress, Toast                         | Loading states and notifications |
+| **Data**     | Table, Tabs                                       | Data presentation                |
 
 ---
 
@@ -111,6 +113,7 @@ All colors, spacing, and typography use CSS custom properties defined in `global
 **Location:** `components/ui/button.tsx`
 
 **Variants:**
+
 - `default` (primary): Main actions (Submit, Save, Create)
 - `destructive`: Delete, Remove actions
 - `outline`: Secondary actions
@@ -148,14 +151,14 @@ import { Button } from "@/components/ui/button"
 
 #### When to Use Each Variant
 
-| Variant | Use Case | Example |
-|---------|----------|---------|
-| `default` | Primary actions | "Save Contact", "Create New" |
-| `destructive` | Delete/remove actions | "Delete Contact", "Remove" |
-| `outline` | Secondary actions | "Cancel", "Go Back" |
-| `secondary` | Tertiary actions | "Learn More", "View Details" |
-| `ghost` | Minimal UI, icon buttons | Menu items, close buttons |
-| `link` | Text links | "Forgot password?", "Terms" |
+| Variant       | Use Case                 | Example                      |
+| ------------- | ------------------------ | ---------------------------- |
+| `default`     | Primary actions          | "Save Contact", "Create New" |
+| `destructive` | Delete/remove actions    | "Delete Contact", "Remove"   |
+| `outline`     | Secondary actions        | "Cancel", "Go Back"          |
+| `secondary`   | Tertiary actions         | "Learn More", "View Details" |
+| `ghost`       | Minimal UI, icon buttons | Menu items, close buttons    |
+| `link`        | Text links               | "Forgot password?", "Terms"  |
 
 ---
 
@@ -198,6 +201,7 @@ import { Label } from "@/components/ui/label"
 ```
 
 **Styling:**
+
 - Automatically styled with design tokens
 - Focus ring follows `ring-ring` token
 - Error states handled by FormMessage
@@ -220,6 +224,7 @@ import { Label } from "@/components/ui/label"
 ```
 
 **Accessibility:**
+
 - Always use `htmlFor` to link to input `id`
 - Screen readers announce label when input is focused
 
@@ -234,16 +239,12 @@ import { Label } from "@/components/ui/label"
 #### Example
 
 ```tsx
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
 
 <div>
   <Label htmlFor="notes">Notes</Label>
-  <Textarea
-    id="notes"
-    placeholder="Additional information..."
-    rows={5}
-  />
-</div>
+  <Textarea id="notes" placeholder="Additional information..." rows={5} />
+</div>;
 ```
 
 ---
@@ -255,6 +256,7 @@ import { Textarea } from "@/components/ui/textarea"
 **Location:** `components/ui/form.tsx`
 
 **Dependencies:**
+
 - `react-hook-form`
 - `zod` (schema validation)
 - `@hookform/resolvers/zod`
@@ -262,9 +264,9 @@ import { Textarea } from "@/components/ui/textarea"
 #### Complete Form Example
 
 ```tsx
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -273,9 +275,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 // 1. Define schema
 const formSchema = z.object({
@@ -286,7 +288,7 @@ const formSchema = z.object({
     message: "Please enter a valid email address.",
   }),
   priority: z.enum(["HIGH", "MEDIUM", "LOW"]),
-})
+});
 
 function ContactForm() {
   // 2. Initialize form
@@ -297,11 +299,11 @@ function ContactForm() {
       email: "",
       priority: "MEDIUM",
     },
-  })
+  });
 
   // 3. Submit handler
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+    console.log(values);
   }
 
   // 4. Render form
@@ -318,10 +320,9 @@ function ContactForm() {
               <FormControl>
                 <Input placeholder="John Doe" {...field} />
               </FormControl>
-              <FormDescription>
-                The contact's full name.
-              </FormDescription>
-              <FormMessage /> {/* Error message auto-linked via aria-describedby */}
+              <FormDescription>The contact's full name.</FormDescription>
+              <FormMessage />{" "}
+              {/* Error message auto-linked via aria-describedby */}
             </FormItem>
           )}
         />
@@ -368,7 +369,7 @@ function ContactForm() {
         <Button type="submit">Save Contact</Button>
       </form>
     </Form>
-  )
+  );
 }
 ```
 
@@ -398,6 +399,7 @@ function ContactForm() {
 ```
 
 **Accessibility:**
+
 - `FormLabel` automatically linked to input via `aria-labelledby`
 - `FormMessage` automatically linked via `aria-describedby`
 - Validation errors announced to screen readers
@@ -417,7 +419,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 <Select onValueChange={setValue} defaultValue="medium">
   <SelectTrigger>
@@ -428,7 +430,7 @@ import {
     <SelectItem value="medium">Medium Priority</SelectItem>
     <SelectItem value="low">Low Priority</SelectItem>
   </SelectContent>
-</Select>
+</Select>;
 ```
 
 ---
@@ -473,6 +475,7 @@ import { AlertCircle } from "lucide-react"
 **Location:** `components/ui/card.tsx`
 
 **Components:**
+
 - `Card`: Container
 - `CardHeader`: Top section
 - `CardTitle`: Main heading
@@ -490,15 +493,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 <Card>
   <CardHeader>
     <CardTitle>Contact Details</CardTitle>
-    <CardDescription>
-      View and manage contact information
-    </CardDescription>
+    <CardDescription>View and manage contact information</CardDescription>
   </CardHeader>
   <CardContent>
     <p>Name: John Doe</p>
@@ -508,12 +509,13 @@ import { Button } from "@/components/ui/button"
     <Button variant="outline">Cancel</Button>
     <Button>Save Changes</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 #### Composition Patterns
 
 **1. Simple Info Card**
+
 ```tsx
 <Card>
   <CardHeader>
@@ -526,6 +528,7 @@ import { Button } from "@/components/ui/button"
 ```
 
 **2. Form Card**
+
 ```tsx
 <Card>
   <CardHeader>
@@ -533,9 +536,7 @@ import { Button } from "@/components/ui/button"
     <CardDescription>Add a new contact to your network</CardDescription>
   </CardHeader>
   <CardContent>
-    <Form>
-      {/* Form fields */}
-    </Form>
+    <Form>{/* Form fields */}</Form>
   </CardContent>
   <CardFooter>
     <Button type="submit">Create</Button>
@@ -544,6 +545,7 @@ import { Button } from "@/components/ui/button"
 ```
 
 **3. List Card**
+
 ```tsx
 <Card>
   <CardHeader>
@@ -599,6 +601,7 @@ import { Separator } from "@/components/ui/separator"
 **Location:** `components/ui/badge.tsx`
 
 **Variants:**
+
 - `default`: Neutral/informational
 - `secondary`: Less prominent
 - `destructive`: Errors, warnings, high priority
@@ -623,9 +626,15 @@ import { Badge } from "@/components/ui/badge"
 
 ```tsx
 // Priority levels
-{priority === 'HIGH' && <Badge variant="destructive">High</Badge>}
-{priority === 'MEDIUM' && <Badge variant="default">Medium</Badge>}
-{priority === 'LOW' && <Badge variant="secondary">Low</Badge>}
+{
+  priority === "HIGH" && <Badge variant="destructive">High</Badge>;
+}
+{
+  priority === "MEDIUM" && <Badge variant="default">Medium</Badge>;
+}
+{
+  priority === "LOW" && <Badge variant="secondary">Low</Badge>;
+}
 ```
 
 ---
@@ -635,6 +644,7 @@ import { Badge } from "@/components/ui/badge"
 **Location:** `components/ui/avatar.tsx`
 
 **Components:**
+
 - `Avatar`: Container
 - `AvatarImage`: Image element
 - `AvatarFallback`: Fallback text/initials
@@ -642,15 +652,16 @@ import { Badge } from "@/components/ui/badge"
 #### Example
 
 ```tsx
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 <Avatar>
   <AvatarImage src={user.profilePicture} alt={user.name} />
   <AvatarFallback>{user.initials}</AvatarFallback>
-</Avatar>
+</Avatar>;
 ```
 
 **With size variants:**
+
 ```tsx
 // Small avatar
 <Avatar className="h-8 w-8">
@@ -682,7 +693,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 <Table>
   <TableCaption>List of contacts</TableCaption>
@@ -706,7 +717,7 @@ import {
       </TableRow>
     ))}
   </TableBody>
-</Table>
+</Table>;
 ```
 
 ---
@@ -718,7 +729,7 @@ import {
 #### Example
 
 ```tsx
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 <Tabs defaultValue="profile">
   <TabsList>
@@ -731,18 +742,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
       <CardHeader>
         <CardTitle>Profile Information</CardTitle>
       </CardHeader>
-      <CardContent>
-        {/* Profile content */}
-      </CardContent>
+      <CardContent>{/* Profile content */}</CardContent>
     </Card>
   </TabsContent>
-  <TabsContent value="contacts">
-    {/* Contacts content */}
-  </TabsContent>
-  <TabsContent value="settings">
-    {/* Settings content */}
-  </TabsContent>
-</Tabs>
+  <TabsContent value="contacts">{/* Contacts content */}</TabsContent>
+  <TabsContent value="settings">{/* Settings content */}</TabsContent>
+</Tabs>;
 ```
 
 ---
@@ -818,9 +823,10 @@ import { Progress } from "@/components/ui/progress"
 #### Setup
 
 1. Add `<Toaster />` to your layout:
+
 ```tsx
 // app/layout.tsx
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
 
 export default function RootLayout({ children }) {
   return (
@@ -830,16 +836,17 @@ export default function RootLayout({ children }) {
         <Toaster />
       </body>
     </html>
-  )
+  );
 }
 ```
 
 2. Use the `useToast` hook:
+
 ```tsx
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast";
 
 function MyComponent() {
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   return (
     <Button
@@ -847,12 +854,12 @@ function MyComponent() {
         toast({
           title: "Contact saved",
           description: "Your contact has been saved successfully.",
-        })
+        });
       }}
     >
       Save Contact
     </Button>
-  )
+  );
 }
 ```
 
@@ -863,21 +870,21 @@ function MyComponent() {
 toast({
   title: "Success",
   description: "Contact created successfully.",
-})
+});
 
 // Error toast
 toast({
   variant: "destructive",
   title: "Error",
   description: "Failed to save contact. Please try again.",
-})
+});
 
 // With action button
 toast({
   title: "Contact deleted",
   description: "John Doe has been removed from your contacts.",
   action: <ToastAction altText="Undo">Undo</ToastAction>,
-})
+});
 ```
 
 ---
@@ -900,7 +907,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 <Dialog>
   <DialogTrigger asChild>
@@ -913,14 +920,13 @@ import {
         Make changes to the contact information here.
       </DialogDescription>
     </DialogHeader>
-    <Form>
-      {/* Form fields */}
-    </Form>
+    <Form>{/* Form fields */}</Form>
   </DialogContent>
-</Dialog>
+</Dialog>;
 ```
 
 **With controlled state:**
+
 ```tsx
 const [open, setOpen] = useState(false)
 
@@ -956,7 +962,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 <AlertDialog>
   <AlertDialogTrigger asChild>
@@ -972,15 +978,14 @@ import {
     </AlertDialogHeader>
     <AlertDialogFooter>
       <AlertDialogCancel>Cancel</AlertDialogCancel>
-      <AlertDialogAction onClick={handleDelete}>
-        Delete
-      </AlertDialogAction>
+      <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
     </AlertDialogFooter>
   </AlertDialogContent>
-</AlertDialog>
+</AlertDialog>;
 ```
 
 **Accessibility:**
+
 - Focus trapped inside dialog
 - Escape key closes dialog
 - Backdrop click closes dialog
@@ -1006,7 +1011,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 
 <Sheet>
   <SheetTrigger asChild>
@@ -1019,11 +1024,9 @@ import {
         Apply filters to refine your contact list
       </SheetDescription>
     </SheetHeader>
-    <div className="py-4">
-      {/* Filter options */}
-    </div>
+    <div className="py-4">{/* Filter options */}</div>
   </SheetContent>
-</Sheet>
+</Sheet>;
 ```
 
 ---
@@ -1044,8 +1047,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
 
 <DropdownMenu>
   <DropdownMenuTrigger asChild>
@@ -1055,21 +1058,14 @@ import { MoreHorizontal } from "lucide-react"
   </DropdownMenuTrigger>
   <DropdownMenuContent align="end">
     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-    <DropdownMenuItem onClick={handleEdit}>
-      Edit Contact
-    </DropdownMenuItem>
-    <DropdownMenuItem onClick={handleShare}>
-      Share
-    </DropdownMenuItem>
+    <DropdownMenuItem onClick={handleEdit}>Edit Contact</DropdownMenuItem>
+    <DropdownMenuItem onClick={handleShare}>Share</DropdownMenuItem>
     <DropdownMenuSeparator />
-    <DropdownMenuItem
-      onClick={handleDelete}
-      className="text-destructive"
-    >
+    <DropdownMenuItem onClick={handleDelete} className="text-destructive">
       Delete
     </DropdownMenuItem>
   </DropdownMenuContent>
-</DropdownMenu>
+</DropdownMenu>;
 ```
 
 ---
@@ -1087,7 +1083,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 <Popover>
   <PopoverTrigger asChild>
@@ -1101,7 +1097,7 @@ import {
       </p>
     </div>
   </PopoverContent>
-</Popover>
+</Popover>;
 ```
 
 ---
@@ -1117,6 +1113,7 @@ See `components/theme-provider.tsx` and `components/theme-toggle.tsx`
 ### Usage in Components
 
 **CSS Variables automatically adapt:**
+
 ```tsx
 // This works in both light and dark mode
 <div className="bg-background text-foreground">
@@ -1126,6 +1123,7 @@ See `components/theme-provider.tsx` and `components/theme-toggle.tsx`
 ```
 
 **No manual dark mode classes needed!**
+
 ```tsx
 // ❌ DON'T DO THIS
 <div className="bg-white dark:bg-gray-900">
@@ -1151,49 +1149,42 @@ All design tokens are defined in `app/globals.css` as CSS custom properties.
 ### Color Tokens
 
 ```css
---background: /* Page background */
---foreground: /* Primary text color */
---card: /* Card background */
---card-foreground: /* Card text color */
---popover: /* Popover background */
---popover-foreground: /* Popover text */
---primary: /* Primary brand color */
---primary-foreground: /* Text on primary */
---secondary: /* Secondary color */
---secondary-foreground: /* Text on secondary */
---muted: /* Muted background */
---muted-foreground: /* Muted text */
---accent: /* Accent background */
---accent-foreground: /* Accent text */
---destructive: /* Error/delete color */
---destructive-foreground: /* Text on destructive */
---border: /* Border color */
---input: /* Input border color */
---ring: /* Focus ring color */
+--background: /* Page background */ --foreground: /* Primary text color */
+  --card: /* Card background */ --card-foreground: /* Card text color */
+  --popover: /* Popover background */ --popover-foreground: /* Popover text */
+  --primary: /* Primary brand color */
+  --primary-foreground: /* Text on primary */ --secondary: /* Secondary color */
+  --secondary-foreground: /* Text on secondary */
+  --muted: /* Muted background */ --muted-foreground: /* Muted text */
+  --accent: /* Accent background */ --accent-foreground: /* Accent text */
+  --destructive: /* Error/delete color */
+  --destructive-foreground: /* Text on destructive */
+  --border: /* Border color */ --input: /* Input border color */
+  --ring: /* Focus ring color */;
 ```
 
 ### Using Design Tokens
 
 ```tsx
 // Backgrounds
-className="bg-background"
-className="bg-card"
-className="bg-muted"
-className="bg-primary"
-className="bg-destructive"
+className = "bg-background";
+className = "bg-card";
+className = "bg-muted";
+className = "bg-primary";
+className = "bg-destructive";
 
 // Text colors
-className="text-foreground"
-className="text-muted-foreground"
-className="text-primary"
-className="text-destructive"
+className = "text-foreground";
+className = "text-muted-foreground";
+className = "text-primary";
+className = "text-destructive";
 
 // Borders
-className="border border-border"
-className="border-input"
+className = "border border-border";
+className = "border-input";
 
 // Focus rings
-className="focus-visible:ring-2 focus-visible:ring-ring"
+className = "focus-visible:ring-2 focus-visible:ring-ring";
 ```
 
 ---
@@ -1203,6 +1194,7 @@ className="focus-visible:ring-2 focus-visible:ring-ring"
 All shadcn components are **WCAG 2.1 AA compliant** by default. Follow these guidelines:
 
 ### 1. **Always Use Labels**
+
 ```tsx
 // ✅ Correct
 <Label htmlFor="email">Email</Label>
@@ -1213,6 +1205,7 @@ All shadcn components are **WCAG 2.1 AA compliant** by default. Follow these gui
 ```
 
 ### 2. **Link Error Messages**
+
 ```tsx
 // ✅ Correct - FormMessage automatically links via aria-describedby
 <FormField
@@ -1231,6 +1224,7 @@ All shadcn components are **WCAG 2.1 AA compliant** by default. Follow these gui
 ```
 
 ### 3. **Use Semantic Components**
+
 ```tsx
 // ✅ Correct - AlertDialog for destructive actions
 <AlertDialog>
@@ -1250,13 +1244,16 @@ All shadcn components are **WCAG 2.1 AA compliant** by default. Follow these gui
 ```
 
 ### 4. **Ensure Keyboard Navigation**
+
 All shadcn components support:
+
 - Tab key navigation
 - Enter/Space key activation
 - Escape key to close dialogs
 - Arrow keys in menus/selects
 
 ### 5. **Maintain Focus Indicators**
+
 ```tsx
 // ✅ shadcn components have focus rings by default
 <Button>Click me</Button> {/* Has focus-visible:ring-2 */}
@@ -1266,9 +1263,11 @@ All shadcn components support:
 ```
 
 ### 6. **Provide Sufficient Color Contrast**
+
 All shadcn design tokens meet WCAG AA contrast ratios (4.5:1 for text, 3:1 for UI components).
 
 **Verified Ratios:**
+
 - Light Mode: Foreground on Background = **20.35:1** ✅
 - Dark Mode: Foreground on Background = **19.53:1** ✅
 - Primary on Background (Light) = **5.15:1** ✅
@@ -1283,6 +1282,7 @@ See `ACCESSIBILITY_AUDIT.md` for complete audit results.
 ### Converting Custom Components to shadcn
 
 #### Before (Custom Component)
+
 ```tsx
 // Custom button with manual dark mode
 <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600">
@@ -1291,13 +1291,15 @@ See `ACCESSIBILITY_AUDIT.md` for complete audit results.
 ```
 
 #### After (shadcn Button)
-```tsx
-import { Button } from "@/components/ui/button"
 
-<Button>Save</Button>
+```tsx
+import { Button } from "@/components/ui/button";
+
+<Button>Save</Button>;
 ```
 
 **Benefits:**
+
 - No manual dark mode classes
 - Consistent styling across app
 - Accessibility built-in
@@ -1306,6 +1308,7 @@ import { Button } from "@/components/ui/button"
 ---
 
 #### Before (Custom Card)
+
 ```tsx
 <div className="border rounded-lg p-6 bg-white dark:bg-gray-800 shadow">
   <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
@@ -1316,8 +1319,9 @@ import { Button } from "@/components/ui/button"
 ```
 
 #### After (shadcn Card)
+
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 <Card>
   <CardHeader>
@@ -1326,10 +1330,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
   <CardContent>
     <p className="text-muted-foreground">Details here</p>
   </CardContent>
-</Card>
+</Card>;
 ```
 
 **Benefits:**
+
 - Design tokens handle dark mode automatically
 - Semantic structure (CardHeader, CardContent)
 - Consistent spacing and styling
@@ -1337,18 +1342,17 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 ---
 
 #### Before (Custom Form)
+
 ```tsx
 <form>
   <label className="block text-sm font-medium mb-1">Email</label>
-  <input
-    className="border rounded px-3 py-2 w-full"
-    type="email"
-  />
+  <input className="border rounded px-3 py-2 w-full" type="email" />
   {error && <p className="text-red-500 text-sm">{error}</p>}
 </form>
 ```
 
 #### After (shadcn Form)
+
 ```tsx
 <Form {...form}>
   <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -1370,6 +1374,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 ```
 
 **Benefits:**
+
 - Automatic error handling with React Hook Form
 - Zod schema validation
 - ARIA attributes auto-linked
@@ -1380,6 +1385,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 ## Common Patterns
 
 ### Contact Card Pattern
+
 ```tsx
 <Card>
   <CardHeader>
@@ -1409,19 +1415,22 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
     </div>
   </CardContent>
   <CardFooter className="flex justify-between">
-    <Button variant="outline" onClick={onEdit}>Edit</Button>
-    <Button variant="destructive" onClick={onDelete}>Delete</Button>
+    <Button variant="outline" onClick={onEdit}>
+      Edit
+    </Button>
+    <Button variant="destructive" onClick={onDelete}>
+      Delete
+    </Button>
   </CardFooter>
 </Card>
 ```
 
 ### Dashboard Stats Card Pattern
+
 ```tsx
 <Card>
   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-    <CardTitle className="text-sm font-medium">
-      Total Contacts
-    </CardTitle>
+    <CardTitle className="text-sm font-medium">Total Contacts</CardTitle>
     <Users className="h-4 w-4 text-muted-foreground" />
   </CardHeader>
   <CardContent>
@@ -1434,6 +1443,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 ```
 
 ### Search and Filter Pattern
+
 ```tsx
 <div className="space-y-4">
   {/* Search */}

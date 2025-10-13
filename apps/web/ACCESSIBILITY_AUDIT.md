@@ -20,20 +20,20 @@ This document provides a comprehensive accessibility audit of all shadcn/ui refa
 
 ### ✅ Fully Compliant Components
 
-| Component | jest-axe Tests | Keyboard Nav | ARIA | Color Contrast | Focus Indicators |
-|-----------|----------------|--------------|------|----------------|------------------|
-| ContactCard | ✅ Passing | ✅ Yes | ✅ Yes | ✅ AA | ✅ Yes |
-| ContactDeleteDialog | ✅ Passing | ✅ Yes | ✅ Yes | ✅ AA | ✅ Yes |
-| ContactSearchBar | ✅ Passing | ✅ Yes | ✅ Yes | ✅ AA | ✅ Yes |
-| Dashboard | ✅ Passing | ✅ Yes | ✅ Yes | ✅ AA | ✅ Yes |
-| ThemeToggle | ✅ Passing | ✅ Yes | ✅ Yes | ✅ AA | ✅ Yes |
-| ThemeProvider | ✅ Passing | N/A | ✅ Yes | N/A | N/A |
+| Component           | jest-axe Tests | Keyboard Nav | ARIA   | Color Contrast | Focus Indicators |
+| ------------------- | -------------- | ------------ | ------ | -------------- | ---------------- |
+| ContactCard         | ✅ Passing     | ✅ Yes       | ✅ Yes | ✅ AA          | ✅ Yes           |
+| ContactDeleteDialog | ✅ Passing     | ✅ Yes       | ✅ Yes | ✅ AA          | ✅ Yes           |
+| ContactSearchBar    | ✅ Passing     | ✅ Yes       | ✅ Yes | ✅ AA          | ✅ Yes           |
+| Dashboard           | ✅ Passing     | ✅ Yes       | ✅ Yes | ✅ AA          | ✅ Yes           |
+| ThemeToggle         | ✅ Passing     | ✅ Yes       | ✅ Yes | ✅ AA          | ✅ Yes           |
+| ThemeProvider       | ✅ Passing     | N/A          | ✅ Yes | N/A            | N/A              |
 
 ### ⚠️ Components with Known Router Mocking Issue
 
-| Component | Status | Issue | Solution |
-|-----------|--------|-------|----------|
-| LoginForm | ⚠️ Test failing | Next.js router mock | Functional in app, E2E tests cover |
+| Component  | Status          | Issue               | Solution                           |
+| ---------- | --------------- | ------------------- | ---------------------------------- |
+| LoginForm  | ⚠️ Test failing | Next.js router mock | Functional in app, E2E tests cover |
 | SignupForm | ⚠️ Test failing | Next.js router mock | Functional in app, E2E tests cover |
 
 **Note:** These components are fully accessible in the actual application. The test failures are due to Jest's inability to properly mock Next.js App Router's `useRouter` hook. End-to-end Playwright tests verify their accessibility.
@@ -58,6 +58,7 @@ Tests: 12 passed (accessibility tests)
 ```
 
 **Files with axe tests:**
+
 - `components/contacts/ContactCard.test.tsx` (2 accessibility tests)
 - `components/contacts/ContactDeleteDialog.test.tsx` (2 accessibility tests)
 - `components/contacts/ContactSearchBar.test.tsx` (accessibility coverage)
@@ -72,24 +73,28 @@ Tests: 12 passed (accessibility tests)
 All interactive elements are fully keyboard accessible:
 
 #### ✅ ContactForm (Task 11.2)
+
 - Tab navigation through all form fields
 - Enter key submits form
 - Escape key clears errors
 - All inputs reachable via keyboard
 
 #### ✅ ContactDeleteDialog (Task 11.3)
+
 - Focus trap implemented (AlertDialog from shadcn)
 - Escape key closes dialog
 - Tab cycles through dialog buttons
 - Enter key on Cancel/Delete buttons works
 
 #### ✅ Login/Signup Forms (Task 11.4)
+
 - Tab through email → password → submit button
 - Enter key submits from any field
 - Google OAuth button keyboard accessible
 - Password strength indicator updates on input
 
 #### ✅ Theme Toggle (Task 11.5)
+
 - Accessible via keyboard (Tab to reach)
 - Enter/Space toggles theme
 - Arrow keys navigate theme options in dropdown
@@ -97,6 +102,7 @@ All interactive elements are fully keyboard accessible:
 
 **E2E Test Coverage:**
 Created comprehensive Playwright keyboard navigation tests in `e2e/accessibility-audit.spec.ts`:
+
 - Login form keyboard navigation
 - Contact form keyboard navigation
 - Theme toggle keyboard accessibility
@@ -111,11 +117,13 @@ Created comprehensive Playwright keyboard navigation tests in `e2e/accessibility
 All interactive elements include proper ARIA labels or accessible text:
 
 **Buttons:**
+
 - Theme toggle: `aria-label="Toggle theme"`
 - Submit buttons: Descriptive text ("Sign in", "Save Contact", etc.)
 - Icon buttons: Include aria-label
 
 **Links:**
+
 - All navigation links have descriptive text
 - Contact cards use semantic HTML (`<a>` with href)
 
@@ -130,6 +138,7 @@ All form inputs use shadcn `<Label>` component with proper `htmlFor` attribute:
 ```
 
 **Verified in:**
+
 - Login form (email, password)
 - Signup form (email, password, confirm password)
 - Contact form (name, email, phone, LinkedIn, company, industry, role, priority, notes)
@@ -156,6 +165,7 @@ shadcn `FormMessage` component automatically provides ARIA associations:
 ```
 
 **Verified in:**
+
 - Contact form validation errors
 - Login form validation errors
 - Signup form validation errors (including password strength)
@@ -167,7 +177,10 @@ shadcn `AlertDialog` component provides proper ARIA attributes:
 ```tsx
 // Example from ContactDeleteDialog
 <AlertDialog>
-  <AlertDialogContent aria-labelledby="dialog-title" aria-describedby="dialog-description">
+  <AlertDialogContent
+    aria-labelledby="dialog-title"
+    aria-describedby="dialog-description"
+  >
     <AlertDialogTitle id="dialog-title">Delete Contact?</AlertDialogTitle>
     <AlertDialogDescription id="dialog-description">
       This will permanently delete the contact...
@@ -177,6 +190,7 @@ shadcn `AlertDialog` component provides proper ARIA attributes:
 ```
 
 **Verified in:**
+
 - Contact delete confirmation dialog
 
 ### 4. Color Contrast (Task 11.10)
@@ -186,6 +200,7 @@ shadcn `AlertDialog` component provides proper ARIA attributes:
 All text meets WCAG 2.1 AA color contrast requirements (4.5:1 for normal text, 3:1 for large text):
 
 #### Light Mode
+
 - **Background:** `hsl(0 0% 100%)` (white)
 - **Foreground:** `hsl(222.2 84% 4.9%)` (near-black) → **Contrast: 20.35:1** ✅
 - **Primary:** `hsl(221.2 83.2% 53.3%)` (blue) → **Contrast: 5.15:1** ✅
@@ -193,6 +208,7 @@ All text meets WCAG 2.1 AA color contrast requirements (4.5:1 for normal text, 3
 - **Destructive:** `hsl(0 84.2% 60.2%)` (red) → **Contrast: 4.56:1** ✅
 
 #### Dark Mode
+
 - **Background:** `hsl(222.2 84% 4.9%)` (near-black)
 - **Foreground:** `hsl(210 40% 98%)` (near-white) → **Contrast: 19.53:1** ✅
 - **Primary:** `hsl(217.2 91.2% 59.8%)` (blue) → **Contrast: 7.18:1** ✅
@@ -202,6 +218,7 @@ All text meets WCAG 2.1 AA color contrast requirements (4.5:1 for normal text, 3
 **shadcn/ui color system** is designed for WCAG AA compliance by default.
 
 **Verified with:**
+
 - Manual contrast checker tools
 - Playwright axe-core automated testing (to be run)
 
@@ -212,11 +229,13 @@ All text meets WCAG 2.1 AA color contrast requirements (4.5:1 for normal text, 3
 All interactive elements have visible focus indicators:
 
 **shadcn default focus styles:**
+
 ```css
 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
 ```
 
 **Applied to:**
+
 - All buttons (Button component)
 - All form inputs (Input, Textarea, Select components)
 - All links
@@ -224,6 +243,7 @@ focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-vi
 - Dialog action buttons
 
 **Focus ring colors:**
+
 - **Light mode:** `hsl(222.2 84% 4.9%)` (dark ring on light background)
 - **Dark mode:** `hsl(212.7 26.8% 83.9%)` (light ring on dark background)
 
@@ -312,12 +332,14 @@ Both provide **excellent visibility** against their respective backgrounds.
 **Issue:** Next.js App Router's `useRouter` hook cannot be properly mocked in Jest environment, causing test failures.
 
 **Resolution:**
+
 - ✅ Components are fully functional and accessible in the actual application
 - ✅ E2E tests with Playwright verify accessibility in real browser
 - ✅ Issue documented in tasks.md (Tasks 7.10, 8.10)
 - ✅ **Not blocking for production deployment**
 
 **Evidence of Functionality:**
+
 - Manual testing confirms keyboard navigation works
 - Playwright E2E tests will verify in real browser
 - No actual accessibility issues in production
@@ -327,6 +349,7 @@ Both provide **excellent visibility** against their respective backgrounds.
 ## Recommendations
 
 ### Completed
+
 - ✅ All shadcn/ui components follow accessibility best practices by default
 - ✅ Color contrast ratios exceed WCAG AA requirements
 - ✅ Keyboard navigation fully functional across all components
@@ -334,6 +357,7 @@ Both provide **excellent visibility** against their respective backgrounds.
 - ✅ Focus indicators visible and consistent
 
 ### Future Enhancements
+
 - 📋 Add automated accessibility testing to CI/CD pipeline
 - 📋 Run Playwright accessibility tests on every PR
 - 📋 Consider WCAG AAA compliance for critical flows
@@ -357,16 +381,19 @@ All components meet WCAG 2.1 AA standards. The application is ready for producti
 ## Appendix: Test Execution Commands
 
 ### Run Jest Accessibility Tests
+
 ```bash
 pnpm --filter web test -- --testNamePattern="accessibility|Accessibility"
 ```
 
 ### Run Playwright Accessibility Tests
+
 ```bash
 pnpm --filter web test:e2e accessibility-audit.spec.ts
 ```
 
 ### Generate Accessibility Coverage Report
+
 ```bash
 pnpm --filter web test -- --coverage --testNamePattern="accessibility"
 ```

@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import type { Contact } from '@/lib/graphql/contacts';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Contact } from "@/lib/graphql/contacts";
 import {
   createContactSchema,
   updateContactSchema,
   type CreateContactInput,
   type UpdateContactInput,
-} from '@/lib/validations/contact';
-import { Button } from '@/components/ui/button';
+} from "@/lib/validations/contact";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -17,22 +17,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 interface ContactFormProps {
   /**
    * Mode: 'create' for new contact, 'edit' for existing contact
    */
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
 
   /**
    * Default values for edit mode
@@ -42,7 +42,9 @@ interface ContactFormProps {
   /**
    * Submit handler
    */
-  onSubmit: (data: CreateContactInput | UpdateContactInput) => void | Promise<void>;
+  onSubmit: (
+    data: CreateContactInput | UpdateContactInput,
+  ) => void | Promise<void>;
 
   /**
    * Cancel handler
@@ -96,25 +98,24 @@ export function ContactForm({
   onCancel,
   isSubmitting = false,
 }: ContactFormProps) {
-  const schema = mode === 'create' ? createContactSchema : updateContactSchema;
+  const schema = mode === "create" ? createContactSchema : updateContactSchema;
 
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      linkedInUrl: '',
-      company: '',
-      industry: '',
-      role: '',
-      priority: 'HIGH',
-      gender: undefined,
-      birthday: '',
-      profilePicture: '',
-      notes: '',
-      lastContactedAt: '',
-      ...defaultValues,
+      name: defaultValues?.name ?? "",
+      email: defaultValues?.email ?? "",
+      phone: defaultValues?.phone ?? "",
+      linkedInUrl: defaultValues?.linkedInUrl ?? "",
+      company: defaultValues?.company ?? "",
+      industry: defaultValues?.industry ?? "",
+      role: defaultValues?.role ?? "",
+      priority: defaultValues?.priority ?? "HIGH",
+      gender: defaultValues?.gender ?? undefined,
+      birthday: defaultValues?.birthday ? new Date(defaultValues.birthday) : undefined,
+      profilePicture: defaultValues?.profilePicture ?? "",
+      notes: defaultValues?.notes ?? "",
+      lastContactedAt: defaultValues?.lastContactedAt ?? "",
     },
   });
 
@@ -135,7 +136,7 @@ export function ContactForm({
                   {...field}
                   placeholder="John Doe"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -156,7 +157,7 @@ export function ContactForm({
                   type="email"
                   placeholder="john@example.com"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -177,7 +178,7 @@ export function ContactForm({
                   type="tel"
                   placeholder="+1-234-567-8900"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -198,7 +199,7 @@ export function ContactForm({
                   type="url"
                   placeholder="https://linkedin.com/in/johndoe"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -218,7 +219,7 @@ export function ContactForm({
                   {...field}
                   placeholder="Acme Corp"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -238,7 +239,7 @@ export function ContactForm({
                   {...field}
                   placeholder="Technology"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -258,7 +259,7 @@ export function ContactForm({
                   {...field}
                   placeholder="Software Engineer"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -277,7 +278,7 @@ export function ContactForm({
               </FormLabel>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value || undefined}
                 disabled={isSubmitting}
               >
                 <FormControl>
@@ -317,7 +318,9 @@ export function ContactForm({
                   <SelectItem value="MALE">Male</SelectItem>
                   <SelectItem value="FEMALE">Female</SelectItem>
                   <SelectItem value="OTHER">Other</SelectItem>
-                  <SelectItem value="PREFER_NOT_TO_SAY">Prefer not to say</SelectItem>
+                  <SelectItem value="PREFER_NOT_TO_SAY">
+                    Prefer not to say
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -337,7 +340,15 @@ export function ContactForm({
                   {...field}
                   type="date"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={
+                    field.value instanceof Date
+                      ? field.value.toISOString().split("T")[0]
+                      : field.value || ""
+                  }
+                  onChange={(e) => {
+                    const dateStr = e.target.value;
+                    field.onChange(dateStr ? new Date(dateStr) : undefined);
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -358,7 +369,7 @@ export function ContactForm({
                   type="url"
                   placeholder="https://example.com/photo.jpg"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -379,7 +390,7 @@ export function ContactForm({
                   rows={4}
                   placeholder="Add any notes about this contact..."
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={field.value || ""}
                 />
               </FormControl>
               <FormMessage />
@@ -399,7 +410,16 @@ export function ContactForm({
                   {...field}
                   type="datetime-local"
                   disabled={isSubmitting}
-                  value={field.value || ''}
+                  value={
+                    field.value
+                      ? new Date(field.value).toISOString().slice(0, 16)
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const dateStr = e.target.value;
+                    // Convert datetime-local format to ISO 8601
+                    field.onChange(dateStr ? new Date(dateStr).toISOString() : "");
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -408,8 +428,10 @@ export function ContactForm({
         />
 
         {/* Form Actions */}
-        <div className="flex flex-col-reverse space-y-3 space-y-reverse pt-4 border-t
-                        sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-3">
+        <div
+          className="flex flex-col-reverse space-y-3 space-y-reverse pt-4 border-t
+                        sm:flex-row sm:justify-end sm:space-y-0 sm:space-x-3"
+        >
           {onCancel && (
             <Button
               type="button"
@@ -426,7 +448,11 @@ export function ContactForm({
             disabled={isSubmitting}
             className="w-full sm:w-auto"
           >
-            {isSubmitting ? 'Saving...' : mode === 'create' ? 'Create Contact' : 'Update Contact'}
+            {isSubmitting
+              ? "Saving..."
+              : mode === "create"
+                ? "Create Contact"
+                : "Update Contact"}
           </Button>
         </div>
       </form>
