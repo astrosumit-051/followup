@@ -17,7 +17,8 @@ describe('ThemeToggle', () => {
       themes: ['light', 'dark', 'system'],
       systemTheme: 'light',
       resolvedTheme: 'light',
-    } as any);
+      forcedTheme: undefined,
+    });
   });
 
   afterEach(() => {
@@ -38,7 +39,8 @@ describe('ThemeToggle', () => {
       themes: ['light', 'dark', 'system'],
       systemTheme: 'light',
       resolvedTheme: 'light',
-    } as any);
+      forcedTheme: undefined,
+    });
 
     render(<ThemeToggle />);
 
@@ -53,7 +55,8 @@ describe('ThemeToggle', () => {
       themes: ['light', 'dark', 'system'],
       systemTheme: 'dark',
       resolvedTheme: 'dark',
-    } as any);
+      forcedTheme: undefined,
+    });
 
     render(<ThemeToggle />);
 
@@ -79,7 +82,8 @@ describe('ThemeToggle', () => {
       themes: ['light', 'dark', 'system'],
       systemTheme: 'light',
       resolvedTheme: 'light',
-    } as any);
+      forcedTheme: undefined,
+    });
 
     render(<ThemeToggle />);
 

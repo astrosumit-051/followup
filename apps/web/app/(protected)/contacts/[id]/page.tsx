@@ -97,7 +97,7 @@ export default function ContactDetailPage() {
                 Contact Not Found
               </h2>
               <p className="text-gray-600 mb-4">
-                The contact you're looking for doesn't exist or has been deleted.
+                The contact you&apos;re looking for doesn&apos;t exist or has been deleted.
               </p>
               <button
                 onClick={() => router.push('/contacts')}
@@ -133,7 +133,7 @@ export default function ContactDetailPage() {
             {/* Edit Button */}
             <button
               onClick={() => router.push(`/contacts/${id}/edit`)}
-              aria-label={`Edit ${contact.name}'s contact information`}
+              aria-label={`Edit ${contact.name}&apos;s contact information`}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium
                          text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
                          focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
@@ -297,7 +297,7 @@ export default function ContactDetailPage() {
                 <dd className="mt-1">
                   <img
                     src={contact.profilePicture}
-                    alt={`${contact.name}'s profile`}
+                    alt={`${contact.name}&apos;s profile`}
                     className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
                   />
                 </dd>

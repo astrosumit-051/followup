@@ -86,7 +86,7 @@ export default function EditContactPage() {
                 Contact Not Found
               </h2>
               <p className="text-gray-600 mb-4">
-                The contact you're trying to edit doesn't exist or has been deleted.
+                The contact you&apos;re trying to edit doesn&apos;t exist or has been deleted.
               </p>
               <button
                 onClick={() => router.push('/contacts')}

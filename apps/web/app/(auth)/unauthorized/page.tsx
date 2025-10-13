@@ -37,7 +37,7 @@ export default function UnauthorizedPage() {
 
             <div className="rounded-lg bg-amber-50 dark:bg-amber-900/10 p-4">
               <p className="text-sm text-amber-800 dark:text-amber-400">
-                Your session may have expired or you don't have permission to view this content.
+                Your session may have expired or you don&apos;t have permission to view this content.
               </p>
             </div>
           </div>

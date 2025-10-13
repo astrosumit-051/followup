@@ -89,7 +89,7 @@ export function LoginForm() {
       <div className="text-center">
         <h2 className="text-3xl font-bold text-foreground">Sign in to your account</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="text-primary hover:underline">
             Sign up
           </Link>
