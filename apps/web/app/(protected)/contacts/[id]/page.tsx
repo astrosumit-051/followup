@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
-import { toast } from 'sonner';
-import { useContact, useDeleteContact } from '@/lib/hooks/useContacts';
-import { ContactDeleteDialog } from '@/components/contacts/ContactDeleteDialog';
-import { ContactLoadingSkeleton } from '@/components/contacts/ContactLoadingSkeleton';
-import { ContactErrorState } from '@/components/contacts/ContactErrorState';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import { useContact, useDeleteContact } from "@/lib/hooks/useContacts";
+import { ContactDeleteDialog } from "@/components/contacts/ContactDeleteDialog";
+import { ContactLoadingSkeleton } from "@/components/contacts/ContactLoadingSkeleton";
+import { ContactErrorState } from "@/components/contacts/ContactErrorState";
 import {
   formatDate,
   formatDateTime,
   formatPriority,
   formatGender,
   getPriorityColor,
-} from '@/lib/utils/contact-formatters';
+} from "@/lib/utils/contact-formatters";
 
 /**
  * Contact Detail Page
@@ -46,7 +46,7 @@ export default function ContactDetailPage() {
   // Update document title when contact loads
   useEffect(() => {
     if (contact) {
-      document.title = 'Contact Details - RelationHub';
+      document.title = "Contact Details - RelationHub";
     }
   }, [contact]);
 
@@ -55,17 +55,19 @@ export default function ContactDetailPage() {
       await deleteContactMutation.mutateAsync(id);
 
       // Show success toast
-      toast.success('Contact deleted successfully!', {
-        description: `${contact?.name || 'Contact'} has been removed from your contacts.`,
+      toast.success("Contact deleted successfully!", {
+        description: `${contact?.name || "Contact"} has been removed from your contacts.`,
       });
 
       // Redirect to contacts list
-      router.push('/contacts');
+      router.push("/contacts");
     } catch (error) {
       // Show error toast
-      toast.error('Failed to delete contact', {
+      toast.error("Failed to delete contact", {
         description:
-          error instanceof Error ? error.message : 'An unexpected error occurred',
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
       });
 
       // Close dialog even on error
@@ -86,21 +88,26 @@ export default function ContactDetailPage() {
   // Not found state
   if (!contact) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4
+      <div
+        className="min-h-screen bg-gray-50 py-8 px-4
                       sm:px-6
-                      lg:px-8">
+                      lg:px-8"
+      >
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white shadow-sm rounded-lg p-6
-                          sm:p-8">
+          <div
+            className="bg-white shadow-sm rounded-lg p-6
+                          sm:p-8"
+          >
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Contact Not Found
               </h2>
               <p className="text-gray-600 mb-4">
-                The contact you're looking for doesn't exist or has been deleted.
+                The contact you&apos;re looking for doesn&apos;t exist or has
+                been deleted.
               </p>
               <button
-                onClick={() => router.push('/contacts')}
+                onClick={() => router.push("/contacts")}
                 aria-label="Return to contacts list"
                 className="px-6 py-3 bg-blue-600 text-white rounded-md
                            hover:bg-blue-700 focus:outline-none
@@ -117,13 +124,17 @@ export default function ContactDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4
+    <div
+      className="min-h-screen bg-gray-50 py-8 px-4
                     sm:px-6
-                    lg:px-8">
+                    lg:px-8"
+    >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex flex-col space-y-4
-                        sm:flex-row sm:justify-between sm:items-start sm:space-y-0">
+        <div
+          className="mb-6 flex flex-col space-y-4
+                        sm:flex-row sm:justify-between sm:items-start sm:space-y-0"
+        >
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{contact.name}</h1>
             <p className="mt-1 text-sm text-gray-500">Contact Details</p>
@@ -133,7 +144,7 @@ export default function ContactDetailPage() {
             {/* Edit Button */}
             <button
               onClick={() => router.push(`/contacts/${id}/edit`)}
-              aria-label={`Edit ${contact.name}'s contact information`}
+              aria-label={`Edit ${contact.name}&apos;s contact information`}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium
                          text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
                          focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
@@ -158,8 +169,10 @@ export default function ContactDetailPage() {
 
         {/* Contact Information Card */}
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div className="px-6 py-8
-                          sm:px-8">
+          <div
+            className="px-6 py-8
+                          sm:px-8"
+          >
             {/* Priority Badge */}
             {contact.priority && (
               <div className="mb-6">
@@ -172,8 +185,10 @@ export default function ContactDetailPage() {
             )}
 
             {/* Contact Details Grid */}
-            <dl className="grid grid-cols-1 gap-x-6 gap-y-6
-                           sm:grid-cols-2">
+            <dl
+              className="grid grid-cols-1 gap-x-6 gap-y-6
+                           sm:grid-cols-2"
+            >
               {/* Email */}
               {contact.email && (
                 <div>
@@ -207,7 +222,9 @@ export default function ContactDetailPage() {
               {/* LinkedIn */}
               {contact.linkedInUrl && (
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">LinkedIn Profile</dt>
+                  <dt className="text-sm font-medium text-gray-500">
+                    LinkedIn Profile
+                  </dt>
                   <dd className="mt-1 text-sm text-gray-900">
                     <a
                       href={contact.linkedInUrl}
@@ -225,15 +242,21 @@ export default function ContactDetailPage() {
               {contact.company && (
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Company</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{contact.company}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {contact.company}
+                  </dd>
                 </div>
               )}
 
               {/* Industry */}
               {contact.industry && (
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Industry</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{contact.industry}</dd>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Industry
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {contact.industry}
+                  </dd>
                 </div>
               )}
 
@@ -249,21 +272,29 @@ export default function ContactDetailPage() {
               {contact.gender && (
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Gender</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatGender(contact.gender)}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {formatGender(contact.gender)}
+                  </dd>
                 </div>
               )}
 
               {/* Birthday */}
               {contact.birthday && (
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Birthday</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDate(contact.birthday)}</dd>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Birthday
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {formatDate(contact.birthday)}
+                  </dd>
                 </div>
               )}
 
               {/* Last Contacted */}
               <div>
-                <dt className="text-sm font-medium text-gray-500">Last Contacted</dt>
+                <dt className="text-sm font-medium text-gray-500">
+                  Last Contacted
+                </dt>
                 <dd className="mt-1 text-sm text-gray-900">
                   {formatDateTime(contact.lastContactedAt)}
                 </dd>
@@ -272,32 +303,44 @@ export default function ContactDetailPage() {
               {/* Created At */}
               <div>
                 <dt className="text-sm font-medium text-gray-500">Added</dt>
-                <dd className="mt-1 text-sm text-gray-900">{formatDateTime(contact.createdAt)}</dd>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {formatDateTime(contact.createdAt)}
+                </dd>
               </div>
 
               {/* Updated At */}
               <div>
-                <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
-                <dd className="mt-1 text-sm text-gray-900">{formatDateTime(contact.updatedAt)}</dd>
+                <dt className="text-sm font-medium text-gray-500">
+                  Last Updated
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {formatDateTime(contact.updatedAt)}
+                </dd>
               </div>
             </dl>
 
             {/* Notes Section (Full Width) */}
             {contact.notes && (
               <div className="mt-8 pt-8 border-t border-gray-200">
-                <dt className="text-sm font-medium text-gray-500 mb-2">Notes</dt>
-                <dd className="text-sm text-gray-900 whitespace-pre-wrap">{contact.notes}</dd>
+                <dt className="text-sm font-medium text-gray-500 mb-2">
+                  Notes
+                </dt>
+                <dd className="text-sm text-gray-900 whitespace-pre-wrap">
+                  {contact.notes}
+                </dd>
               </div>
             )}
 
             {/* Profile Picture (if available) */}
             {contact.profilePicture && (
               <div className="mt-8 pt-8 border-t border-gray-200">
-                <dt className="text-sm font-medium text-gray-500 mb-2">Profile Picture</dt>
+                <dt className="text-sm font-medium text-gray-500 mb-2">
+                  Profile Picture
+                </dt>
                 <dd className="mt-1">
                   <img
                     src={contact.profilePicture}
-                    alt={`${contact.name}'s profile`}
+                    alt={`${contact.name}&apos;s profile`}
                     className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
                   />
                 </dd>
@@ -309,7 +352,7 @@ export default function ContactDetailPage() {
         {/* Back to Contacts Button */}
         <div className="mt-6">
           <button
-            onClick={() => router.push('/contacts')}
+            onClick={() => router.push("/contacts")}
             className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
           >
             ← Back to Contacts

@@ -1,10 +1,10 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, it, expect, jest } from '@jest/globals';
-import { ContactForm } from './ContactForm';
-import type { Contact } from '@/lib/graphql/contacts';
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, it, expect, jest } from "@jest/globals";
+import { ContactForm } from "./ContactForm";
+import type { Contact } from "@/lib/graphql/contacts";
 
-describe('ContactForm', () => {
+describe("ContactForm", () => {
   const mockOnSubmit = jest.fn();
   const mockOnCancel = jest.fn();
 
@@ -12,27 +12,19 @@ describe('ContactForm', () => {
     jest.clearAllMocks();
   });
 
-  describe('Create Mode', () => {
-    it('renders all required fields', () => {
-      render(
-        <ContactForm
-          mode="create"
-          onSubmit={mockOnSubmit}
-        />
-      );
+  describe("Create Mode", () => {
+    it("renders all required fields", () => {
+      render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
       expect(screen.getByLabelText(/Name/)).toBeInTheDocument();
       expect(screen.getByLabelText(/Priority/)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Create Contact/ })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Create Contact/ }),
+      ).toBeInTheDocument();
     });
 
-    it('renders all optional fields', () => {
-      render(
-        <ContactForm
-          mode="create"
-          onSubmit={mockOnSubmit}
-        />
-      );
+    it("renders all optional fields", () => {
+      render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
       expect(screen.getByLabelText(/Email/)).toBeInTheDocument();
       expect(screen.getByLabelText(/Phone/)).toBeInTheDocument();
@@ -47,17 +39,14 @@ describe('ContactForm', () => {
       expect(screen.getByLabelText(/Last Contacted/)).toBeInTheDocument();
     });
 
-    it('shows validation error when name is empty', async () => {
+    it("shows validation error when name is empty", async () => {
       const user = userEvent.setup();
 
-      render(
-        <ContactForm
-          mode="create"
-          onSubmit={mockOnSubmit}
-        />
-      );
+      render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
-      const submitButton = screen.getByRole('button', { name: /Create Contact/ });
+      const submitButton = screen.getByRole("button", {
+        name: /Create Contact/,
+      });
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -67,87 +56,83 @@ describe('ContactForm', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
-    it.skip('submits form with valid data', async () => {
+    it.skip("submits form with valid data", async () => {
       const user = userEvent.setup();
 
       const { container } = render(
-        <ContactForm
-          mode="create"
-          onSubmit={mockOnSubmit}
-        />
+        <ContactForm mode="create" onSubmit={mockOnSubmit} />,
       );
 
-      await user.type(screen.getByLabelText(/Name/), 'John Doe');
-      await user.selectOptions(screen.getByLabelText(/Priority/), 'HIGH');
-      await user.type(screen.getByLabelText(/Email/), 'john@example.com');
+      await user.type(screen.getByLabelText(/Name/), "John Doe");
+      await user.selectOptions(screen.getByLabelText(/Priority/), "HIGH");
+      await user.type(screen.getByLabelText(/Email/), "john@example.com");
 
-      const form = container.querySelector('form');
+      const form = container.querySelector("form");
       fireEvent.submit(form!);
 
       await waitFor(
         () => {
           expect(mockOnSubmit).toHaveBeenCalledWith(
             expect.objectContaining({
-              name: 'John Doe',
-              priority: 'HIGH',
-              email: 'john@example.com',
-            })
+              name: "John Doe",
+              priority: "HIGH",
+              email: "john@example.com",
+            }),
           );
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
     });
 
-    it('does not show cancel button in create mode without onCancel', () => {
-      render(
-        <ContactForm
-          mode="create"
-          onSubmit={mockOnSubmit}
-        />
-      );
+    it("does not show cancel button in create mode without onCancel", () => {
+      render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
-      expect(screen.queryByRole('button', { name: /Cancel/ })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Cancel/ }),
+      ).not.toBeInTheDocument();
     });
   });
 
-  describe('Edit Mode', () => {
+  describe("Edit Mode", () => {
     const mockContact: Partial<Contact> = {
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+1-555-0123',
-      company: 'TechCorp',
-      priority: 'MEDIUM',
+      name: "Jane Smith",
+      email: "jane@example.com",
+      phone: "+1-555-0123",
+      company: "TechCorp",
+      priority: "MEDIUM",
     };
 
-    it('pre-fills form with default values', () => {
+    it("pre-fills form with default values", () => {
       render(
         <ContactForm
           mode="edit"
           defaultValues={mockContact}
           onSubmit={mockOnSubmit}
-        />
+        />,
       );
 
-      expect(screen.getByDisplayValue('Jane Smith')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('jane@example.com')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('+1-555-0123')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('TechCorp')).toBeInTheDocument();
+      expect(screen.getByDisplayValue("Jane Smith")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("jane@example.com")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("+1-555-0123")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("TechCorp")).toBeInTheDocument();
     });
 
-    it('shows cancel button when onCancel is provided', () => {
+    it("shows cancel button when onCancel is provided", () => {
       render(
         <ContactForm
           mode="edit"
           defaultValues={mockContact}
           onSubmit={mockOnSubmit}
           onCancel={mockOnCancel}
-        />
+        />,
       );
 
-      expect(screen.getByRole('button', { name: /Cancel/ })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Cancel/ }),
+      ).toBeInTheDocument();
     });
 
-    it('calls onCancel when cancel button is clicked', async () => {
+    it("calls onCancel when cancel button is clicked", async () => {
       const user = userEvent.setup();
 
       render(
@@ -156,10 +141,10 @@ describe('ContactForm', () => {
           defaultValues={mockContact}
           onSubmit={mockOnSubmit}
           onCancel={mockOnCancel}
-        />
+        />,
       );
 
-      const cancelButton = screen.getByRole('button', { name: /Cancel/ });
+      const cancelButton = screen.getByRole("button", { name: /Cancel/ });
       await user.click(cancelButton);
 
       expect(mockOnCancel).toHaveBeenCalledTimes(1);
@@ -171,13 +156,15 @@ describe('ContactForm', () => {
           mode="edit"
           defaultValues={mockContact}
           onSubmit={mockOnSubmit}
-        />
+        />,
       );
 
-      expect(screen.getByRole('button', { name: /Update Contact/ })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Update Contact/ }),
+      ).toBeInTheDocument();
     });
 
-    it.skip('submits updated data', async () => {
+    it.skip("submits updated data", async () => {
       const user = userEvent.setup();
 
       const { container } = render(
@@ -185,40 +172,40 @@ describe('ContactForm', () => {
           mode="edit"
           defaultValues={mockContact}
           onSubmit={mockOnSubmit}
-        />
+        />,
       );
 
-      const nameInput = screen.getByDisplayValue('Jane Smith');
+      const nameInput = screen.getByDisplayValue("Jane Smith");
       await user.clear(nameInput);
-      await user.type(nameInput, 'Jane Doe');
+      await user.type(nameInput, "Jane Doe");
 
-      const form = container.querySelector('form');
+      const form = container.querySelector("form");
       fireEvent.submit(form!);
 
       await waitFor(
         () => {
           expect(mockOnSubmit).toHaveBeenCalledWith(
             expect.objectContaining({
-              name: 'Jane Doe',
-            })
+              name: "Jane Doe",
+            }),
           );
         },
-        { timeout: 3000 }
+        { timeout: 3000 },
       );
     });
   });
 
-  describe('Loading State', () => {
-    it('disables submit button when isSubmitting is true', () => {
+  describe("Loading State", () => {
+    it("disables submit button when isSubmitting is true", () => {
       render(
         <ContactForm
           mode="create"
           onSubmit={mockOnSubmit}
           isSubmitting={true}
-        />
+        />,
       );
 
-      const submitButton = screen.getByRole('button', { name: /Saving\.\.\./ });
+      const submitButton = screen.getByRole("button", { name: /Saving\.\.\./ });
       expect(submitButton).toBeDisabled();
     });
 
@@ -228,19 +215,19 @@ describe('ContactForm', () => {
           mode="create"
           onSubmit={mockOnSubmit}
           isSubmitting={true}
-        />
+        />,
       );
 
       expect(screen.getByText(/Saving\.\.\./)).toBeInTheDocument();
     });
 
-    it('disables all form fields when isSubmitting', () => {
+    it("disables all form fields when isSubmitting", () => {
       render(
         <ContactForm
           mode="create"
           onSubmit={mockOnSubmit}
           isSubmitting={true}
-        />
+        />,
       );
 
       expect(screen.getByLabelText(/Name/)).toBeDisabled();
@@ -248,31 +235,33 @@ describe('ContactForm', () => {
       expect(screen.getByLabelText(/Priority/)).toBeDisabled();
     });
 
-    it('disables cancel button when isSubmitting', () => {
+    it("disables cancel button when isSubmitting", () => {
       render(
         <ContactForm
           mode="edit"
           onSubmit={mockOnSubmit}
           onCancel={mockOnCancel}
           isSubmitting={true}
-        />
+        />,
       );
 
-      const cancelButton = screen.getByRole('button', { name: /Cancel/ });
+      const cancelButton = screen.getByRole("button", { name: /Cancel/ });
       expect(cancelButton).toBeDisabled();
     });
   });
 
-  describe('Validation', () => {
-    it('validates email format', async () => {
+  describe("Validation", () => {
+    it("validates email format", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
-      await user.type(screen.getByLabelText(/Name/), 'John Doe');
-      await user.type(screen.getByLabelText(/Email/), 'invalid-email');
+      await user.type(screen.getByLabelText(/Name/), "John Doe");
+      await user.type(screen.getByLabelText(/Email/), "invalid-email");
 
-      const submitButton = screen.getByRole('button', { name: /Create Contact/ });
+      const submitButton = screen.getByRole("button", {
+        name: /Create Contact/,
+      });
       await user.click(submitButton);
 
       // Form should not submit with invalid email
@@ -281,15 +270,17 @@ describe('ContactForm', () => {
       });
     });
 
-    it('validates URL format for LinkedIn profile', async () => {
+    it("validates URL format for LinkedIn profile", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
-      await user.type(screen.getByLabelText(/Name/), 'John Doe');
-      await user.type(screen.getByLabelText(/LinkedIn Profile/), 'not-a-url');
+      await user.type(screen.getByLabelText(/Name/), "John Doe");
+      await user.type(screen.getByLabelText(/LinkedIn Profile/), "not-a-url");
 
-      const submitButton = screen.getByRole('button', { name: /Create Contact/ });
+      const submitButton = screen.getByRole("button", {
+        name: /Create Contact/,
+      });
       await user.click(submitButton);
 
       // Form should not submit with invalid URL
@@ -298,15 +289,20 @@ describe('ContactForm', () => {
       });
     });
 
-    it('validates URL format for profile picture', async () => {
+    it("validates URL format for profile picture", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
-      await user.type(screen.getByLabelText(/Name/), 'John Doe');
-      await user.type(screen.getByLabelText(/Profile Picture URL/), 'invalid-url');
+      await user.type(screen.getByLabelText(/Name/), "John Doe");
+      await user.type(
+        screen.getByLabelText(/Profile Picture URL/),
+        "invalid-url",
+      );
 
-      const submitButton = screen.getByRole('button', { name: /Create Contact/ });
+      const submitButton = screen.getByRole("button", {
+        name: /Create Contact/,
+      });
       await user.click(submitButton);
 
       // Form should not submit with invalid URL
@@ -316,8 +312,8 @@ describe('ContactForm', () => {
     });
   });
 
-  describe('Keyboard Navigation', () => {
-    it('allows tabbing through form fields in correct order', async () => {
+  describe("Keyboard Navigation", () => {
+    it("allows tabbing through form fields in correct order", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
@@ -339,18 +335,18 @@ describe('ContactForm', () => {
       expect(phoneInput).toHaveFocus();
     });
 
-    it('allows typing in text inputs', async () => {
+    it("allows typing in text inputs", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
       const nameInput = screen.getByLabelText(/Name/);
-      await user.type(nameInput, 'John Doe');
+      await user.type(nameInput, "John Doe");
 
-      expect(nameInput).toHaveValue('John Doe');
+      expect(nameInput).toHaveValue("John Doe");
     });
 
-    it('allows shift+tab to navigate backwards', async () => {
+    it("allows shift+tab to navigate backwards", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
@@ -367,61 +363,63 @@ describe('ContactForm', () => {
       expect(nameInput).toHaveFocus();
     });
 
-    it('allows Enter key to submit form', async () => {
+    it("allows Enter key to submit form", async () => {
       const user = userEvent.setup();
 
       const { container } = render(
-        <ContactForm mode="create" onSubmit={mockOnSubmit} />
+        <ContactForm mode="create" onSubmit={mockOnSubmit} />,
       );
 
       const nameInput = screen.getByLabelText(/Name/);
-      await user.type(nameInput, 'John Doe');
+      await user.type(nameInput, "John Doe");
 
       // Press Enter to submit
-      await user.keyboard('{Enter}');
+      await user.keyboard("{Enter}");
 
       // Since name is the only required field filled, form should attempt submit
       // (It may fail validation for other reasons, but Enter should trigger submit)
-      const form = container.querySelector('form');
+      const form = container.querySelector("form");
       expect(form).toBeInTheDocument();
     });
 
-    it('escape key does not submit form', async () => {
+    it("escape key does not submit form", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
       const nameInput = screen.getByLabelText(/Name/);
-      await user.type(nameInput, 'John Doe');
+      await user.type(nameInput, "John Doe");
 
       // Press Escape
-      await user.keyboard('{Escape}');
+      await user.keyboard("{Escape}");
 
       // Form should not be submitted
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
-    it('can navigate and select in Select dropdown', async () => {
+    it("can navigate and select in Select dropdown", async () => {
       const user = userEvent.setup();
 
       render(<ContactForm mode="create" onSubmit={mockOnSubmit} />);
 
       // Find and click the Priority select trigger
-      const priorityTrigger = screen.getByRole('combobox', { name: /Priority/ });
+      const priorityTrigger = screen.getByRole("combobox", {
+        name: /Priority/,
+      });
       await user.click(priorityTrigger);
 
       // Wait for dropdown to open and select an option
       await waitFor(() => {
-        const highOption = screen.getByRole('option', { name: /High/i });
+        const highOption = screen.getByRole("option", { name: /High/i });
         expect(highOption).toBeInTheDocument();
       });
 
-      const highOption = screen.getByRole('option', { name: /High/i });
+      const highOption = screen.getByRole("option", { name: /High/i });
       await user.click(highOption);
 
       // Verify selection (the trigger should now show "High")
       await waitFor(() => {
-        expect(screen.getByText('High')).toBeInTheDocument();
+        expect(screen.getByText("High")).toBeInTheDocument();
       });
     });
   });

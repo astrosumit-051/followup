@@ -11,6 +11,7 @@ Visual regression tests capture screenshots of components and pages in different
 The visual regression test suite (`visual-regression.spec.ts`) covers:
 
 ### Pages
+
 - **Dashboard** - Light/Dark modes, Desktop/Tablet/Mobile viewports
 - **Contact List** - Light/Dark modes, Desktop/Mobile viewports
 - **Contact Form** - Light/Dark modes, Desktop/Mobile viewports, Validation errors
@@ -18,6 +19,7 @@ The visual regression test suite (`visual-regression.spec.ts`) covers:
 - **Signup Page** - Light/Dark modes, Desktop/Mobile viewports, Password strength indicator
 
 ### Components
+
 - **Button variants** - Primary, Outline, Destructive (Light/Dark modes)
 - **Card components** - CardHeader, CardTitle, CardContent, CardFooter (Light/Dark modes)
 - **Form components** - Input, Label, Select, Textarea with validation states
@@ -33,6 +35,7 @@ pnpm --filter web test:e2e --grep="Visual Regression" --project=chromium --updat
 ```
 
 This will:
+
 - Run all visual regression tests
 - Create baseline screenshots in `apps/web/e2e/visual-regression.spec.ts-snapshots/`
 - Organize screenshots by browser (chromium, firefox, webkit)
@@ -45,6 +48,7 @@ pnpm --filter web test:e2e --grep="Visual Regression" --project=chromium
 ```
 
 This will:
+
 - Compare current screenshots against baselines
 - Fail if visual differences exceed threshold (configurable in `playwright.config.ts`)
 - Generate diff images showing what changed
@@ -105,7 +109,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -129,6 +133,7 @@ jobs:
 When tests fail due to visual changes:
 
 1. **Review the HTML report**:
+
    ```bash
    pnpm --filter web exec playwright show-report
    ```
@@ -185,13 +190,13 @@ When adding new components or pages:
 Example:
 
 ```typescript
-test('new-component - light mode - desktop', async ({ page }) => {
-  await page.goto('/new-page');
-  await setTheme(page, 'light');
-  await page.waitForLoadState('networkidle');
-  await expect(page).toHaveScreenshot('new-component-light-desktop.png', {
+test("new-component - light mode - desktop", async ({ page }) => {
+  await page.goto("/new-page");
+  await setTheme(page, "light");
+  await page.waitForLoadState("networkidle");
+  await expect(page).toHaveScreenshot("new-component-light-desktop.png", {
     fullPage: true,
-    animations: 'disabled',
+    animations: "disabled",
   });
 });
 ```

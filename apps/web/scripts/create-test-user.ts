@@ -10,21 +10,21 @@
  * TEST_USER_EMAIL=test@relationhub.com TEST_USER_PASSWORD=TestPassword123! npx tsx scripts/create-test-user.ts
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const testEmail = process.env.TEST_USER_EMAIL || 'test@relationhub.com';
-const testPassword = process.env.TEST_USER_PASSWORD || 'TestPassword123!';
+const testEmail = process.env.TEST_USER_EMAIL || "test@relationhub.com";
+const testPassword = process.env.TEST_USER_PASSWORD || "TestPassword123!";
 
 if (!supabaseUrl) {
-  console.error('❌ Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+  console.error("❌ Missing NEXT_PUBLIC_SUPABASE_URL environment variable");
   process.exit(1);
 }
 
 if (!supabaseServiceKey) {
-  console.error('❌ Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
-  console.error('This key is required to create users programmatically');
+  console.error("❌ Missing SUPABASE_SERVICE_ROLE_KEY environment variable");
+  console.error("This key is required to create users programmatically");
   process.exit(1);
 }
 
@@ -37,19 +37,19 @@ async function createTestUser() {
     },
   });
 
-  console.log('🔧 Creating test user for E2E testing...');
+  console.log("🔧 Creating test user for E2E testing...");
   console.log(`📧 Email: ${testEmail}`);
 
   // Check if user already exists
   const { data: existingUsers } = await supabase.auth.admin.listUsers();
-  const existingUser = existingUsers?.users.find(u => u.email === testEmail);
+  const existingUser = existingUsers?.users.find((u) => u.email === testEmail);
 
   if (existingUser) {
-    console.log('✅ Test user already exists');
+    console.log("✅ Test user already exists");
     console.log(`User ID: ${existingUser.id}`);
     console.log(`Email: ${existingUser.email}`);
     console.log(`Created at: ${existingUser.created_at}`);
-    console.log('\n📝 Use these credentials in E2E tests:');
+    console.log("\n📝 Use these credentials in E2E tests:");
     console.log(`   TEST_USER_EMAIL=${testEmail}`);
     console.log(`   TEST_USER_PASSWORD=${testPassword}`);
     return;
@@ -63,28 +63,30 @@ async function createTestUser() {
   });
 
   if (error) {
-    console.error('❌ Error creating test user:', error.message);
+    console.error("❌ Error creating test user:", error.message);
     process.exit(1);
   }
 
   if (!data.user) {
-    console.error('❌ User creation failed - no user data returned');
+    console.error("❌ User creation failed - no user data returned");
     process.exit(1);
   }
 
-  console.log('✅ Test user created successfully!');
+  console.log("✅ Test user created successfully!");
   console.log(`User ID: ${data.user.id}`);
   console.log(`Email: ${data.user.email}`);
-  console.log(`Email confirmed: ${data.user.email_confirmed_at ? 'Yes' : 'No'}`);
-  console.log('\n📝 Use these credentials in E2E tests:');
+  console.log(
+    `Email confirmed: ${data.user.email_confirmed_at ? "Yes" : "No"}`,
+  );
+  console.log("\n📝 Use these credentials in E2E tests:");
   console.log(`   TEST_USER_EMAIL=${testEmail}`);
   console.log(`   TEST_USER_PASSWORD=${testPassword}`);
-  console.log('\n💡 Add these to your .env.test.local file:');
+  console.log("\n💡 Add these to your .env.test.local file:");
   console.log(`TEST_USER_EMAIL=${testEmail}`);
   console.log(`TEST_USER_PASSWORD=${testPassword}`);
 }
 
-createTestUser().catch(error => {
-  console.error('❌ Unexpected error:', error);
+createTestUser().catch((error) => {
+  console.error("❌ Unexpected error:", error);
   process.exit(1);
 });

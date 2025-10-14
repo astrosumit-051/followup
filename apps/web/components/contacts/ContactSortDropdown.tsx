@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { ContactSortField, SortOrder } from '@/lib/graphql/contacts';
+import type { ContactSortField, SortOrder } from "@/lib/graphql/contacts";
 
 interface ContactSortDropdownProps {
   /**
@@ -56,24 +56,27 @@ export function ContactSortDropdown({
   const sortValue = `${sortBy}:${sortOrder}`;
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const [field, order] = e.target.value.split(':') as [ContactSortField, SortOrder];
+    const [field, order] = e.target.value.split(":") as [
+      ContactSortField,
+      SortOrder,
+    ];
     onSortChange(field, order);
   };
 
   // Sort options with human-readable labels
   const sortOptions = [
-    { value: 'NAME:asc', label: 'Name (A-Z)' },
-    { value: 'NAME:desc', label: 'Name (Z-A)' },
-    { value: 'CREATED_AT:desc', label: 'Recently Added' },
-    { value: 'CREATED_AT:asc', label: 'Oldest First' },
-    { value: 'LAST_CONTACTED_AT:desc', label: 'Recently Contacted' },
-    { value: 'LAST_CONTACTED_AT:asc', label: 'Least Recently Contacted' },
-    { value: 'PRIORITY:desc', label: 'Priority (High to Low)' },
-    { value: 'PRIORITY:asc', label: 'Priority (Low to High)' },
-    { value: 'COMPANY:asc', label: 'Company (A-Z)' },
-    { value: 'COMPANY:desc', label: 'Company (Z-A)' },
-    { value: 'INDUSTRY:asc', label: 'Industry (A-Z)' },
-    { value: 'INDUSTRY:desc', label: 'Industry (Z-A)' },
+    { value: "NAME:asc", label: "Name (A-Z)" },
+    { value: "NAME:desc", label: "Name (Z-A)" },
+    { value: "CREATED_AT:desc", label: "Recently Added" },
+    { value: "CREATED_AT:asc", label: "Oldest First" },
+    { value: "LAST_CONTACTED_AT:desc", label: "Recently Contacted" },
+    { value: "LAST_CONTACTED_AT:asc", label: "Least Recently Contacted" },
+    { value: "PRIORITY:desc", label: "Priority (High to Low)" },
+    { value: "PRIORITY:asc", label: "Priority (Low to High)" },
+    { value: "COMPANY:asc", label: "Company (A-Z)" },
+    { value: "COMPANY:desc", label: "Company (Z-A)" },
+    { value: "INDUSTRY:asc", label: "Industry (A-Z)" },
+    { value: "INDUSTRY:desc", label: "Industry (Z-A)" },
   ];
 
   return (

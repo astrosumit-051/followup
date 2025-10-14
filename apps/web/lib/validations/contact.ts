@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Contact Validation Schemas
@@ -21,10 +21,15 @@ import { z } from 'zod';
  */
 
 // Enums matching GraphQL schema
-export const PriorityEnum = z.enum(['HIGH', 'MEDIUM', 'LOW']);
+export const PriorityEnum = z.enum(["HIGH", "MEDIUM", "LOW"]);
 export type Priority = z.infer<typeof PriorityEnum>;
 
-export const GenderEnum = z.enum(['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY']);
+export const GenderEnum = z.enum([
+  "MALE",
+  "FEMALE",
+  "OTHER",
+  "PREFER_NOT_TO_SAY",
+]);
 export type Gender = z.infer<typeof GenderEnum>;
 
 /**
@@ -36,45 +41,41 @@ export type Gender = z.infer<typeof GenderEnum>;
 export const createContactSchema = z.object({
   name: z
     .string()
-    .min(1, 'Name is required')
-    .max(255, 'Name must be less than 255 characters')
-    .regex(/\S/, 'Name cannot be only whitespace')
+    .min(1, "Name is required")
+    .max(255, "Name must be less than 255 characters")
+    .regex(/\S/, "Name cannot be only whitespace")
     .trim(),
 
-  email: z
-    .string()
-    .email('Invalid email format')
-    .or(z.literal(''))
-    .optional(),
+  email: z.string().email("Invalid email format").or(z.literal("")).optional(),
 
   phone: z
     .string()
-    .max(50, 'Phone must be less than 50 characters')
-    .or(z.literal(''))
+    .max(50, "Phone must be less than 50 characters")
+    .or(z.literal(""))
     .optional(),
 
   linkedInUrl: z
     .string()
-    .url('Invalid URL format')
-    .or(z.literal(''))
+    .url("Invalid URL format")
+    .or(z.literal(""))
     .optional(),
 
   company: z
     .string()
-    .max(255, 'Company must be less than 255 characters')
-    .or(z.literal(''))
+    .max(255, "Company must be less than 255 characters")
+    .or(z.literal(""))
     .optional(),
 
   industry: z
     .string()
-    .max(255, 'Industry must be less than 255 characters')
-    .or(z.literal(''))
+    .max(255, "Industry must be less than 255 characters")
+    .or(z.literal(""))
     .optional(),
 
   role: z
     .string()
-    .max(255, 'Role must be less than 255 characters')
-    .or(z.literal(''))
+    .max(255, "Role must be less than 255 characters")
+    .or(z.literal(""))
     .optional(),
 
   priority: PriorityEnum.optional(),
@@ -83,15 +84,27 @@ export const createContactSchema = z.object({
 
   birthday: z
     .date({
-      invalid_type_error: 'Invalid date',
+      message: "Invalid date",
     })
     .optional()
     .nullable(),
 
   notes: z
     .string()
-    .max(10000, 'Notes must be less than 10,000 characters')
-    .or(z.literal(''))
+    .max(10000, "Notes must be less than 10,000 characters")
+    .or(z.literal(""))
+    .optional(),
+
+  profilePicture: z
+    .string()
+    .url("Invalid URL format")
+    .or(z.literal(""))
+    .optional(),
+
+  lastContactedAt: z
+    .string()
+    .datetime({ message: "Invalid datetime format" })
+    .or(z.literal(""))
     .optional(),
 });
 
@@ -105,51 +118,51 @@ export const createContactSchema = z.object({
 export const updateContactSchema = z.object({
   name: z
     .string()
-    .min(1, 'Name is required')
-    .max(255, 'Name must be less than 255 characters')
-    .regex(/\S/, 'Name cannot be only whitespace')
+    .min(1, "Name is required")
+    .max(255, "Name must be less than 255 characters")
+    .regex(/\S/, "Name cannot be only whitespace")
     .trim()
     .optional(),
 
   email: z
     .string()
-    .email('Invalid email format')
-    .or(z.literal(''))
+    .email("Invalid email format")
+    .or(z.literal(""))
     .nullable()
     .optional(),
 
   phone: z
     .string()
-    .max(50, 'Phone must be less than 50 characters')
-    .or(z.literal(''))
+    .max(50, "Phone must be less than 50 characters")
+    .or(z.literal(""))
     .nullable()
     .optional(),
 
   linkedInUrl: z
     .string()
-    .url('Invalid URL format')
-    .or(z.literal(''))
+    .url("Invalid URL format")
+    .or(z.literal(""))
     .nullable()
     .optional(),
 
   company: z
     .string()
-    .max(255, 'Company must be less than 255 characters')
-    .or(z.literal(''))
+    .max(255, "Company must be less than 255 characters")
+    .or(z.literal(""))
     .nullable()
     .optional(),
 
   industry: z
     .string()
-    .max(255, 'Industry must be less than 255 characters')
-    .or(z.literal(''))
+    .max(255, "Industry must be less than 255 characters")
+    .or(z.literal(""))
     .nullable()
     .optional(),
 
   role: z
     .string()
-    .max(255, 'Role must be less than 255 characters')
-    .or(z.literal(''))
+    .max(255, "Role must be less than 255 characters")
+    .or(z.literal(""))
     .nullable()
     .optional(),
 
@@ -159,15 +172,29 @@ export const updateContactSchema = z.object({
 
   birthday: z
     .date({
-      invalid_type_error: 'Invalid date',
+      message: "Invalid date",
     })
     .optional()
     .nullable(),
 
   notes: z
     .string()
-    .max(10000, 'Notes must be less than 10,000 characters')
-    .or(z.literal(''))
+    .max(10000, "Notes must be less than 10,000 characters")
+    .or(z.literal(""))
+    .nullable()
+    .optional(),
+
+  profilePicture: z
+    .string()
+    .url("Invalid URL format")
+    .or(z.literal(""))
+    .nullable()
+    .optional(),
+
+  lastContactedAt: z
+    .string()
+    .datetime("Invalid datetime format")
+    .or(z.literal(""))
     .nullable()
     .optional(),
 });
@@ -185,24 +212,24 @@ export type UpdateContactInput = z.infer<typeof updateContactSchema>;
 export const contactFilterSchema = z.object({
   search: z
     .string()
-    .max(255, 'Search query must be less than 255 characters')
+    .max(255, "Search query must be less than 255 characters")
     .optional(),
 
   priority: PriorityEnum.optional(),
 
   company: z
     .string()
-    .max(255, 'Company filter must be less than 255 characters')
+    .max(255, "Company filter must be less than 255 characters")
     .optional(),
 
   industry: z
     .string()
-    .max(255, 'Industry filter must be less than 255 characters')
+    .max(255, "Industry filter must be less than 255 characters")
     .optional(),
 
   role: z
     .string()
-    .max(255, 'Role filter must be less than 255 characters')
+    .max(255, "Role filter must be less than 255 characters")
     .optional(),
 });
 
@@ -215,16 +242,13 @@ export type ContactFilterInput = z.infer<typeof contactFilterSchema>;
  * Matches backend ContactPaginationInput validation.
  */
 export const contactPaginationSchema = z.object({
-  cursor: z
-    .string()
-    .uuid('Cursor must be a valid UUID')
-    .optional(),
+  cursor: z.string().uuid("Cursor must be a valid UUID").optional(),
 
   limit: z
     .number()
-    .int('Limit must be an integer')
-    .min(1, 'Limit must be at least 1')
-    .max(100, 'Limit cannot exceed 100')
+    .int("Limit must be an integer")
+    .min(1, "Limit must be at least 1")
+    .max(100, "Limit cannot exceed 100")
     .optional()
     .default(20),
 });
@@ -236,7 +260,7 @@ export type ContactPaginationInput = z.infer<typeof contactPaginationSchema>;
  * Useful for optional fields in forms
  */
 export const transformEmptyToUndefined = <T>(value: T): T | undefined => {
-  if (typeof value === 'string' && value.trim() === '') {
+  if (typeof value === "string" && value.trim() === "") {
     return undefined;
   }
   return value;

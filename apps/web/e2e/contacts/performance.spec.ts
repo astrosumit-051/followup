@@ -13,7 +13,7 @@
  * - Authenticated session with performance.test@relationhub.com user
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page } from "@playwright/test";
 
 const PERFORMANCE_THRESHOLDS = {
   LIST_PAGE_LOAD: 3000, // 3 seconds max for initial load
@@ -25,30 +25,35 @@ const PERFORMANCE_THRESHOLDS = {
 // Helper function to measure page load performance
 async function measurePageLoad(page: Page, url: string): Promise<number> {
   const startTime = Date.now();
-  await page.goto(url, { waitUntil: 'networkidle' });
+  await page.goto(url, { waitUntil: "networkidle" });
   const endTime = Date.now();
   return endTime - startTime;
 }
 
 // Helper function to measure interaction performance
-async function measureInteraction(page: Page, action: () => Promise<void>): Promise<number> {
+async function measureInteraction(
+  page: Page,
+  action: () => Promise<void>,
+): Promise<number> {
   const startTime = Date.now();
   await action();
   const endTime = Date.now();
   return endTime - startTime;
 }
 
-test.describe('Contact Performance Tests', () => {
+test.describe("Contact Performance Tests", () => {
   test.beforeEach(async ({ page }) => {
     // TODO: Implement authentication for performance.test@relationhub.com user
     // This will be implemented once Supabase test environment is set up
     // For now, tests will be skipped with annotation
-    test.skip(true, 'Skipping until backend with test data is available');
+    test.skip(true, "Skipping until backend with test data is available");
   });
 
-  test.describe('List Page Performance', () => {
-    test('should load contact list page with 1000+ contacts in under 3 seconds', async ({ page }) => {
-      const loadTime = await measurePageLoad(page, '/contacts');
+  test.describe("List Page Performance", () => {
+    test("should load contact list page with 1000+ contacts in under 3 seconds", async ({
+      page,
+    }) => {
+      const loadTime = await measurePageLoad(page, "/contacts");
 
       console.log(`📊 Contact list load time: ${loadTime}ms`);
       expect(loadTime).toBeLessThan(PERFORMANCE_THRESHOLDS.LIST_PAGE_LOAD);
@@ -60,13 +65,15 @@ test.describe('Contact Performance Tests', () => {
       expect(count).toBeLessThanOrEqual(20); // Default page size
     });
 
-    test('should display loading indicators during initial load', async ({ page }) => {
-      await page.goto('/contacts');
+    test("should display loading indicators during initial load", async ({
+      page,
+    }) => {
+      await page.goto("/contacts");
 
       // Check for loading skeleton or spinner
-      const loadingIndicator = page.locator('[data-testid="contacts-loading"]').or(
-        page.locator('text=Loading...')
-      );
+      const loadingIndicator = page
+        .locator('[data-testid="contacts-loading"]')
+        .or(page.locator("text=Loading..."));
 
       // Loading should appear briefly
       const isVisible = await loadingIndicator.isVisible().catch(() => false);
@@ -74,17 +81,18 @@ test.describe('Contact Performance Tests', () => {
     });
   });
 
-  test.describe('Search Performance', () => {
-    test('should return search results in under 500ms', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+  test.describe("Search Performance", () => {
+    test("should return search results in under 500ms", async ({ page }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       const searchInput = page.locator('[data-testid="contact-search-input"]');
 
       const searchTime = await measureInteraction(page, async () => {
-        await searchInput.fill('John');
-        await page.waitForResponse((response) =>
-          response.url().includes('graphql') && response.status() === 200
+        await searchInput.fill("John");
+        await page.waitForResponse(
+          (response) =>
+            response.url().includes("graphql") && response.status() === 200,
         );
       });
 
@@ -97,19 +105,20 @@ test.describe('Contact Performance Tests', () => {
       expect(count).toBeGreaterThan(0);
     });
 
-    test('should handle debounced search efficiently', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+    test("should handle debounced search efficiently", async ({ page }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       const searchInput = page.locator('[data-testid="contact-search-input"]');
 
       // Type multiple characters rapidly
-      await searchInput.type('John', { delay: 50 }); // 50ms between keystrokes
+      await searchInput.type("John", { delay: 50 }); // 50ms between keystrokes
 
       // Wait for debounce and response
       await page.waitForTimeout(500); // Debounce delay
-      await page.waitForResponse((response) =>
-        response.url().includes('graphql') && response.status() === 200
+      await page.waitForResponse(
+        (response) =>
+          response.url().includes("graphql") && response.status() === 200,
       );
 
       // Only one request should be made after debounce
@@ -118,16 +127,17 @@ test.describe('Contact Performance Tests', () => {
       expect(count).toBeGreaterThan(0);
     });
 
-    test('should handle empty search results quickly', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+    test("should handle empty search results quickly", async ({ page }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       const searchInput = page.locator('[data-testid="contact-search-input"]');
 
       const searchTime = await measureInteraction(page, async () => {
-        await searchInput.fill('NONEXISTENT_CONTACT_XYZ123');
-        await page.waitForResponse((response) =>
-          response.url().includes('graphql') && response.status() === 200
+        await searchInput.fill("NONEXISTENT_CONTACT_XYZ123");
+        await page.waitForResponse(
+          (response) =>
+            response.url().includes("graphql") && response.status() === 200,
         );
       });
 
@@ -140,21 +150,36 @@ test.describe('Contact Performance Tests', () => {
     });
   });
 
-  test.describe('Form Submission Performance', () => {
-    test('should submit new contact form in under 1 second', async ({ page }) => {
-      await page.goto('/contacts/new');
-      await page.waitForLoadState('networkidle');
+  test.describe("Form Submission Performance", () => {
+    test("should submit new contact form in under 1 second", async ({
+      page,
+    }) => {
+      await page.goto("/contacts/new");
+      await page.waitForLoadState("networkidle");
 
       const submitTime = await measureInteraction(page, async () => {
-        await page.fill('[data-testid="contact-form-name"]', 'Performance Test Contact');
-        await page.fill('[data-testid="contact-form-email"]', 'perf.test@example.com');
-        await page.fill('[data-testid="contact-form-phone"]', '+1 (555) 123-4567');
-        await page.selectOption('[data-testid="contact-form-priority"]', 'MEDIUM');
+        await page.fill(
+          '[data-testid="contact-form-name"]',
+          "Performance Test Contact",
+        );
+        await page.fill(
+          '[data-testid="contact-form-email"]',
+          "perf.test@example.com",
+        );
+        await page.fill(
+          '[data-testid="contact-form-phone"]',
+          "+1 (555) 123-4567",
+        );
+        await page.selectOption(
+          '[data-testid="contact-form-priority"]',
+          "MEDIUM",
+        );
 
         await page.click('[data-testid="contact-form-submit"]');
 
-        await page.waitForResponse((response) =>
-          response.url().includes('graphql') && response.status() === 200
+        await page.waitForResponse(
+          (response) =>
+            response.url().includes("graphql") && response.status() === 200,
         );
       });
 
@@ -165,25 +190,33 @@ test.describe('Contact Performance Tests', () => {
       await expect(page).toHaveURL(/\/contacts\/[a-f0-9-]+$/);
     });
 
-    test('should submit edit contact form in under 1 second', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+    test("should submit edit contact form in under 1 second", async ({
+      page,
+    }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       // Click first contact
-      const firstContact = page.locator('[data-testid^="contact-card-"]').first();
+      const firstContact = page
+        .locator('[data-testid^="contact-card-"]')
+        .first();
       await firstContact.click();
 
       // Navigate to edit
       await page.click('[data-testid="contact-detail-edit-button"]');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState("networkidle");
 
       const submitTime = await measureInteraction(page, async () => {
-        await page.fill('[data-testid="contact-form-notes"]', 'Updated via performance test');
+        await page.fill(
+          '[data-testid="contact-form-notes"]',
+          "Updated via performance test",
+        );
 
         await page.click('[data-testid="contact-form-submit"]');
 
-        await page.waitForResponse((response) =>
-          response.url().includes('graphql') && response.status() === 200
+        await page.waitForResponse(
+          (response) =>
+            response.url().includes("graphql") && response.status() === 200,
         );
       });
 
@@ -191,13 +224,19 @@ test.describe('Contact Performance Tests', () => {
       expect(submitTime).toBeLessThan(PERFORMANCE_THRESHOLDS.FORM_SUBMISSION);
     });
 
-    test('should show optimistic UI updates immediately', async ({ page }) => {
-      await page.goto('/contacts/new');
-      await page.waitForLoadState('networkidle');
+    test("should show optimistic UI updates immediately", async ({ page }) => {
+      await page.goto("/contacts/new");
+      await page.waitForLoadState("networkidle");
 
-      await page.fill('[data-testid="contact-form-name"]', 'Optimistic Test Contact');
-      await page.fill('[data-testid="contact-form-email"]', 'optimistic@example.com');
-      await page.selectOption('[data-testid="contact-form-priority"]', 'HIGH');
+      await page.fill(
+        '[data-testid="contact-form-name"]',
+        "Optimistic Test Contact",
+      );
+      await page.fill(
+        '[data-testid="contact-form-email"]',
+        "optimistic@example.com",
+      );
+      await page.selectOption('[data-testid="contact-form-priority"]', "HIGH");
 
       await page.click('[data-testid="contact-form-submit"]');
 
@@ -207,7 +246,9 @@ test.describe('Contact Performance Tests', () => {
 
       // Loading state should appear within 100ms
       const startTime = Date.now();
-      await page.waitForSelector('[data-testid="contact-form-loading"]', { timeout: 100 });
+      await page.waitForSelector('[data-testid="contact-form-loading"]', {
+        timeout: 100,
+      });
       const loadingAppearTime = Date.now() - startTime;
 
       console.log(`⚡ Optimistic UI response time: ${loadingAppearTime}ms`);
@@ -215,10 +256,10 @@ test.describe('Contact Performance Tests', () => {
     });
   });
 
-  test.describe('Pagination Performance', () => {
-    test('should load next page in under 2 seconds', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+  test.describe("Pagination Performance", () => {
+    test("should load next page in under 2 seconds", async ({ page }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       // Scroll to load more button
       const loadMoreButton = page.locator('[data-testid="contacts-load-more"]');
@@ -227,13 +268,16 @@ test.describe('Contact Performance Tests', () => {
       const paginationTime = await measureInteraction(page, async () => {
         await loadMoreButton.click();
 
-        await page.waitForResponse((response) =>
-          response.url().includes('graphql') && response.status() === 200
+        await page.waitForResponse(
+          (response) =>
+            response.url().includes("graphql") && response.status() === 200,
         );
       });
 
       console.log(`📄 Pagination load time: ${paginationTime}ms`);
-      expect(paginationTime).toBeLessThan(PERFORMANCE_THRESHOLDS.PAGINATION_LOAD);
+      expect(paginationTime).toBeLessThan(
+        PERFORMANCE_THRESHOLDS.PAGINATION_LOAD,
+      );
 
       // Verify more contacts loaded
       const contactCards = page.locator('[data-testid^="contact-card-"]');
@@ -241,9 +285,11 @@ test.describe('Contact Performance Tests', () => {
       expect(count).toBeGreaterThan(20); // Should have more than initial page
     });
 
-    test('should handle rapid pagination clicks gracefully', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+    test("should handle rapid pagination clicks gracefully", async ({
+      page,
+    }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       const loadMoreButton = page.locator('[data-testid="contacts-load-more"]');
       await loadMoreButton.scrollIntoViewIfNeeded();
@@ -261,9 +307,11 @@ test.describe('Contact Performance Tests', () => {
       await expect(errorMessage).not.toBeVisible();
     });
 
-    test('should maintain scroll position during pagination', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+    test("should maintain scroll position during pagination", async ({
+      page,
+    }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       const loadMoreButton = page.locator('[data-testid="contacts-load-more"]');
       await loadMoreButton.scrollIntoViewIfNeeded();
@@ -271,31 +319,39 @@ test.describe('Contact Performance Tests', () => {
       const scrollPositionBefore = await page.evaluate(() => window.scrollY);
 
       await loadMoreButton.click();
-      await page.waitForResponse((response) =>
-        response.url().includes('graphql') && response.status() === 200
+      await page.waitForResponse(
+        (response) =>
+          response.url().includes("graphql") && response.status() === 200,
       );
 
       const scrollPositionAfter = await page.evaluate(() => window.scrollY);
 
-      console.log(`📜 Scroll position change: ${Math.abs(scrollPositionAfter - scrollPositionBefore)}px`);
+      console.log(
+        `📜 Scroll position change: ${Math.abs(scrollPositionAfter - scrollPositionBefore)}px`,
+      );
 
       // Scroll position should not jump significantly
-      expect(Math.abs(scrollPositionAfter - scrollPositionBefore)).toBeLessThan(200);
+      expect(Math.abs(scrollPositionAfter - scrollPositionBefore)).toBeLessThan(
+        200,
+      );
     });
   });
 
-  test.describe('Filter Performance', () => {
-    test('should apply filters in under 500ms', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+  test.describe("Filter Performance", () => {
+    test("should apply filters in under 500ms", async ({ page }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
-      const priorityFilter = page.locator('[data-testid="contact-filter-priority"]');
+      const priorityFilter = page.locator(
+        '[data-testid="contact-filter-priority"]',
+      );
 
       const filterTime = await measureInteraction(page, async () => {
-        await priorityFilter.selectOption('HIGH');
+        await priorityFilter.selectOption("HIGH");
 
-        await page.waitForResponse((response) =>
-          response.url().includes('graphql') && response.status() === 200
+        await page.waitForResponse(
+          (response) =>
+            response.url().includes("graphql") && response.status() === 200,
         );
       });
 
@@ -308,22 +364,26 @@ test.describe('Contact Performance Tests', () => {
       expect(count).toBeGreaterThan(0);
     });
 
-    test('should combine multiple filters efficiently', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+    test("should combine multiple filters efficiently", async ({ page }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       const startTime = Date.now();
 
-      await page.selectOption('[data-testid="contact-filter-priority"]', 'HIGH');
+      await page.selectOption(
+        '[data-testid="contact-filter-priority"]',
+        "HIGH",
+      );
       await page.waitForTimeout(100);
 
-      await page.fill('[data-testid="contact-search-input"]', 'Smith');
+      await page.fill('[data-testid="contact-search-input"]', "Smith");
       await page.waitForTimeout(100);
 
-      await page.selectOption('[data-testid="contact-sort"]', 'name');
+      await page.selectOption('[data-testid="contact-sort"]', "name");
 
-      await page.waitForResponse((response) =>
-        response.url().includes('graphql') && response.status() === 200
+      await page.waitForResponse(
+        (response) =>
+          response.url().includes("graphql") && response.status() === 200,
       );
 
       const totalTime = Date.now() - startTime;
@@ -333,23 +393,25 @@ test.describe('Contact Performance Tests', () => {
     });
   });
 
-  test.describe('Memory and Resource Management', () => {
-    test('should not cause memory leaks during rapid navigation', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+  test.describe("Memory and Resource Management", () => {
+    test("should not cause memory leaks during rapid navigation", async ({
+      page,
+    }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       // Navigate between pages rapidly
       for (let i = 0; i < 10; i++) {
-        await page.goto('/contacts/new');
+        await page.goto("/contacts/new");
         await page.waitForTimeout(200);
-        await page.goto('/contacts');
+        await page.goto("/contacts");
         await page.waitForTimeout(200);
       }
 
       // Check for console errors
-      page.on('console', (msg) => {
-        if (msg.type() === 'error') {
-          console.error('❌ Console error:', msg.text());
+      page.on("console", (msg) => {
+        if (msg.type() === "error") {
+          console.error("❌ Console error:", msg.text());
         }
       });
 
@@ -359,9 +421,11 @@ test.describe('Contact Performance Tests', () => {
       await expect(searchInput).toBeEnabled();
     });
 
-    test('should handle large contact lists without crashing', async ({ page }) => {
-      await page.goto('/contacts');
-      await page.waitForLoadState('networkidle');
+    test("should handle large contact lists without crashing", async ({
+      page,
+    }) => {
+      await page.goto("/contacts");
+      await page.waitForLoadState("networkidle");
 
       // Load multiple pages
       const loadMoreButton = page.locator('[data-testid="contacts-load-more"]');
@@ -382,9 +446,9 @@ test.describe('Contact Performance Tests', () => {
 
       // Search should still work
       const searchInput = page.locator('[data-testid="contact-search-input"]');
-      await searchInput.fill('Test');
+      await searchInput.fill("Test");
       await page.waitForTimeout(500);
-      await expect(searchInput).toHaveValue('Test');
+      await expect(searchInput).toHaveValue("Test");
     });
   });
 });

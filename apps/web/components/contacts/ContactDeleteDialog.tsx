@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   AlertDialog,
@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 interface ContactDeleteDialogProps {
   /**
@@ -81,23 +81,22 @@ export function ContactDeleteDialog({
   onCancel,
 }: ContactDeleteDialogProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => !open && !isDeleting && onCancel()}>
+    <AlertDialog
+      open={isOpen}
+      onOpenChange={(open) => !open && !isDeleting && onCancel()}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Contact</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete{' '}
-            <span className="font-semibold text-foreground">
-              {contactName}
-            </span>
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">{contactName}</span>
             ? This action cannot be undone and will permanently remove this
             contact from your network.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             disabled={isDeleting}
             onClick={(e) => {
@@ -131,7 +130,7 @@ export function ContactDeleteDialog({
                 Deleting...
               </>
             ) : (
-              'Confirm'
+              "Confirm"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

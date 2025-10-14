@@ -1,11 +1,19 @@
-import { graphqlRequest, graphqlMutation } from './client';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { graphqlRequest, graphqlMutation } from "./client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   CreateContactInput,
   UpdateContactInput,
   ContactFilterInput,
   ContactPaginationInput,
-} from '@/lib/validations/contact';
+} from "@/lib/validations/contact";
+
+// Re-export validation types for convenience
+export type {
+  CreateContactInput,
+  UpdateContactInput,
+  ContactFilterInput,
+  ContactPaginationInput,
+} from "@/lib/validations/contact";
 
 /**
  * Contact GraphQL Queries and Mutations
@@ -156,8 +164,8 @@ export interface Contact {
   company?: string | null;
   industry?: string | null;
   role?: string | null;
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  gender?: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY' | null;
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  gender?: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY" | null;
   birthday?: string | null; // ISO 8601 date string
   profilePicture?: string | null;
   notes?: string | null;
@@ -200,17 +208,17 @@ export interface ContactConnection {
  * Sort field options for contacts query
  */
 export type ContactSortField =
-  | 'NAME'
-  | 'CREATED_AT'
-  | 'LAST_CONTACTED_AT'
-  | 'PRIORITY'
-  | 'COMPANY'
-  | 'INDUSTRY';
+  | "NAME"
+  | "CREATED_AT"
+  | "LAST_CONTACTED_AT"
+  | "PRIORITY"
+  | "COMPANY"
+  | "INDUSTRY";
 
 /**
  * Sort order options
  */
-export type SortOrder = 'asc' | 'desc';
+export type SortOrder = "asc" | "desc";
 
 /**
  * Variables for getContact query
@@ -298,8 +306,15 @@ export interface DeleteContactResponse {
  * @returns Promise resolving to Contact or null if not found
  * @throws Error if request fails or user lacks authorization
  */
-export async function getContact(id: string, supabaseClient?: SupabaseClient): Promise<Contact | null> {
-  const data = await graphqlRequest<GetContactResponse>(GET_CONTACT_QUERY, { id }, supabaseClient);
+export async function getContact(
+  id: string,
+  supabaseClient?: SupabaseClient,
+): Promise<Contact | null> {
+  const data = await graphqlRequest<GetContactResponse>(
+    GET_CONTACT_QUERY,
+    { id },
+    supabaseClient,
+  );
   return data.contact;
 }
 
@@ -313,9 +328,13 @@ export async function getContact(id: string, supabaseClient?: SupabaseClient): P
  */
 export async function getContacts(
   variables?: GetContactsVariables,
-  supabaseClient?: SupabaseClient
+  supabaseClient?: SupabaseClient,
 ): Promise<ContactConnection> {
-  const data = await graphqlRequest<GetContactsResponse>(GET_CONTACTS_QUERY, variables, supabaseClient);
+  const data = await graphqlRequest<GetContactsResponse>(
+    GET_CONTACTS_QUERY,
+    variables,
+    supabaseClient,
+  );
   return data.contacts;
 }
 
@@ -327,10 +346,17 @@ export async function getContacts(
  * @returns Promise resolving to created Contact
  * @throws Error if validation fails or request fails
  */
-export async function createContact(input: CreateContactInput, supabaseClient?: SupabaseClient): Promise<Contact> {
-  const data = await graphqlMutation<CreateContactResponse>(CREATE_CONTACT_MUTATION, {
-    input,
-  }, supabaseClient);
+export async function createContact(
+  input: CreateContactInput,
+  supabaseClient?: SupabaseClient,
+): Promise<Contact> {
+  const data = await graphqlMutation<CreateContactResponse>(
+    CREATE_CONTACT_MUTATION,
+    {
+      input,
+    },
+    supabaseClient,
+  );
   return data.createContact;
 }
 
@@ -346,12 +372,16 @@ export async function createContact(input: CreateContactInput, supabaseClient?: 
 export async function updateContact(
   id: string,
   input: UpdateContactInput,
-  supabaseClient?: SupabaseClient
+  supabaseClient?: SupabaseClient,
 ): Promise<Contact> {
-  const data = await graphqlMutation<UpdateContactResponse>(UPDATE_CONTACT_MUTATION, {
-    id,
-    input,
-  }, supabaseClient);
+  const data = await graphqlMutation<UpdateContactResponse>(
+    UPDATE_CONTACT_MUTATION,
+    {
+      id,
+      input,
+    },
+    supabaseClient,
+  );
   return data.updateContact;
 }
 
@@ -363,9 +393,16 @@ export async function updateContact(
  * @returns Promise resolving to true if deletion successful
  * @throws Error if contact not found or user lacks authorization
  */
-export async function deleteContact(id: string, supabaseClient?: SupabaseClient): Promise<boolean> {
-  const data = await graphqlMutation<DeleteContactResponse>(DELETE_CONTACT_MUTATION, {
-    id,
-  }, supabaseClient);
+export async function deleteContact(
+  id: string,
+  supabaseClient?: SupabaseClient,
+): Promise<boolean> {
+  const data = await graphqlMutation<DeleteContactResponse>(
+    DELETE_CONTACT_MUTATION,
+    {
+      id,
+    },
+    supabaseClient,
+  );
   return data.deleteContact;
 }

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
-import { Search, X, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect, useCallback } from "react";
+import { Input } from "@/components/ui/input";
+import { Search, X, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ContactSearchBarProps {
   /**
@@ -86,8 +86,8 @@ export function ContactSearchBar({
   }, [value]);
 
   const handleClear = useCallback(() => {
-    setInputValue('');
-    onChange('');
+    setInputValue("");
+    onChange("");
   }, [onChange]);
 
   return (
@@ -110,7 +110,10 @@ export function ContactSearchBar({
       {/* Loading Indicator or Clear Button */}
       <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
         {isLoading ? (
-          <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" aria-label="Loading" />
+          <Loader2
+            className="h-4 w-4 text-muted-foreground animate-spin"
+            aria-label="Loading"
+          />
         ) : (
           inputValue && (
             <Button

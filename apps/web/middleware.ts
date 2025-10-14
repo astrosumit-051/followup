@@ -1,6 +1,6 @@
-import { createServerClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { createServerClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 /**
  * Next.js Middleware for Authentication
@@ -21,17 +21,17 @@ export async function middleware(request: NextRequest) {
     // Get current session
     const {
       data: { session },
-      error
+      error,
     } = await supabase.auth.getSession();
 
     // Log authentication errors for debugging (without exposing sensitive data)
     if (error) {
-      console.error('Middleware auth check error:', error.message);
+      console.error("Middleware auth check error:", error.message);
     }
 
     // If no session, redirect to unauthorized page
     if (!session) {
-      const unauthorizedUrl = new URL('/unauthorized', request.url);
+      const unauthorizedUrl = new URL("/unauthorized", request.url);
 
       // Optionally preserve the intended destination for post-login redirect
       // Uncomment to enable return-to-URL functionality:
@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
     // Log when session is approaching expiration (for monitoring)
     if (timeUntilExpiry > 0 && timeUntilExpiry < fiveMinutes) {
       console.log(
-        `Session expiring in ${Math.floor(timeUntilExpiry / 60)} minutes (automatic refresh on next getUser call)`
+        `Session expiring in ${Math.floor(timeUntilExpiry / 60)} minutes (automatic refresh on next getUser call)`,
       );
     }
 
@@ -59,14 +59,14 @@ export async function middleware(request: NextRequest) {
     // This is called on every protected route request
     const {
       data: { user },
-      error: userError
+      error: userError,
     } = await supabase.auth.getUser();
 
     // If token refresh failed or user is invalid, redirect to unauthorized
     if (userError || !user) {
-      console.error('Token refresh failed:', userError?.message);
+      console.error("Token refresh failed:", userError?.message);
 
-      const unauthorizedUrl = new URL('/unauthorized', request.url);
+      const unauthorizedUrl = new URL("/unauthorized", request.url);
       return NextResponse.redirect(unauthorizedUrl);
     }
 
@@ -74,10 +74,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   } catch (error) {
     // Handle unexpected errors gracefully
-    console.error('Middleware error:', error);
+    console.error("Middleware error:", error);
 
     // Redirect to unauthorized page on error for security
-    const unauthorizedUrl = new URL('/unauthorized', request.url);
+    const unauthorizedUrl = new URL("/unauthorized", request.url);
     return NextResponse.redirect(unauthorizedUrl);
   }
 }
@@ -114,6 +114,6 @@ export const config = {
      * - /auth-code-error, /unauthorized (error pages)
      * - .*\\..*  (files with extensions: css, js, images, etc.)
      */
-    '/((?!api|_next|auth|login|signup|auth-code-error|unauthorized$|$).*)'
-  ]
+    "/((?!api|_next|auth|login|signup|auth-code-error|unauthorized$|$).*)",
+  ],
 };

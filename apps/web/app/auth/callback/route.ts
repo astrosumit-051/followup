@@ -1,6 +1,6 @@
-import { createServerClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { createServerClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 /**
  * OAuth callback route handler
@@ -29,13 +29,13 @@ import type { NextRequest } from 'next/server';
  */
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get('code');
-  const next = requestUrl.searchParams.get('next') || '/';
+  const code = requestUrl.searchParams.get("code");
+  const next = requestUrl.searchParams.get("next") || "/";
 
   // Validate code parameter exists and is non-empty
-  if (!code || code.trim() === '') {
-    console.warn('OAuth callback called without valid code parameter');
-    return NextResponse.redirect(new URL('/login', requestUrl.origin));
+  if (!code || code.trim() === "") {
+    console.warn("OAuth callback called without valid code parameter");
+    return NextResponse.redirect(new URL("/login", requestUrl.origin));
   }
 
   if (code) {
@@ -51,15 +51,21 @@ export async function GET(request: NextRequest) {
 
       if (error) {
         // Log only safe error details (avoid exposing sensitive OAuth data)
-        console.error('OAuth callback error:', {
-          code: error.code || 'oauth_callback_error',
-          message: error.message || 'Failed to complete authentication',
+        console.error("OAuth callback error:", {
+          code: error.code || "oauth_callback_error",
+          message: error.message || "Failed to complete authentication",
           // Omit: error.details, full stack traces, tokens
         });
         // Redirect to auth-code-error page with error details
-        const errorUrl = new URL('/auth-code-error', requestUrl.origin);
-        errorUrl.searchParams.set('error', error.code || 'oauth_callback_error');
-        errorUrl.searchParams.set('error_description', error.message || 'Failed to complete authentication');
+        const errorUrl = new URL("/auth-code-error", requestUrl.origin);
+        errorUrl.searchParams.set(
+          "error",
+          error.code || "oauth_callback_error",
+        );
+        errorUrl.searchParams.set(
+          "error_description",
+          error.message || "Failed to complete authentication",
+        );
         return NextResponse.redirect(errorUrl);
       }
 
@@ -69,24 +75,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(safeNext, requestUrl.origin));
     } catch (error) {
       // Log only safe error details (avoid exposing sensitive OAuth data)
-      console.error('Unexpected OAuth error:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
+      console.error("Unexpected OAuth error:", {
+        message: error instanceof Error ? error.message : "Unknown error",
         type: error instanceof Error ? error.constructor.name : typeof error,
         // Omit: full error object, stack traces, tokens
       });
       // Redirect to auth-code-error page for unexpected errors
-      const errorUrl = new URL('/auth-code-error', requestUrl.origin);
-      errorUrl.searchParams.set('error', 'unexpected_error');
+      const errorUrl = new URL("/auth-code-error", requestUrl.origin);
+      errorUrl.searchParams.set("error", "unexpected_error");
       errorUrl.searchParams.set(
-        'error_description',
-        error instanceof Error ? error.message : 'An unexpected error occurred during authentication'
+        "error_description",
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred during authentication",
       );
       return NextResponse.redirect(errorUrl);
     }
   }
 
   // No code provided - redirect to login
-  return NextResponse.redirect(new URL('/login', requestUrl.origin));
+  return NextResponse.redirect(new URL("/login", requestUrl.origin));
 }
 
 /**
@@ -113,10 +121,12 @@ function validateRedirectUrl(url: string, origin: string): string {
     const redirectUrl = new URL(url, origin);
 
     // Security Check 1: Reject dangerous protocols
-    const dangerousProtocols = ['javascript:', 'data:', 'file:', 'vbscript:'];
-    if (dangerousProtocols.some(proto => redirectUrl.protocol === proto)) {
-      console.warn(`Blocked redirect with dangerous protocol: ${redirectUrl.protocol}`);
-      return '/';
+    const dangerousProtocols = ["javascript:", "data:", "file:", "vbscript:"];
+    if (dangerousProtocols.some((proto) => redirectUrl.protocol === proto)) {
+      console.warn(
+        `Blocked redirect with dangerous protocol: ${redirectUrl.protocol}`,
+      );
+      return "/";
     }
 
     // Security Check 2: Enforce same-origin policy
@@ -127,11 +137,11 @@ function validateRedirectUrl(url: string, origin: string): string {
 
     // External origin attempted
     console.warn(`Blocked redirect to external origin: ${redirectUrl.origin}`);
-  } catch (error) {
-    // Invalid URL format
+  } catch (_error) {
+    // Invalid URL format - error not needed, just log the URL
     console.warn(`Blocked redirect with invalid URL format: ${url}`);
   }
 
   // Default to home page for all rejected redirects
-  return '/';
+  return "/";
 }

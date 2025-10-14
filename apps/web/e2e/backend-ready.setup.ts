@@ -1,4 +1,4 @@
-import { test as setup } from '@playwright/test';
+import { test as setup } from "@playwright/test";
 
 /**
  * Backend Readiness Setup
@@ -15,19 +15,21 @@ import { test as setup } from '@playwright/test';
  * net::ERR_CONNECTION_REFUSED when trying to call GraphQL at localhost:3001
  */
 
-setup('wait for backend API', async ({}) => {
+setup("wait for backend API", async ({}) => {
   const maxAttempts = 60; // 60 seconds max wait
   const delayMs = 1000; // Check every 1 second
 
-  console.log('⏳ Waiting for backend API at http://localhost:3001/health...');
+  console.log("⏳ Waiting for backend API at http://localhost:3001/health...");
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const response = await fetch('http://localhost:3001/health');
+      const response = await fetch("http://localhost:3001/health");
 
       if (response.ok) {
         const data = await response.json();
-        console.log(`✅ Backend API is ready! (attempt ${attempt}/${maxAttempts})`);
+        console.log(
+          `✅ Backend API is ready! (attempt ${attempt}/${maxAttempts})`,
+        );
         console.log(`   Status: ${data.status}`);
         console.log(`   Timestamp: ${data.timestamp}`);
         return; // Backend is ready, exit setup
@@ -35,7 +37,9 @@ setup('wait for backend API', async ({}) => {
     } catch (error) {
       // Backend not ready yet, continue waiting
       if (attempt === maxAttempts) {
-        throw new Error(`Backend API failed to start after ${maxAttempts} seconds`);
+        throw new Error(
+          `Backend API failed to start after ${maxAttempts} seconds`,
+        );
       }
     }
 

@@ -7,8 +7,8 @@
  * Add your production and staging domains here
  */
 const ALLOWED_ORIGINS = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
   // Add production domains:
   // 'https://yourdomain.com',
   // 'https://staging.yourdomain.com',
@@ -24,7 +24,9 @@ export function validateRedirectOrigin(origin: string): string {
     return origin;
   }
 
-  console.warn(`Attempted redirect to untrusted origin: ${origin}. Using fallback.`);
+  console.warn(
+    `Attempted redirect to untrusted origin: ${origin}. Using fallback.`,
+  );
 
   // Fallback to first allowed origin (usually localhost in dev, production URL in prod)
   return ALLOWED_ORIGINS[0];
@@ -41,7 +43,11 @@ export function validatePasswordStrength(password: string): {
   reason?: string;
 } {
   if (password.length < 8) {
-    return { valid: false, strength: 0, reason: 'Password must be at least 8 characters' };
+    return {
+      valid: false,
+      strength: 0,
+      reason: "Password must be at least 8 characters",
+    };
   }
 
   let strength = 0;
@@ -63,20 +69,31 @@ export function validatePasswordStrength(password: string): {
   strength = Math.min(strength, 100);
 
   // Require at least 3 character types for validity
-  const characterTypes = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
+  const characterTypes = [hasLower, hasUpper, hasNumber, hasSpecial].filter(
+    Boolean,
+  ).length;
 
   if (characterTypes < 3) {
     return {
       valid: false,
       strength,
-      reason: 'Password must contain at least 3 of: lowercase, uppercase, number, special character'
+      reason:
+        "Password must contain at least 3 of: lowercase, uppercase, number, special character",
     };
   }
 
   // Check against common weak passwords
   const commonPatterns = [
-    'password', '12345678', 'qwerty', 'abc123', 'letmein',
-    'welcome', 'monkey', '1234567890', 'admin', 'user'
+    "password",
+    "12345678",
+    "qwerty",
+    "abc123",
+    "letmein",
+    "welcome",
+    "monkey",
+    "1234567890",
+    "admin",
+    "user",
   ];
 
   const lowerPassword = password.toLowerCase();
@@ -85,7 +102,7 @@ export function validatePasswordStrength(password: string): {
       return {
         valid: false,
         strength,
-        reason: 'Password contains common patterns and is too weak'
+        reason: "Password contains common patterns and is too weak",
       };
     }
   }

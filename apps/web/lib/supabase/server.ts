@@ -1,6 +1,6 @@
-import { createServerClient as createSupabaseServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { createServerClient as createSupabaseServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Create a Supabase client for use in Next.js Server Components
@@ -13,7 +13,7 @@ export function createServerClient(): SupabaseClient {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing required Supabase environment variables');
+    throw new Error("Missing required Supabase environment variables");
   }
 
   const cookieStore = cookies();
@@ -23,17 +23,19 @@ export function createServerClient(): SupabaseClient {
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       set(name: string, value: string, options: any) {
         try {
           cookieStore.set({ name, value, ...options });
-        } catch (error) {
+        } catch (_error) {
           // Server component - ignore cookie errors in read-only contexts
         }
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       remove(name: string, options: any) {
         try {
-          cookieStore.set({ name, value: '', ...options });
-        } catch (error) {
+          cookieStore.set({ name, value: "", ...options });
+        } catch (_error) {
           // Server component - ignore cookie errors in read-only contexts
         }
       },

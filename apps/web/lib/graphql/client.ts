@@ -1,5 +1,5 @@
-import { createBrowserClient } from '@/lib/supabase/client';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from "@/lib/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * GraphQL Client Configuration
@@ -16,7 +16,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  * - Production: Configured via NEXT_PUBLIC_API_URL environment variable
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/graphql';
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/graphql";
 
 /**
  * GraphQL request function with automatic authentication
@@ -32,10 +33,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/graphq
  * const data = await graphqlRequest(GET_CONTACT_QUERY, { id: '123' });
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function graphqlRequest<T = any>(
   query: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   variables?: Record<string, any>,
-  supabaseClient?: SupabaseClient
+  supabaseClient?: SupabaseClient,
 ): Promise<T> {
   const supabase = supabaseClient || createBrowserClient();
 
@@ -46,14 +49,14 @@ export async function graphqlRequest<T = any>(
   } = await supabase.auth.getSession();
 
   if (sessionError || !session) {
-    throw new Error('User not authenticated');
+    throw new Error("User not authenticated");
   }
 
   // Make GraphQL request with JWT token in Authorization header
   const response = await fetch(API_URL, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${session.access_token}`,
     },
     body: JSON.stringify({
@@ -62,15 +65,19 @@ export async function graphqlRequest<T = any>(
     }),
   });
 
-  if (!response.ok) {
-    throw new Error(`GraphQL request failed: ${response.statusText}`);
-  }
-
+  // Read response body for both success and error cases
   const json = await response.json();
 
-  // Check for GraphQL errors
+  // Check HTTP status first
+  if (!response.ok) {
+    // Try to extract error message from GraphQL errors in the response
+    const errorMessage = json.errors?.[0]?.message || json.message || response.statusText;
+    throw new Error(`GraphQL request failed: ${errorMessage}`);
+  }
+
+  // Check for GraphQL errors in successful HTTP responses
   if (json.errors) {
-    throw new Error(json.errors[0]?.message || 'GraphQL request failed');
+    throw new Error(json.errors[0]?.message || "GraphQL request failed");
   }
 
   return json.data;
@@ -84,10 +91,12 @@ export async function graphqlRequest<T = any>(
  * @param supabaseClient - Optional Supabase client for dependency injection (testing)
  * @returns Promise resolving to the mutation response data
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function graphqlMutation<T = any>(
   mutation: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   variables?: Record<string, any>,
-  supabaseClient?: SupabaseClient
+  supabaseClient?: SupabaseClient,
 ): Promise<T> {
   return graphqlRequest<T>(mutation, variables, supabaseClient);
 }

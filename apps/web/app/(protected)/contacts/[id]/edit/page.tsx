@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
-import { toast } from 'sonner';
-import { ContactForm } from '@/components/contacts/ContactForm';
-import { useContact, useUpdateContact } from '@/lib/hooks/useContacts';
-import type { UpdateContactInput } from '@/lib/validations/contact';
-import { ContactLoadingSkeleton } from '@/components/contacts/ContactLoadingSkeleton';
-import { ContactErrorState } from '@/components/contacts/ContactErrorState';
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import { ContactForm } from "@/components/contacts/ContactForm";
+import { useContact, useUpdateContact } from "@/lib/hooks/useContacts";
+import type { UpdateContactInput } from "@/lib/validations/contact";
+import { ContactLoadingSkeleton } from "@/components/contacts/ContactLoadingSkeleton";
+import { ContactErrorState } from "@/components/contacts/ContactErrorState";
 
 /**
  * Edit Contact Page
@@ -39,11 +39,11 @@ export default function EditContactPage() {
       // Update the contact
       await updateContact.mutateAsync({
         id,
-        data,
+        input: data,
       });
 
       // Show success toast
-      toast.success('Contact updated successfully!', {
+      toast.success("Contact updated successfully!", {
         description: `${data.name || contact?.name} has been updated.`,
       });
 
@@ -51,9 +51,11 @@ export default function EditContactPage() {
       router.push(`/contacts/${id}`);
     } catch (error) {
       // Show error toast
-      toast.error('Failed to update contact', {
+      toast.error("Failed to update contact", {
         description:
-          error instanceof Error ? error.message : 'An unexpected error occurred',
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
       });
     }
   };
@@ -75,21 +77,26 @@ export default function EditContactPage() {
   // Not found state
   if (!contact) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4
+      <div
+        className="min-h-screen bg-gray-50 py-8 px-4
                       sm:px-6
-                      lg:px-8">
+                      lg:px-8"
+      >
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white shadow-sm rounded-lg p-6
-                          sm:p-8">
+          <div
+            className="bg-white shadow-sm rounded-lg p-6
+                          sm:p-8"
+          >
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Contact Not Found
               </h2>
               <p className="text-gray-600 mb-4">
-                The contact you're trying to edit doesn't exist or has been deleted.
+                The contact you&apos;re trying to edit doesn&apos;t exist or has
+                been deleted.
               </p>
               <button
-                onClick={() => router.push('/contacts')}
+                onClick={() => router.push("/contacts")}
                 aria-label="Return to contacts list"
                 className="px-4 py-2 bg-blue-600 text-white rounded-md
                            hover:bg-blue-700 focus:outline-none
@@ -113,7 +120,7 @@ export default function EditContactPage() {
     company: contact.company || undefined,
     industry: contact.industry || undefined,
     role: contact.role || undefined,
-    priority: contact.priority || 'HIGH',
+    priority: contact.priority || "HIGH",
     gender: contact.gender || undefined,
     birthday: contact.birthday || undefined,
     profilePicture: contact.profilePicture || undefined,
@@ -122,9 +129,11 @@ export default function EditContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4
+    <div
+      className="min-h-screen bg-gray-50 py-8 px-4
                     sm:px-6
-                    lg:px-8">
+                    lg:px-8"
+    >
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -135,8 +144,10 @@ export default function EditContactPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white shadow-sm rounded-lg p-6
-                        sm:p-8">
+        <div
+          className="bg-white shadow-sm rounded-lg p-6
+                        sm:p-8"
+        >
           <ContactForm
             mode="edit"
             defaultValues={defaultValues}

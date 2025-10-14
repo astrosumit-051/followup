@@ -1,7 +1,6 @@
-import { test as setup, expect } from '@playwright/test';
-import { createBrowserClient } from '../lib/supabase/client';
+import { test as setup } from "@playwright/test";
 
-const authFile = 'playwright/.auth/user.json';
+const authFile = "playwright/.auth/user.json";
 
 /**
  * Global authentication setup for E2E tests
@@ -17,12 +16,12 @@ const authFile = 'playwright/.auth/user.json';
  * - TEST_USER_PASSWORD: Password for the test user
  */
 
-setup('authenticate', async ({ page }) => {
-  const testEmail = process.env.TEST_USER_EMAIL || 'test@relationhub.com';
-  const testPassword = process.env.TEST_USER_PASSWORD || 'TestPassword123!';
+setup("authenticate", async ({ page }) => {
+  const testEmail = process.env.TEST_USER_EMAIL || "test@relationhub.com";
+  const testPassword = process.env.TEST_USER_PASSWORD || "TestPassword123!";
 
   // Navigate to login page
-  await page.goto('/login');
+  await page.goto("/login");
 
   // Wait for the Auth UI component to load
   await page.waitForSelector('input[type="email"]', { timeout: 10000 });
@@ -41,15 +40,16 @@ setup('authenticate', async ({ page }) => {
 
   // Verify we're actually authenticated by checking for user session
   const cookies = await page.context().cookies();
-  const hasAuthCookie = cookies.some(cookie =>
-    cookie.name.includes('sb-') && cookie.name.includes('auth-token')
+  const hasAuthCookie = cookies.some(
+    (cookie) =>
+      cookie.name.includes("sb-") && cookie.name.includes("auth-token"),
   );
 
   if (!hasAuthCookie) {
-    throw new Error('Authentication failed - no auth cookie found');
+    throw new Error("Authentication failed - no auth cookie found");
   }
 
-  console.log('✅ Authentication setup complete - test user logged in');
+  console.log("✅ Authentication setup complete - test user logged in");
 
   // Save authenticated state
   await page.context().storageState({ path: authFile });

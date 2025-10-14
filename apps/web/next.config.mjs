@@ -19,32 +19,33 @@ const nextConfig = {
     return [
       {
         // Apply security headers to all routes
-        source: '/:path*',
+        source: "/:path*",
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY', // Prevent embedding in iframes (clickjacking protection)
+            key: "X-Frame-Options",
+            value: "DENY", // Prevent embedding in iframes (clickjacking protection)
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff', // Prevent MIME type sniffing
+            key: "X-Content-Type-Options",
+            value: "nosniff", // Prevent MIME type sniffing
           },
           {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin', // Control referrer information leakage
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin", // Control referrer information leakage
           },
           {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on', // Enable DNS prefetching for performance
+            key: "X-DNS-Prefetch-Control",
+            value: "on", // Enable DNS prefetching for performance
           },
           {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()', // Disable unnecessary browser features
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(), geolocation=(), interest-cohort=()", // Disable unnecessary browser features
           },
         ],
       },
     ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

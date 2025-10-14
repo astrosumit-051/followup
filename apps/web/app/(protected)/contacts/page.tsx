@@ -1,29 +1,34 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { useContacts } from '@/lib/hooks/useContacts';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { ContactCard } from '@/components/contacts/ContactCard';
-import { ContactListSkeleton } from '@/components/contacts/ContactCardSkeleton';
-import { ContactListEmpty } from '@/components/contacts/ContactListEmpty';
-import { ContactSearchBar } from '@/components/contacts/ContactSearchBar';
-import { ContactFilters } from '@/components/contacts/ContactFilters';
-import { ContactSortDropdown } from '@/components/contacts/ContactSortDropdown';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { createBrowserClient } from "@/lib/supabase/client";
+import { useContacts } from "@/lib/hooks/useContacts";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ContactCard } from "@/components/contacts/ContactCard";
+import { ContactListSkeleton } from "@/components/contacts/ContactCardSkeleton";
+import { ContactListEmpty } from "@/components/contacts/ContactListEmpty";
+import { ContactSearchBar } from "@/components/contacts/ContactSearchBar";
+import { ContactFilters } from "@/components/contacts/ContactFilters";
+import { ContactSortDropdown } from "@/components/contacts/ContactSortDropdown";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Plus, Loader2 } from 'lucide-react';
-import type { ContactFilterInput, ContactSortField, SortOrder } from '@/lib/graphql/contacts';
+} from "@/components/ui/select";
+import { Plus, Loader2 } from "lucide-react";
+import type {
+  ContactFilterInput,
+  ContactSortField,
+  SortOrder,
+  ContactConnection,
+} from "@/lib/graphql/contacts";
 
 /**
  * Contact List Page
@@ -47,10 +52,10 @@ function ContactsPageContent() {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   // Search and filter state
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<ContactFilterInput>({});
-  const [sortBy, setSortBy] = useState<ContactSortField>('NAME');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [sortBy, setSortBy] = useState<ContactSortField>("NAME");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pageSize, setPageSize] = useState(12);
 
   // Client-side auth check (in addition to middleware)
@@ -62,7 +67,7 @@ function ContactsPageContent() {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
@@ -90,7 +95,8 @@ function ContactsPageContent() {
   });
 
   // Flatten paginated results
-  const contacts = data?.pages.flatMap((page) => page.nodes) ?? [];
+  const contacts =
+    data?.pages.flatMap((page) => page.nodes) ?? [];
 
   // Handle search query changes
   const handleSearchChange = (query: string) => {
@@ -123,14 +129,18 @@ function ContactsPageContent() {
   // Loading skeleton state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background py-8 px-4
+      <div
+        className="min-h-screen bg-background py-8 px-4
                       sm:px-6
-                      lg:px-8">
+                      lg:px-8"
+      >
         <div className="max-w-7xl mx-auto">
           {/* Header Skeleton */}
           <div className="mb-8">
-            <div className="flex flex-col space-y-4
-                            sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div
+              className="flex flex-col space-y-4
+                            sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+            >
               <div className="space-y-2">
                 <Skeleton className="h-9 w-32" />
                 <Skeleton className="h-4 w-48" />
@@ -164,7 +174,9 @@ function ContactsPageContent() {
             Error Loading Contacts
           </h2>
           <p className="text-destructive/90">
-            {error instanceof Error ? error.message : 'An unexpected error occurred'}
+            {error instanceof Error
+              ? error.message
+              : "An unexpected error occurred"}
           </p>
         </div>
       </div>
@@ -172,18 +184,23 @@ function ContactsPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4
+    <div
+      className="min-h-screen bg-background py-8 px-4
                     sm:px-6
-                    lg:px-8">
+                    lg:px-8"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex flex-col space-y-4
-                          sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div
+            className="flex flex-col space-y-4
+                          sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+          >
             <div>
               <h1 className="text-3xl font-bold text-foreground">Contacts</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Manage your professional network ({contacts.length} contact{contacts.length !== 1 ? 's' : ''})
+                Manage your professional network ({contacts.length} contact
+                {contacts.length !== 1 ? "s" : ""})
               </p>
             </div>
             <Button asChild>
@@ -205,9 +222,14 @@ function ContactsPageContent() {
           />
 
           {/* Filters, Sort, and Page Size */}
-          <div className="flex flex-col space-y-4
-                          sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4">
-            <ContactFilters filters={filters} onChange={handleFilterChange} />
+          <div
+            className="flex flex-col space-y-4
+                          sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-4"
+          >
+            <ContactFilters
+              filters={filters}
+              onFiltersChange={handleFilterChange}
+            />
             <div className="flex space-x-4">
               {/* Page Size Selector */}
               <div className="flex items-center space-x-2">
@@ -242,10 +264,23 @@ function ContactsPageContent() {
         {/* Empty State */}
         {contacts.length === 0 && !isLoading && (
           <ContactListEmpty
-            hasFilters={!!searchQuery || Object.keys(filters).length > 0}
-            onClearFilters={() => {
-              setSearchQuery('');
-              setFilters({});
+            message={
+              !!searchQuery || Object.keys(filters).length > 0
+                ? "No contacts match your search or filters"
+                : "No contacts found"
+            }
+            actionText={
+              !!searchQuery || Object.keys(filters).length > 0
+                ? "Clear Filters"
+                : "Create Contact"
+            }
+            onAction={() => {
+              if (!!searchQuery || Object.keys(filters).length > 0) {
+                setSearchQuery("");
+                setFilters({});
+              } else {
+                router.push("/contacts/new");
+              }
             }}
           />
         )}
@@ -258,7 +293,8 @@ function ContactsPageContent() {
               className="grid grid-cols-1 gap-6
                             sm:grid-cols-2
                             lg:grid-cols-3
-                            xl:grid-cols-4">
+                            xl:grid-cols-4"
+            >
               {contacts.map((contact) => (
                 <ContactCard key={contact.id} contact={contact} />
               ))}
@@ -278,7 +314,7 @@ function ContactsPageContent() {
                       Loading more...
                     </>
                   ) : (
-                    'Load More'
+                    "Load More"
                   )}
                 </Button>
               </div>

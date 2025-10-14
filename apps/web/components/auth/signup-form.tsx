@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
-import { Loader2 } from 'lucide-react';
-import { validateRedirectOrigin, validatePasswordStrength, calculatePasswordStrength as calcStrength } from '@/lib/security';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { createBrowserClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { Loader2 } from "lucide-react";
+import {
+  validateRedirectOrigin,
+  validatePasswordStrength,
+  calculatePasswordStrength as calcStrength,
+} from "@/lib/security";
 
 export function SignupForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -25,15 +29,21 @@ export function SignupForm() {
   const passwordStrength = calcStrength(password);
 
   const getStrengthColor = (strength: number): string => {
-    if (strength < 40) return 'bg-destructive';
-    if (strength < 70) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (strength < 40) return "bg-destructive";
+    if (strength < 70) return "bg-amber-500";
+    return "bg-green-500";
   };
 
   const getStrengthText = (strength: number): string => {
-    if (strength < 40) return 'Weak';
-    if (strength < 70) return 'Medium';
-    return 'Strong';
+    if (strength < 40) return "Weak";
+    if (strength < 70) return "Medium";
+    return "Strong";
+  };
+
+  const getStrengthTextColor = (strength: number): string => {
+    if (strength < 40) return "text-destructive";
+    if (strength < 70) return "text-amber-500";
+    return "text-green-500";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,14 +52,17 @@ export function SignupForm() {
 
     // Validation
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     // Enhanced password validation using security utility
     const passwordValidation = validatePasswordStrength(password);
     if (!passwordValidation.valid) {
-      setError(passwordValidation.reason || 'Password does not meet security requirements');
+      setError(
+        passwordValidation.reason ||
+          "Password does not meet security requirements",
+      );
       return;
     }
 
@@ -75,16 +88,16 @@ export function SignupForm() {
       if (data.user) {
         // Check if email confirmation is required
         if (data.user.identities?.length === 0) {
-          setError('An account with this email already exists');
+          setError("An account with this email already exists");
           return;
         }
 
         // Redirect to confirmation page or dashboard
-        router.push('/auth/confirm-email');
+        router.push("/auth/confirm-email");
       }
     } catch (err) {
-      console.error('Unexpected signup error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      console.error("Unexpected signup error:", err);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +112,7 @@ export function SignupForm() {
       const validatedOrigin = validateRedirectOrigin(window.location.origin);
 
       const { error: signInError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${validatedOrigin}/auth/callback`,
         },
@@ -110,8 +123,8 @@ export function SignupForm() {
         setIsLoading(false);
       }
     } catch (err) {
-      console.error('Google signup error:', err);
-      setError('Failed to initiate Google signup');
+      console.error("Google signup error:", err);
+      setError("Failed to initiate Google signup");
       setIsLoading(false);
     }
   };
@@ -119,7 +132,9 @@ export function SignupForm() {
   return (
     <div className="w-full max-w-md space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-foreground">Create your account</h2>
+        <h2 className="text-3xl font-bold text-foreground">
+          Create your account
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Get started with RelationHub
         </p>
@@ -164,12 +179,12 @@ export function SignupForm() {
             {password && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Password strength:</span>
-                  <span className={`font-medium ${
-                    passwordStrength < 40 ? 'text-destructive' :
-                    passwordStrength < 70 ? 'text-yellow-600 dark:text-yellow-500' :
-                    'text-green-600 dark:text-green-500'
-                  }`}>
+                  <span className="text-muted-foreground">
+                    Password strength:
+                  </span>
+                  <span
+                    className={`font-medium ${getStrengthTextColor(passwordStrength)}`}
+                  >
                     {getStrengthText(passwordStrength)}
                   </span>
                 </div>
@@ -203,7 +218,7 @@ export function SignupForm() {
 
         <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isLoading ? 'Creating account...' : 'Create account'}
+          {isLoading ? "Creating account..." : "Create account"}
         </Button>
 
         <div className="relative">
@@ -211,11 +226,19 @@ export function SignupForm() {
             <Separator />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-background text-muted-foreground">Or continue with</span>
+            <span className="px-2 bg-background text-muted-foreground">
+              Or continue with
+            </span>
           </div>
         </div>
 
-        <Button type="button" variant="outline" onClick={handleGoogleSignup} disabled={isLoading} className="w-full">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleGoogleSignup}
+          disabled={isLoading}
+          className="w-full"
+        >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -238,7 +261,9 @@ export function SignupForm() {
         </Button>
 
         <div className="text-center text-sm">
-          <span className="text-muted-foreground">Already have an account? </span>
+          <span className="text-muted-foreground">
+            Already have an account?{" "}
+          </span>
           <Link href="/login" className="text-primary hover:underline">
             Sign in
           </Link>
