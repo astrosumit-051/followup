@@ -9,11 +9,11 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 - [ ] 1. Database Schema & Migrations
   - [ ] 1.1 Write tests for Email model validation
-  - [ ] 1.2 Create Prisma schema for `emails`, `email_templates`, and `conversation_history` tables
-  - [ ] 1.3 Add enums: `EmailStatus`, `TemplateType`, `Direction`
-  - [ ] 1.4 Add relations to `User` and `Contact` models
-  - [ ] 1.5 Generate and run Prisma migration
-  - [ ] 1.6 Create seed data for development/testing
+  - [x] 1.2 Create Prisma schema for `emails`, `email_templates`, and `conversation_history` tables
+  - [x] 1.3 Add enums: `EmailStatus`, `TemplateType`, `Direction`
+  - [x] 1.4 Add relations to `User` and `Contact` models
+  - [ ] 1.5 Generate and run Prisma migration ⚠️ **Blocked: Database not running**
+  - [x] 1.6 Create seed data for development/testing
   - [ ] 1.7 Verify all tests pass
 
 - [ ] 2. LangChain Integration Module
