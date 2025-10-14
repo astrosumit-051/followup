@@ -1,4 +1,4 @@
-import { PrismaClient, Priority, Gender, EmailStatus, TemplateType, Direction, ActivityType } from '../src/generated/client';
+import { PrismaClient, Priority, Gender, EmailStatus, TemplateType, Direction, ActivityType } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -10,6 +10,7 @@ async function main() {
     where: { email: 'john.doe@example.com' },
     update: {},
     create: {
+      supabaseId: '00000000-0000-0000-0000-000000000001',
       email: 'john.doe@example.com',
       name: 'John Doe',
       profilePicture: null,
@@ -20,6 +21,7 @@ async function main() {
     where: { email: 'jane.smith@example.com' },
     update: {},
     create: {
+      supabaseId: '00000000-0000-0000-0000-000000000002',
       email: 'jane.smith@example.com',
       name: 'Jane Smith',
       profilePicture: null,
