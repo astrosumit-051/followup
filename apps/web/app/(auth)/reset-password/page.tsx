@@ -1,12 +1,12 @@
 "use client";
 
-import { LoginForm } from "@/components/auth/login-form";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useEffect } from "react";
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   useEffect(() => {
-    document.title = "Login | RelationHub";
+    document.title = "Reset Password | RelationHub";
   }, []);
 
   return (
@@ -17,7 +17,7 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
 
-      <LoginForm />
+      <ResetPasswordForm />
     </div>
   );
 }

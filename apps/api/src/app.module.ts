@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ContactModule } from './contact/contact.module';
+import { AIModule } from './ai/ai.module';
 import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 
 /**
@@ -76,6 +77,7 @@ import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
     AuthModule,
     UserModule,
     ContactModule,
+    AIModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { User, PrismaClient } from '../generated/client';
+import { User, PrismaClient } from '@prisma/client';
 
 // Create a mock Prisma Client using Vitest's vi.fn()
 const prismaMock = {

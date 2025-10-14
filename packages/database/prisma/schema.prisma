@@ -34,6 +34,27 @@ enum ActivityType {
   NOTE
 }
 
+enum EmailStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum TemplateType {
+  FORMAL
+  CASUAL
+  CUSTOM
+  AI_GENERATED
+  TEMPLATE_BASED
+}
+
+enum Direction {
+  SENT
+  RECEIVED
+}
+
 model User {
   id             String    @id @default(uuid())
   supabaseId     String    @unique
@@ -46,11 +67,13 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  contacts   Contact[]
-  emails     Email[]
-  activities Activity[]
-  reminders  Reminder[]
-  tags       Tag[]
+  contacts            Contact[]
+  emails              Email[]
+  activities          Activity[]
+  reminders           Reminder[]
+  tags                Tag[]
+  emailTemplates      EmailTemplate[]
+  conversationHistory ConversationHistory[]
 
   @@index([supabaseId])
   @@index([email])
@@ -77,19 +100,20 @@ model Contact {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  emails     Email[]
-  activities Activity[]
-  reminders  Reminder[]
-  tags       ContactTag[]
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emails              Email[]
+  activities          Activity[]
+  reminders           Reminder[]
+  tags                ContactTag[]
+  conversationHistory ConversationHistory[]
 
   // Performance indexes for frequently queried fields
-  @@index([userId, createdAt(sort: Desc)])    // Default sort order (most common query)
-  @@index([userId, priority])                  // Filter by priority
-  @@index([userId, lastContactedAt])           // Sort by last contact date
-  @@index([userId, company])                   // Filter/sort by company
-  @@index([userId, industry])                  // Filter/sort by industry
-  @@index([userId, name])                      // Sort by name alphabetically
+  @@index([userId, createdAt(sort: Desc)]) // Default sort order (most common query)
+  @@index([userId, priority]) // Filter by priority
+  @@index([userId, lastContactedAt]) // Sort by last contact date
+  @@index([userId, company]) // Filter/sort by company
+  @@index([userId, industry]) // Filter/sort by industry
+  @@index([userId, name]) // Sort by name alphabetically
   @@map("contacts")
 }
 
@@ -121,21 +145,31 @@ model ContactTag {
 }
 
 model Email {
-  id         String        @id @default(uuid())
-  userId     String
-  contactId  String
-  subject    String
-  body       String        @db.Text
-  sentAt     DateTime      @default(now())
-  openedAt   DateTime?
-  clickedAt  DateTime?
-  provider   EmailProvider
-  metadata   Json?
+  id           String        @id @default(uuid())
+  userId       String
+  contactId    String
+  subject      String
+  body         String        @db.Text
+  bodyHtml     String?       @db.Text
+  status       EmailStatus   @default(DRAFT)
+  templateType TemplateType?
+  providerId   String? // Which LLM model generated this (e.g., "openai/gpt-4-turbo")
+  tokensUsed   Int?
+  generatedAt  DateTime? // When AI generated the template
+  sentAt       DateTime? // When email was actually sent (null for drafts)
+  openedAt     DateTime? // Email tracking (Phase 4)
+  repliedAt    DateTime? // Response received
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact             Contact               @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  conversationHistory ConversationHistory[]
 
-  @@index([userId, sentAt])
+  @@index([userId])
+  @@index([contactId])
+  @@index([status])
+  @@index([sentAt])
   @@map("emails")
 }
 
@@ -170,4 +204,43 @@ model Reminder {
 
   @@index([userId, dueDate, completed])
   @@map("reminders")
+}
+
+model EmailTemplate {
+  id         String   @id @default(uuid())
+  userId     String
+  name       String // User-friendly template name
+  subject    String
+  body       String   @db.Text
+  bodyHtml   String?  @db.Text
+  isDefault  Boolean  @default(false) // User's default template
+  category   String? // e.g., "follow-up", "introduction", "thank-you"
+  usageCount Int      @default(0) // Track template popularity
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDefault])
+  @@map("email_templates")
+}
+
+model ConversationHistory {
+  id        String    @id @default(uuid())
+  userId    String
+  contactId String
+  emailId   String? // Reference to emails table
+  content   String    @db.Text // Concatenated subject + body for AI context
+  direction Direction // SENT or RECEIVED
+  timestamp DateTime  @default(now())
+  metadata  Json? // Store email metadata (opened, clicked, etc.)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  email   Email?  @relation(fields: [emailId], references: [id], onDelete: SetNull)
+
+  @@index([userId, contactId]) // Composite index for efficient context retrieval
+  @@index([timestamp])
+  @@map("conversation_history")
 }
