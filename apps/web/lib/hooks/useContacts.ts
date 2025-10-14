@@ -243,7 +243,22 @@ export function useCreateContact(
   const queryClient = useQueryClient();
 
   return useMutation<Contact, Error, CreateContactInput>({
-    mutationFn: (input: CreateContactInput) => createContact(input),
+    mutationFn: (input: CreateContactInput) => {
+      // Transform and filter input for backend GraphQL API
+      const transformedInput = {
+        ...input,
+        // Convert birthday Date to ISO string if present
+        birthday: input.birthday instanceof Date
+          ? input.birthday.toISOString()
+          : input.birthday,
+      };
+
+      // Remove fields not supported by backend CreateContactDto
+      // profilePicture and lastContactedAt are not in the backend schema yet
+      const { profilePicture, lastContactedAt, ...backendInput } = transformedInput;
+
+      return createContact(backendInput as CreateContactInput);
+    },
     onSuccess: (newContact) => {
       // Invalidate and refetch contact lists to include new contact
       queryClient.invalidateQueries({ queryKey: contactKeys.lists() });

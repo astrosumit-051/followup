@@ -65,13 +65,17 @@ export async function graphqlRequest<T = any>(
     }),
   });
 
-  if (!response.ok) {
-    throw new Error(`GraphQL request failed: ${response.statusText}`);
-  }
-
+  // Read response body for both success and error cases
   const json = await response.json();
 
-  // Check for GraphQL errors
+  // Check HTTP status first
+  if (!response.ok) {
+    // Try to extract error message from GraphQL errors in the response
+    const errorMessage = json.errors?.[0]?.message || json.message || response.statusText;
+    throw new Error(`GraphQL request failed: ${errorMessage}`);
+  }
+
+  // Check for GraphQL errors in successful HTTP responses
   if (json.errors) {
     throw new Error(json.errors[0]?.message || "GraphQL request failed");
   }
