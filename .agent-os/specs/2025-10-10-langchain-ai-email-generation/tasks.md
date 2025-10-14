@@ -16,36 +16,36 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 1.6 Create seed data for development/testing
   - [x] 1.7 Verify all tests pass (30 tests passing)
 
-- [ ] 2. LangChain Integration Module
-  - [ ] 2.1 Write tests for AIService with mocked LLM responses
-  - [ ] 2.2 Install dependencies: `langchain`, `@langchain/openai`, `@langchain/anthropic`, `ioredis`
-  - [ ] 2.3 Create `apps/api/src/ai/` module with NestJS CLI
-  - [ ] 2.4 Implement AIService with LangChain setup (OpenAI + Anthropic providers)
-  - [ ] 2.5 Configure environment variables for API keys (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`)
-  - [ ] 2.6 Implement provider fallback chain logic
-  - [ ] 2.7 Verify all tests pass
+- [x] 2. LangChain Integration Module ✅ **COMPLETED**
+  - [x] 2.1 Write tests for AIService with mocked LLM responses (13 comprehensive tests)
+  - [x] 2.2 Install dependencies: `@langchain/openai@0.6.16`, `@langchain/core@0.3.78`, `ioredis@5.8.1` (OpenRouter instead of separate providers)
+  - [x] 2.3 Create `apps/api/src/ai/` module (manually created due to npm CLI issues)
+  - [x] 2.4 Implement AIService with LangChain setup (OpenRouter with 3-provider fallback: OpenAI → Anthropic → Google Gemini)
+  - [x] 2.5 Configure environment variables (`OPENROUTER_API_KEY`, `APP_URL` in `.env.example`)
+  - [x] 2.6 Implement provider fallback chain logic (sequential try-catch with 3 providers)
+  - [x] 2.7 Verify all tests pass (13/13 tests passing)
 
-- [ ] 3. Prompt Engineering & Template System
-  - [ ] 3.1 Write tests for prompt building with various contact contexts
-  - [ ] 3.2 Create system prompt defining AI role as networking assistant
-  - [ ] 3.3 Build prompt template with variable substitution (name, company, role, notes, priority)
-  - [ ] 3.4 Create few-shot examples for high-quality email generation
-  - [ ] 3.5 Implement separate prompts for formal vs casual styles
-  - [ ] 3.6 Add conversation history injection into prompts
-  - [ ] 3.7 Implement input sanitization for prompt injection protection
-  - [ ] 3.8 Verify all tests pass
+- [x] 3. Prompt Engineering & Template System ✅ **COMPLETED**
+  - [x] 3.1 Write tests for prompt building with various contact contexts (7 tests added)
+  - [x] 3.2 Create system prompt defining AI role as networking assistant
+  - [x] 3.3 Build prompt template with variable substitution (name, company, role, notes, priority)
+  - [x] 3.4 Create few-shot examples for high-quality email generation (2 examples: formal conference follow-up, casual reconnection)
+  - [x] 3.5 Implement separate prompts for formal vs casual styles
+  - [x] 3.6 Add conversation history injection into prompts
+  - [x] 3.7 Implement input sanitization for prompt injection protection (10 security patterns, length validation, newline normalization)
+  - [x] 3.8 Verify all tests pass (26/26 tests passing)
 
-- [ ] 4. Email Generation Service
-  - [ ] 4.1 Write tests for email generation with formal/casual variants
-  - [ ] 4.2 Implement `generateEmailTemplate()` method in AIService
-  - [ ] 4.3 Fetch contact data from database (Prisma)
-  - [ ] 4.4 Fetch conversation history (last 5 entries)
-  - [ ] 4.5 Build AI prompt with full context
-  - [ ] 4.6 Call LangChain with formal style prompt
-  - [ ] 4.7 Call LangChain with casual style prompt
-  - [ ] 4.8 Parse LLM responses into structured format
-  - [ ] 4.9 Track providerId and tokensUsed
-  - [ ] 4.10 Verify all tests pass
+- [x] 4. Email Generation Service ✅ **COMPLETED**
+  - [x] 4.1 Write tests for email generation with formal/casual variants (11 tests covering all scenarios)
+  - [x] 4.2 Implement `generateEmailTemplate()` method in AIService
+  - [x] 4.3 ~~Fetch contact data from database (Prisma)~~ → **MOVED TO TASK 9** (GraphQL resolver responsibility)
+  - [x] 4.4 ~~Fetch conversation history (last 5 entries)~~ → **MOVED TO TASK 9** (GraphQL resolver responsibility)
+  - [x] 4.5 Build AI prompt with full context (buildFormalPrompt, buildCasualPrompt with sanitized inputs)
+  - [x] 4.6 Call LangChain with formal style prompt
+  - [x] 4.7 Call LangChain with casual style prompt
+  - [x] 4.8 Parse LLM responses into structured format (parseEmailResponse method)
+  - [x] 4.9 Track providerId and tokensUsed (returned in GeneratedEmailTemplate)
+  - [x] 4.10 Verify all tests pass (26/26 tests passing)
 
 - [ ] 5. Redis Caching Layer
   - [ ] 5.1 Write tests for cache hit/miss scenarios
@@ -91,10 +91,14 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 - [ ] 9. GraphQL Resolvers - Mutations (Core Feature)
   - [ ] 9.1 Write tests for generateEmailTemplate mutation
-  - [ ] 9.2 Implement `generateEmailTemplate()` mutation
-  - [ ] 9.3 Connect to AIService for template generation
-  - [ ] 9.4 Store both formal and casual drafts in database
-  - [ ] 9.5 Return GeneratedEmailTemplate response
+  - [ ] 9.2 Implement `generateEmailTemplate()` mutation resolver
+    - [ ] 9.2.1 Fetch contact data from database (Prisma) - **MOVED FROM TASK 4.3**
+    - [ ] 9.2.2 Fetch conversation history (last 5 entries) - **MOVED FROM TASK 4.4**
+    - [ ] 9.2.3 Build GenerateEmailTemplateInput from fetched data
+    - [ ] 9.2.4 Validate user owns the contact (authorization)
+  - [ ] 9.3 Connect to AIService.generateEmailTemplate() for template generation
+  - [ ] 9.4 Store both formal and casual drafts in database (EmailService)
+  - [ ] 9.5 Return GeneratedEmailTemplate response to client
   - [ ] 9.6 Add rate limiting (10 req/min per user)
   - [ ] 9.7 Add error handling for AI service failures
   - [ ] 9.8 Verify all tests pass
