@@ -12,8 +12,6 @@ import type { NextRequest } from "next/server";
  * @see https://supabase.com/docs/guides/auth/server-side/nextjs
  */
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
   // Create Supabase client for server-side auth check
   const supabase = createServerClient();
 
@@ -99,6 +97,7 @@ export async function middleware(request: NextRequest) {
  * - /auth/* - Authentication routes (login, signup, callback)
  * - / - Home/landing page
  * - /login, /signup - Public auth pages
+ * - /forgot-password, /reset-password - Password reset flow
  *
  * @see https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
  */
@@ -111,9 +110,10 @@ export const config = {
      * - /auth/* (auth routes: login, signup, callback)
      * - / (home page)
      * - /login, /signup (public auth pages)
+     * - /forgot-password, /reset-password (password reset flow)
      * - /auth-code-error, /unauthorized (error pages)
      * - .*\\..*  (files with extensions: css, js, images, etc.)
      */
-    "/((?!api|_next|auth|login|signup|auth-code-error|unauthorized$|$).*)",
+    "/((?!api|_next|auth|login|signup|forgot-password|reset-password|auth-code-error|unauthorized$|$).*)",
   ],
 };
