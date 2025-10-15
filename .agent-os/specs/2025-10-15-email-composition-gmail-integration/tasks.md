@@ -7,26 +7,26 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 ## Tasks
 
-- [ ] 1. Database Schema & Migrations
-  - [ ] 1.1 Write tests for EmailDraft model validation
-  - [ ] 1.2 Create Prisma schema for `email_drafts` table with bodyJson, attachments array, signatureId
-  - [ ] 1.3 Create Prisma schema for `email_signatures` table with contentJson, default flags
-  - [ ] 1.4 Create Prisma schema for `gmail_tokens` table with encrypted tokens, expiresAt
-  - [ ] 1.5 Update `email_templates` table with isUserCreated, category, usageCount fields
-  - [ ] 1.6 Update `emails` table with gmailMessageId, gmailThreadId, signatureId, attachments, campaignId, isColdEmail fields
-  - [ ] 1.7 Run Prisma migration (`prisma migrate dev --name email-composition-gmail`)
-  - [ ] 1.8 Create seed data for test signatures, drafts, and contacts
-  - [ ] 1.9 Verify all tests pass
+- [x] 1. Database Schema & Migrations
+  - [x] 1.1 Write tests for EmailDraft model validation
+  - [x] 1.2 Create Prisma schema for `email_drafts` table with bodyJson, attachments array, signatureId
+  - [x] 1.3 Create Prisma schema for `email_signatures` table with contentJson, default flags
+  - [x] 1.4 Create Prisma schema for `gmail_tokens` table with encrypted tokens, expiresAt
+  - [x] 1.5 Update `email_templates` table with isUserCreated, category, usageCount fields
+  - [x] 1.6 Update `emails` table with gmailMessageId, gmailThreadId, signatureId, attachments, campaignId, isColdEmail fields
+  - [x] 1.7 Run Prisma migration (`prisma migrate dev --name email-composition-gmail`)
+  - [x] 1.8 Create seed data for test signatures, drafts, and contacts
+  - [x] 1.9 Verify all tests pass
 
-- [ ] 2. Backend - Email Draft Service
-  - [ ] 2.1 Write tests for EmailDraftService (auto-save, get, list, delete)
-  - [ ] 2.2 Create `apps/api/src/email-draft/` module with NestJS CLI
-  - [ ] 2.3 Implement EmailDraftService with Prisma operations
-  - [ ] 2.4 Implement `autoSaveDraft()` with conflict detection (lastSyncedAt comparison)
-  - [ ] 2.5 Implement `getDraftByContact()` with authorization check
-  - [ ] 2.6 Implement `listDrafts()` with pagination and sorting
-  - [ ] 2.7 Implement `deleteDraft()` with S3 cleanup job queuing
-  - [ ] 2.8 Verify all tests pass (unit tests for service layer)
+- [x] 2. Backend - Email Draft Service
+  - [x] 2.1 Write tests for EmailDraftService (auto-save, get, list, delete)
+  - [x] 2.2 Create `apps/api/src/email-draft/` module with NestJS CLI
+  - [x] 2.3 Implement EmailDraftService with Prisma operations
+  - [x] 2.4 Implement `autoSaveDraft()` with conflict detection (lastSyncedAt comparison)
+  - [x] 2.5 Implement `getDraftByContact()` with authorization check
+  - [x] 2.6 Implement `listDrafts()` with pagination and sorting
+  - [x] 2.7 Implement `deleteDraft()` with S3 cleanup job queuing
+  - [x] 2.8 Verify all tests pass (unit tests for service layer)
 
 - [ ] 3. Backend - Email Signature Service
   - [ ] 3.1 Write tests for EmailSignatureService (CRUD, default flags logic)
