@@ -52,17 +52,17 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 4.9 Implement `disconnect()` with Google API token revocation
   - [x] 4.10 Verify all tests pass
 
-- [ ] 5. Backend - Gmail Send Service
-  - [ ] 5.1 Write tests for GmailSendService (MIME email construction, attachment handling, API sending)
-  - [ ] 5.2 Create `apps/api/src/gmail-send/` module
-  - [ ] 5.3 Implement `buildMimeEmail()` with RFC 2822 format (headers + body)
-  - [ ] 5.4 Implement multipart MIME with base64 encoded attachments
-  - [ ] 5.5 Implement `sendEmail()` via Gmail API (`/gmail/v1/users/me/messages/send`)
-  - [ ] 5.6 Implement error handling for Gmail API errors (401, 429, 500) with retry logic
-  - [ ] 5.7 Implement sent email storage in `emails` table with gmailMessageId
-  - [ ] 5.8 Implement draft deletion after successful send
-  - [ ] 5.9 Implement conversation history entry creation
-  - [ ] 5.10 Verify all tests pass
+- [x] 5. Backend - Gmail Send Service
+  - [x] 5.1 Write tests for GmailSendService (MIME email construction, attachment handling, API sending)
+  - [x] 5.2 Create `apps/api/src/gmail-send/` module
+  - [x] 5.3 Implement `buildMimeEmail()` with RFC 2822 format (headers + body)
+  - [x] 5.4 Implement multipart MIME with base64 encoded attachments
+  - [x] 5.5 Implement `sendEmail()` via Gmail API (`/gmail/v1/users/me/messages/send`)
+  - [x] 5.6 Implement error handling for Gmail API errors (401, 429, 500) with retry logic
+  - [x] 5.7 Implement sent email storage in `emails` table with gmailMessageId
+  - [x] 5.8 Implement draft deletion after successful send
+  - [x] 5.9 Implement conversation history entry creation
+  - [x] 5.10 Verify all tests pass
 
 - [ ] 6. Backend - Attachment Service
   - [ ] 6.1 Write tests for AttachmentService (presigned URL generation, file validation, S3 deletion)
