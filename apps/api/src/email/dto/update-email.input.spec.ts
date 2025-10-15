@@ -7,8 +7,9 @@ describe('UpdateEmailInput', () => {
     expect(UpdateEmailInput).toBeDefined();
   });
 
-  it('should pass validation with no fields (all optional)', async () => {
+  it('should pass validation with only id field (other fields optional)', async () => {
     const input = new UpdateEmailInput();
+    input.id = 'email-123';
 
     const errors = await validate(input);
     expect(errors.length).toBe(0);
@@ -16,6 +17,7 @@ describe('UpdateEmailInput', () => {
 
   it('should pass validation with subject field', async () => {
     const input = new UpdateEmailInput();
+    input.id = 'email-123';
     input.subject = 'Updated subject';
 
     const errors = await validate(input);
@@ -46,6 +48,7 @@ describe('UpdateEmailInput', () => {
 
   it('should pass validation with body field', async () => {
     const input = new UpdateEmailInput();
+    input.id = 'email-123';
     input.body = 'Updated email body content...';
 
     const errors = await validate(input);
@@ -76,6 +79,7 @@ describe('UpdateEmailInput', () => {
 
   it('should pass validation with optional bodyHtml', async () => {
     const input = new UpdateEmailInput();
+    input.id = 'email-123';
     input.bodyHtml = '<p>Updated HTML content</p>';
 
     const errors = await validate(input);
@@ -84,6 +88,7 @@ describe('UpdateEmailInput', () => {
 
   it('should pass validation with valid EmailStatus', async () => {
     const input = new UpdateEmailInput();
+    input.id = 'email-123';
     input.status = EmailStatus.SCHEDULED;
 
     const errors = await validate(input);
@@ -103,6 +108,7 @@ describe('UpdateEmailInput', () => {
 
   it('should pass validation with valid TemplateType', async () => {
     const input = new UpdateEmailInput();
+    input.id = 'email-123';
     input.templateType = TemplateType.CUSTOM;
 
     const errors = await validate(input);
@@ -111,6 +117,7 @@ describe('UpdateEmailInput', () => {
 
   it('should pass validation with multiple fields', async () => {
     const input = new UpdateEmailInput();
+    input.id = 'email-123';
     input.subject = 'Updated subject';
     input.body = 'Updated body content...';
     input.bodyHtml = '<p>Updated HTML</p>';
