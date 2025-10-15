@@ -103,7 +103,8 @@ export class AIService {
     // Initialize OpenRouter (primary provider - unified access to multiple LLMs)
     if (openrouterKey) {
       this.openrouterClient = new ChatOpenAI({
-        modelName: 'openai/gpt-oss-20b:free', //'anthropic/claude-3.5-sonnet', // or 'openai/gpt-4-turbo' or 'google/gemini-2.0-flash-exp'
+        modelName: 'openai/gpt-oss-20b:free', // Free tier OpenRouter model
+        // Alternative models: 'anthropic/claude-3.5-sonnet', 'openai/gpt-4-turbo', 'google/gemini-2.0-flash-exp'
         temperature: 0.7,
         maxTokens: 500,
         timeout: 30000,
