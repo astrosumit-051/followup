@@ -13,9 +13,9 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [ ] 1.3 Create Prisma schema for `email_signatures` table with contentJson, default flags
   - [ ] 1.4 Create Prisma schema for `gmail_tokens` table with encrypted tokens, expiresAt
   - [ ] 1.5 Update `email_templates` table with isUserCreated, category, usageCount fields
-  - [ ] 1.6 Update `emails` table with gmailMessageId, gmailThreadId, signatureId, attachments fields
+  - [ ] 1.6 Update `emails` table with gmailMessageId, gmailThreadId, signatureId, attachments, campaignId, isColdEmail fields
   - [ ] 1.7 Run Prisma migration (`prisma migrate dev --name email-composition-gmail`)
-  - [ ] 1.8 Create seed data for test signatures and drafts
+  - [ ] 1.8 Create seed data for test signatures, drafts, and contacts
   - [ ] 1.9 Verify all tests pass
 
 - [ ] 2. Backend - Email Draft Service
@@ -88,8 +88,12 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [ ] 7.9 Implement `deleteDraft()` mutation
   - [ ] 7.10 Implement `createEmailSignature()`, `updateEmailSignature()`, `deleteEmailSignature()` mutations
   - [ ] 7.11 Implement `sendEmailViaGmail()` mutation with Gmail integration
-  - [ ] 7.12 Add rate limiting for email send (100 emails/day per user)
-  - [ ] 7.13 Verify all tests pass
+  - [ ] 7.12 Implement `sendBulkCampaignViaGmail()` mutation (accepts up to 100 contactIds)
+  - [ ] 7.13 Implement bulk send logic: generate campaignId, queue BullMQ jobs, rate limit 10/min
+  - [ ] 7.14 Implement `polishDraft()` mutation (AI refinement with 4 styles: Formal, Casual, Elaborate, Concise)
+  - [ ] 7.15 Add rate limiting for email send (100 emails/day per user cumulative)
+  - [ ] 7.16 Add rate limiting for Polish Draft (20 requests/min)
+  - [ ] 7.17 Verify all tests pass
 
 - [ ] 8. Backend - REST API Endpoints
   - [ ] 8.1 Write tests for Gmail OAuth REST endpoints
@@ -102,144 +106,218 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [ ] 8.8 Add rate limiting middleware to attachment endpoints
   - [ ] 8.9 Verify all tests pass
 
-- [ ] 9. Frontend - TipTap Editor Component
-  - [ ] 9.1 Write tests for EmailComposer component (rendering, formatting, toolbar)
-  - [ ] 9.2 Install TipTap packages (`@tiptap/react`, `@tiptap/starter-kit`, extensions)
-  - [ ] 9.3 Create `apps/web/components/email/EmailComposer.tsx` component
-  - [ ] 9.4 Implement TipTap editor with starter kit (Bold, Italic, Underline, Lists)
-  - [ ] 9.5 Implement custom toolbar with button states reflecting current selection
-  - [ ] 9.6 Add keyboard shortcuts (Cmd/Ctrl+B, I, U for formatting)
-  - [ ] 9.7 Implement subject input field with character count
-  - [ ] 9.8 Implement recipient field (pre-populated from contact)
-  - [ ] 9.9 Implement placeholder text: "Compose your email..."
-  - [ ] 9.10 Style editor with Tailwind CSS (min-height: 300px, max-height: 600px with scroll)
-  - [ ] 9.11 Verify all tests pass
+- [ ] 9. Frontend - Standalone Compose Page
+  - [ ] 9.1 Write tests for ComposePage component (layout, routing, contact pre-selection)
+  - [ ] 9.2 Create `apps/web/app/compose/page.tsx` route (standalone page, not modal)
+  - [ ] 9.3 Implement CSS Grid layout: 30% left sidebar, 70% right composer area
+  - [ ] 9.4 Implement responsive design (mobile <768px: single column, contact selector at top)
+  - [ ] 9.5 Implement deep linking: `/compose?contactId={id}&type={followup|cold}` pre-selects contact
+  - [ ] 9.6 Implement breadcrumb: "Compose > {Contact Name}" when contact selected
+  - [ ] 9.7 Add "Compose" tab to main navigation menu
+  - [ ] 9.8 Verify all tests pass
 
-- [ ] 10. Frontend - Auto-Save Hook
-  - [ ] 10.1 Write tests for useAutoSave hook (localStorage, DB sync, conflict detection)
-  - [ ] 10.2 Create `apps/web/hooks/useAutoSave.ts` hook
-  - [ ] 10.3 Implement localStorage save every 2 seconds with debounce (lodash.debounce)
-  - [ ] 10.4 Implement DB sync every 10 seconds with separate debounced API call
-  - [ ] 10.5 Implement save status indicator ("Saving..." → "Saved 5s ago")
-  - [ ] 10.6 Implement error handling (continue local saves if DB sync fails)
-  - [ ] 10.7 Implement cleanup on unmount (cancel pending debounced saves)
-  - [ ] 10.8 Verify all tests pass
+- [ ] 10. Frontend - Contact Selection Sidebar
+  - [ ] 10.1 Write tests for ContactSidebar component (search, filters, multi-select)
+  - [ ] 10.2 Install `react-select` package for multi-select dropdowns
+  - [ ] 10.3 Create `apps/web/components/email/ContactSidebar.tsx` component
+  - [ ] 10.4 Implement contact list with avatar, name, company, priority badge
+  - [ ] 10.5 Implement search bar with debounced text search (500ms) across name, email, company
+  - [ ] 10.6 Implement filter dropdowns: Company (multi-select), Industry, Role, Gender, Birthday Month, Priority
+  - [ ] 10.7 Implement filter logic: AND across categories, OR within category
+  - [ ] 10.8 Implement active filters indicator: "5 filters applied" badge with clear button
+  - [ ] 10.9 Implement filter persistence in URL params for shareable links
+  - [ ] 10.10 Implement multi-select checkboxes for campaign mode (Shift+Click for range selection)
+  - [ ] 10.11 Implement selected counter: "20 contacts selected" badge
+  - [ ] 10.12 Implement "Clear all" button when >0 contacts selected
+  - [ ] 10.13 Implement max 100 contacts validation with error message
+  - [ ] 10.14 Verify all tests pass
 
-- [ ] 11. Frontend - Draft Recovery Hook
-  - [ ] 11.1 Write tests for useDraftRecovery hook (timestamp comparison, recovery flow)
-  - [ ] 11.2 Create `apps/web/hooks/useDraftRecovery.ts` hook
-  - [ ] 11.3 Implement localStorage timestamp comparison with DB on mount
-  - [ ] 11.4 Implement recovery prompt modal (Recover / Discard buttons)
-  - [ ] 11.5 Implement "Recover" action (load localStorage content)
-  - [ ] 11.6 Implement "Discard" action (load DB content, clear localStorage)
-  - [ ] 11.7 Implement no-prompt flow if timestamps match or localStorage empty
-  - [ ] 11.8 Verify all tests pass
+- [ ] 11. Frontend - TipTap Editor Component
+  - [ ] 11.1 Write tests for EmailComposer component (rendering, formatting, toolbar)
+  - [ ] 11.2 Install TipTap packages (`@tiptap/react`, `@tiptap/starter-kit`, extensions)
+  - [ ] 11.3 Create `apps/web/components/email/EmailComposer.tsx` component
+  - [ ] 11.4 Implement TipTap editor with starter kit (Bold, Italic, Underline, Lists)
+  - [ ] 11.5 Implement custom toolbar with button states reflecting current selection
+  - [ ] 11.6 Add keyboard shortcuts (Cmd/Ctrl+B, I, U for formatting)
+  - [ ] 11.7 Implement subject input field with character count
+  - [ ] 11.8 Implement recipient display (shows selected contacts count in campaign mode)
+  - [ ] 11.9 Implement placeholder text: "Compose your email..."
+  - [ ] 11.10 Implement context indicator badge: "Follow-Up Email • {date}" or "Cold Email • First Contact"
+  - [ ] 11.11 Style editor with Tailwind CSS (min-height: 300px, max-height: 600px with scroll)
+  - [ ] 11.12 Verify all tests pass
 
-- [ ] 12. Frontend - File Upload Component
-  - [ ] 12.1 Write tests for FileUploadZone component (drag-drop, validation, upload progress)
-  - [ ] 12.2 Install `react-dropzone` package
-  - [ ] 12.3 Create `apps/web/components/email/FileUploadZone.tsx` component
-  - [ ] 12.4 Implement drag-and-drop zone with react-dropzone
-  - [ ] 12.5 Implement file type validation (PDF, DOC, DOCX, XLS, XLSX only)
-  - [ ] 12.6 Implement file size validation (25MB per file) with error messages
-  - [ ] 12.7 Implement presigned URL fetch from backend
-  - [ ] 12.8 Implement direct S3 upload with progress indicator (0-100%)
-  - [ ] 12.9 Implement concurrent upload limiting (max 3 files at a time)
-  - [ ] 12.10 Implement thumbnail generation for image attachments (Canvas API)
-  - [ ] 12.11 Implement attachment removal (queue S3 deletion)
-  - [ ] 12.12 Verify all tests pass
+- [ ] 12. Frontend - Auto-Save Hook
+  - [ ] 12.1 Write tests for useAutoSave hook (localStorage, DB sync, conflict detection)
+  - [ ] 12.2 Create `apps/web/hooks/useAutoSave.ts` hook
+  - [ ] 12.3 Implement localStorage save every 2 seconds with debounce (lodash.debounce)
+  - [ ] 12.4 Implement DB sync every 10 seconds with separate debounced API call
+  - [ ] 12.5 Implement save status indicator ("Saving..." → "Saved 5s ago")
+  - [ ] 12.6 Implement error handling (continue local saves if DB sync fails)
+  - [ ] 12.7 Implement cleanup on unmount (cancel pending debounced saves)
+  - [ ] 12.8 Verify all tests pass
 
-- [ ] 13. Frontend - Signature Components
-  - [ ] 13.1 Write tests for SignatureSelector component (dropdown, preview, auto-selection)
-  - [ ] 13.2 Create `apps/web/components/email/SignatureSelector.tsx` component
-  - [ ] 13.3 Implement signature dropdown with all user signatures
-  - [ ] 13.4 Implement default signature auto-selection based on context (formal/casual)
-  - [ ] 13.5 Implement manual signature switching
-  - [ ] 13.6 Implement signature preview on hover
-  - [ ] 13.7 Write tests for SignatureManager component (CRUD, settings page)
-  - [ ] 13.8 Create `apps/web/components/settings/SignatureManager.tsx` component
-  - [ ] 13.9 Implement signature list with preview cards
-  - [ ] 13.10 Implement "Create Signature" modal with TipTap editor
-  - [ ] 13.11 Implement default flag checkboxes (global, formal, casual)
-  - [ ] 13.12 Implement signature edit and delete with confirmation
-  - [ ] 13.13 Implement max 10 signatures enforcement (disable "Create" button)
-  - [ ] 13.14 Verify all tests pass
+- [ ] 13. Frontend - Draft Recovery Hook
+  - [ ] 13.1 Write tests for useDraftRecovery hook (timestamp comparison, recovery flow)
+  - [ ] 13.2 Create `apps/web/hooks/useDraftRecovery.ts` hook
+  - [ ] 13.3 Implement localStorage timestamp comparison with DB on mount
+  - [ ] 13.4 Implement recovery prompt modal (Recover / Discard buttons)
+  - [ ] 13.5 Implement "Recover" action (load localStorage content)
+  - [ ] 13.6 Implement "Discard" action (load DB content, clear localStorage)
+  - [ ] 13.7 Implement no-prompt flow if timestamps match or localStorage empty
+  - [ ] 13.8 Verify all tests pass
 
-- [ ] 14. Frontend - AI Template Modal
-  - [ ] 14.1 Write tests for AITemplateModal component (loading, template display, regeneration)
-  - [ ] 14.2 Create `apps/web/components/email/AITemplateModal.tsx` component
-  - [ ] 14.3 Implement "Generate with AI" button in composer
-  - [ ] 14.4 Implement modal with loading state (spinner, 2-5s expected)
-  - [ ] 14.5 Implement formal and casual template display with preview
-  - [ ] 14.6 Implement "Use This Template" button (loads into composer)
-  - [ ] 14.7 Implement "Regenerate" button (triggers new AI generation)
-  - [ ] 14.8 Implement error state (AI generation failed)
-  - [ ] 14.9 Implement modal close on "Cancel" or template selection
-  - [ ] 14.10 Verify all tests pass
+- [ ] 14. Frontend - File Upload Component
+  - [ ] 14.1 Write tests for FileUploadZone component (drag-drop, validation, upload progress)
+  - [ ] 14.2 Install `react-dropzone` package
+  - [ ] 14.3 Create `apps/web/components/email/FileUploadZone.tsx` component
+  - [ ] 14.4 Implement drag-and-drop zone with react-dropzone
+  - [ ] 14.5 Implement file type validation (PDF, DOC, DOCX, XLS, XLSX only)
+  - [ ] 14.6 Implement file size validation (25MB per file) with error messages
+  - [ ] 14.7 Implement presigned URL fetch from backend
+  - [ ] 14.8 Implement direct S3 upload with progress indicator (0-100%)
+  - [ ] 14.9 Implement concurrent upload limiting (max 3 files at a time)
+  - [ ] 14.10 Implement thumbnail generation for image attachments (Canvas API)
+  - [ ] 14.11 Implement attachment removal (queue S3 deletion)
+  - [ ] 14.12 Verify all tests pass
 
-- [ ] 15. Frontend - Gmail OAuth Integration
-  - [ ] 15.1 Write tests for useGmailAuth hook (OAuth popup, callback handling)
-  - [ ] 15.2 Install `@react-oauth/google` package
-  - [ ] 15.3 Create `apps/web/hooks/useGmailAuth.ts` hook
-  - [ ] 15.4 Implement "Connect Gmail" button in Settings
-  - [ ] 15.5 Implement OAuth popup window opening (redirect to `/api/auth/gmail/authorize`)
-  - [ ] 15.6 Implement callback message listener (postMessage from popup)
-  - [ ] 15.7 Implement connection status polling after callback
-  - [ ] 15.8 Implement error handling (user cancels, invalid permissions)
-  - [ ] 15.9 Implement "Disconnect Gmail" button with confirmation
-  - [ ] 15.10 Verify all tests pass
+- [ ] 15. Frontend - Signature Components
+  - [ ] 15.1 Write tests for SignatureSelector component (dropdown, preview, auto-selection)
+  - [ ] 15.2 Create `apps/web/components/email/SignatureSelector.tsx` component
+  - [ ] 15.3 Implement signature dropdown with all user signatures
+  - [ ] 15.4 Implement default signature auto-selection based on context (formal/casual)
+  - [ ] 15.5 Implement manual signature switching
+  - [ ] 15.6 Implement signature preview on hover
+  - [ ] 15.7 Write tests for SignatureManager component (CRUD, settings page)
+  - [ ] 15.8 Create `apps/web/components/settings/SignatureManager.tsx` component
+  - [ ] 15.9 Implement signature list with preview cards
+  - [ ] 15.10 Implement "Create Signature" modal with TipTap editor
+  - [ ] 15.11 Implement default flag checkboxes (global, formal, casual)
+  - [ ] 15.12 Implement signature edit and delete with confirmation
+  - [ ] 15.13 Implement max 10 signatures enforcement (disable "Create" button)
+  - [ ] 15.14 Verify all tests pass
 
-- [ ] 16. Frontend - Template Library UI
-  - [ ] 16.1 Write tests for TemplateLibrary component (list, load, save, delete)
-  - [ ] 16.2 Create `apps/web/components/email/TemplateLibrary.tsx` component
-  - [ ] 16.3 Implement "Save as Template" button in composer
-  - [ ] 16.4 Implement save template modal with name input and category selection
-  - [ ] 16.5 Implement template list view (grouped by category: follow-up, introduction, thank-you)
-  - [ ] 16.6 Implement template preview cards with hover effect
-  - [ ] 16.7 Implement "Load Template" action (loads into composer)
-  - [ ] 16.8 Implement template edit modal (update name, category, content)
-  - [ ] 16.9 Implement template delete with confirmation dialog
-  - [ ] 16.10 Verify all tests pass
+- [ ] 16. Frontend - A/B Template Modal (Side-by-Side Display)
+  - [ ] 16.1 Write tests for AITemplateModal component (loading, side-by-side display, regeneration)
+  - [ ] 16.2 Create `apps/web/components/email/AITemplateModal.tsx` component
+  - [ ] 16.3 Implement "Generate with AI" button in composer
+  - [ ] 16.4 Implement modal with 80% viewport width, max 1200px
+  - [ ] 16.5 Implement two-column grid: Template A (left 50%) | Template B (right 50%)
+  - [ ] 16.6 Implement vertical divider between templates
+  - [ ] 16.7 Implement responsive design (mobile: tabs instead of columns)
+  - [ ] 16.8 Implement template cards with header badges (blue for Formal, green for Casual)
+  - [ ] 16.9 Implement loading skeletons for both columns during AI generation (2-5s)
+  - [ ] 16.10 Implement "Use Template A" and "Use Template B" action buttons
+  - [ ] 16.11 Implement "Regenerate Both" button below templates
+  - [ ] 16.12 Implement error state (AI generation failed)
+  - [ ] 16.13 Implement modal close on "Cancel" or template selection
+  - [ ] 16.14 Verify all tests pass
 
-- [ ] 17. Integration Testing
-  - [ ] 17.1 Write E2E test for complete email composition workflow
-  - [ ] 17.2 Test: Load composer → Generate AI template → Edit → Upload attachment → Send via Gmail
-  - [ ] 17.3 Test: Auto-save localStorage (2s) → DB sync (10s) → Save indicator updates
-  - [ ] 17.4 Test: Browser crash → Recovery prompt → Restore draft from localStorage
-  - [ ] 17.5 Test: Gmail OAuth flow → Connect → Send email → Verify in Gmail inbox
-  - [ ] 17.6 Test: Signature auto-selection → Formal template → Formal signature loaded
-  - [ ] 17.7 Test: Template library → Save draft as template → Load template → Edit and send
-  - [ ] 17.8 Verify all integration tests pass
+- [ ] 17. Frontend - Polish Draft Modal
+  - [ ] 17.1 Write tests for PolishDraftModal component (4-style grid, word count)
+  - [ ] 17.2 Create `apps/web/components/email/PolishDraftModal.tsx` component
+  - [ ] 17.3 Implement "Polish Draft" button in composer
+  - [ ] 17.4 Implement modal with 90% viewport width, max 1400px
+  - [ ] 17.5 Implement 2x2 grid layout for 4 style options (Formal, Casual, Elaborate, Concise)
+  - [ ] 17.6 Implement responsive design (mobile: single column with tabs)
+  - [ ] 17.7 Implement style cards with header badges and word count diff ("150 words (-20%)")
+  - [ ] 17.8 Implement loading skeletons for all 4 cards during AI refinement (2-4s)
+  - [ ] 17.9 Implement "Use This Version" button on each card
+  - [ ] 17.10 Implement selection action (replace TipTap content, preserve attachments/signature)
+  - [ ] 17.11 Verify all tests pass
 
-- [ ] 18. Security & Performance
-  - [ ] 18.1 Run Semgrep scan on email composition code (focus: XSS, file upload, OAuth)
-  - [ ] 18.2 Test file upload security (reject .exe, .py, .json, >25MB files)
-  - [ ] 18.3 Test Gmail token encryption (verify tokens never in API responses)
-  - [ ] 18.4 Test authorization (user cannot access other users' drafts/signatures)
-  - [ ] 18.5 Test rate limiting (60 auto-saves/min, 100 emails/day)
-  - [ ] 18.6 Performance test: Auto-save localStorage (<5ms) and DB sync (<200ms)
-  - [ ] 18.7 Performance test: File upload (25MB in <10s)
-  - [ ] 18.8 Performance test: Email send with attachments (<5s total)
-  - [ ] 18.9 Verify 80%+ test coverage
-  - [ ] 18.10 Fix any Semgrep findings or performance issues
+- [ ] 18. Frontend - Dynamic CTA on Contact Detail Page
+  - [ ] 18.1 Write tests for Contact Detail page CTA logic (conversation history check)
+  - [ ] 18.2 Update `apps/web/app/contacts/[id]/page.tsx` component
+  - [ ] 18.3 Implement GraphQL query to check conversation history count for contact
+  - [ ] 18.4 Implement conditional CTA rendering: "Follow Up" (blue, bg-blue-600) if count > 0
+  - [ ] 18.5 Implement conditional CTA rendering: "Cold Email" (orange/amber, bg-orange-500) if count === 0
+  - [ ] 18.6 Implement navigation to `/compose?contactId={id}&type={followup|cold}` on click
+  - [ ] 18.7 Verify all tests pass
 
-- [ ] 19. Documentation & Environment Setup
-  - [ ] 19.1 Update `.env.example` with Gmail OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI)
-  - [ ] 19.2 Update `.env.example` with AWS S3 configuration (S3_BUCKET, S3_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
-  - [ ] 19.3 Update `.env.example` with encryption key for Gmail tokens (ENCRYPTION_KEY)
-  - [ ] 19.4 Create Gmail API project setup guide (`docs/GMAIL_OAUTH_SETUP.md`)
-  - [ ] 19.5 Create S3 bucket configuration guide (`docs/S3_ATTACHMENT_SETUP.md`)
-  - [ ] 19.6 Update `apps/web/README.md` with email composer usage documentation
-  - [ ] 19.7 Update GraphQL schema documentation comments
-  - [ ] 19.8 Create troubleshooting guide for common issues (OAuth errors, S3 upload failures)
+- [ ] 19. Frontend - Gmail OAuth Integration
+  - [ ] 19.1 Write tests for useGmailAuth hook (OAuth popup, callback handling)
+  - [ ] 19.2 Install `@react-oauth/google` package
+  - [ ] 19.3 Create `apps/web/hooks/useGmailAuth.ts` hook
+  - [ ] 19.4 Implement "Connect Gmail" button in Settings
+  - [ ] 19.5 Implement OAuth popup window opening (redirect to `/api/auth/gmail/authorize`)
+  - [ ] 19.6 Implement callback message listener (postMessage from popup)
+  - [ ] 19.7 Implement connection status polling after callback
+  - [ ] 19.8 Implement error handling (user cancels, invalid permissions)
+  - [ ] 19.9 Implement "Disconnect Gmail" button with confirmation
+  - [ ] 19.10 Verify all tests pass
 
-- [ ] 20. Final Verification & PR
-  - [ ] 20.1 Run full test suite (unit + integration + E2E) and verify all passing
-  - [ ] 20.2 Test manual flow: Compose → AI generate → Upload → Auto-save → Recover → Send
-  - [ ] 20.3 Test Gmail OAuth connection in staging environment
-  - [ ] 20.4 Test S3 attachment upload in staging environment
-  - [ ] 20.5 Verify email sent via Gmail API appears in actual Gmail inbox
-  - [ ] 20.6 Run Semgrep final security scan (0 critical findings)
-  - [ ] 20.7 Verify test coverage meets 80% minimum
-  - [ ] 20.8 Create pull request with comprehensive description
-  - [ ] 20.9 Update roadmap.md to mark "Email Composition Interface" and "Gmail OAuth Integration" as complete
+- [ ] 20. Frontend - Template Library UI
+  - [ ] 20.1 Write tests for TemplateLibrary component (list, load, save, delete)
+  - [ ] 20.2 Create `apps/web/components/email/TemplateLibrary.tsx` component
+  - [ ] 20.3 Implement "Save as Template" button in composer
+  - [ ] 20.4 Implement save template modal with name input and category selection
+  - [ ] 20.5 Implement template list view (grouped by category: follow-up, introduction, thank-you)
+  - [ ] 20.6 Implement template preview cards with hover effect
+  - [ ] 20.7 Implement "Load Template" action (loads into composer)
+  - [ ] 20.8 Implement template edit modal (update name, category, content)
+  - [ ] 20.9 Implement template delete with confirmation dialog
+  - [ ] 20.10 Verify all tests pass
+
+- [ ] 21. Integration Testing
+  - [ ] 21.1 Write E2E test for complete email composition workflow
+  - [ ] 21.2 Test: Load composer → Generate AI template → Edit → Upload attachment → Send via Gmail
+  - [ ] 21.3 Test: Auto-save localStorage (2s) → DB sync (10s) → Save indicator updates
+  - [ ] 21.4 Test: Browser crash → Recovery prompt → Restore draft from localStorage
+  - [ ] 21.5 Test: Gmail OAuth flow → Connect → Send email → Verify in Gmail inbox
+  - [ ] 21.6 Test: Signature auto-selection → Formal template → Formal signature loaded
+  - [ ] 21.7 Test: Template library → Save draft as template → Load template → Edit and send
+  - [ ] 21.8 Test: Bulk campaign workflow → Select 20 contacts via sidebar → Send campaign → Verify all sent
+  - [ ] 21.9 Test: Bulk campaign placeholders → {{firstName}} and {{company}} replaced per contact
+  - [ ] 21.10 Test: Bulk campaign progress indicator → "Sending 5/20..." updates during send
+  - [ ] 21.11 Test: Bulk campaign error handling → Some emails fail, summary shows "18 sent, 2 failed"
+  - [ ] 21.12 Test: Polish Draft workflow → Type rough draft → Click "Polish Draft" → Select style → Verify content replaced
+  - [ ] 21.13 Test: Polish Draft 4-style grid → All 4 versions displayed (Formal, Casual, Elaborate, Concise)
+  - [ ] 21.14 Test: Polish Draft word count diff → Verify "150 words (-20%)" accuracy
+  - [ ] 21.15 Test: A/B Template side-by-side display → Both templates shown, divider visible
+  - [ ] 21.16 Test: A/B Template responsive → Mobile shows tabs instead of columns
+  - [ ] 21.17 Test: Dynamic CTA navigation → "Follow Up" button redirects to /compose?contactId={id}&type=followup
+  - [ ] 21.18 Test: Dynamic CTA navigation → "Cold Email" button redirects to /compose?contactId={id}&type=cold
+  - [ ] 21.19 Test: Contact sidebar filters → Apply Company + Industry filters → Verify filtered results
+  - [ ] 21.20 Test: Contact sidebar search → Debounced text search (500ms) → Verify results
+  - [ ] 21.21 Verify all integration tests pass
+
+- [ ] 22. Security & Performance
+  - [ ] 22.1 Run Semgrep scan on email composition code (focus: XSS, file upload, OAuth)
+  - [ ] 22.2 Test file upload security (reject .exe, .py, .json, >25MB files)
+  - [ ] 22.3 Test Gmail token encryption (verify tokens never in API responses)
+  - [ ] 22.4 Test authorization (user cannot access other users' drafts/signatures)
+  - [ ] 22.5 Test rate limiting (60 auto-saves/min, 100 emails/day, 20 Polish Draft/min)
+  - [ ] 22.6 Performance test: Auto-save localStorage (<5ms) and DB sync (<200ms)
+  - [ ] 22.7 Performance test: File upload (25MB in <10s)
+  - [ ] 22.8 Performance test: Email send with attachments (<5s total)
+  - [ ] 22.9 Performance test: Bulk send 100 emails with rate limiting (10 emails/min, 10 minutes total)
+  - [ ] 22.10 Performance test: Polish Draft AI refinement (all 4 styles in <5s)
+  - [ ] 22.11 Security test: Bulk send max 100 contacts enforcement (reject 101+ contacts)
+  - [ ] 22.12 Security test: Campaign placeholder injection prevention (validate {{firstName}} and {{company}})
+  - [ ] 22.13 Verify 80%+ test coverage
+  - [ ] 22.14 Fix any Semgrep findings or performance issues
+
+- [ ] 23. Documentation & Environment Setup
+  - [ ] 23.1 Update `.env.example` with Gmail OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI)
+  - [ ] 23.2 Update `.env.example` with AWS S3 configuration (S3_BUCKET, S3_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+  - [ ] 23.3 Update `.env.example` with encryption key for Gmail tokens (ENCRYPTION_KEY)
+  - [ ] 23.4 Create Gmail API project setup guide (`docs/GMAIL_OAUTH_SETUP.md`)
+  - [ ] 23.5 Create S3 bucket configuration guide (`docs/S3_ATTACHMENT_SETUP.md`)
+  - [ ] 23.6 Update `apps/web/README.md` with email composer usage documentation
+  - [ ] 23.7 Update `apps/web/README.md` with bulk campaign and Polish Draft feature documentation
+  - [ ] 23.8 Update GraphQL schema documentation comments
+  - [ ] 23.9 Create troubleshooting guide for common issues (OAuth errors, S3 upload failures, bulk send failures)
+
+- [ ] 24. Final Verification & PR
+  - [ ] 24.1 Run full test suite (unit + integration + E2E) and verify all passing
+  - [ ] 24.2 Test manual flow: Compose → AI generate → Upload → Auto-save → Recover → Send
+  - [ ] 24.3 Test manual bulk campaign flow: Select 10 contacts → Send campaign → Verify all sent
+  - [ ] 24.4 Test manual Polish Draft flow: Write rough draft → Polish → Select Formal → Send
+  - [ ] 24.5 Test Gmail OAuth connection in staging environment
+  - [ ] 24.6 Test S3 attachment upload in staging environment
+  - [ ] 24.7 Verify email sent via Gmail API appears in actual Gmail inbox
+  - [ ] 24.8 Verify bulk campaign emails appear in Gmail Sent folder with correct campaignId
+  - [ ] 24.9 Run Semgrep final security scan (0 critical findings)
+  - [ ] 24.10 Verify test coverage meets 80% minimum
+  - [ ] 24.11 Create pull request with comprehensive description
+  - [ ] 24.12 Update roadmap.md to mark "Email Composition Interface", "Gmail OAuth Integration", "A/B Template Display", "Polish Draft Feature", and "Bulk Campaign Mode" as complete
