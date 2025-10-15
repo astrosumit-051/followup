@@ -16,97 +16,97 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 1.6 Create seed data for development/testing
   - [x] 1.7 Verify all tests pass (30 tests passing)
 
-- [ ] 2. LangChain Integration Module
-  - [ ] 2.1 Write tests for AIService with mocked LLM responses
-  - [ ] 2.2 Install dependencies: `langchain`, `@langchain/openai`, `@langchain/anthropic`, `ioredis`
-  - [ ] 2.3 Create `apps/api/src/ai/` module with NestJS CLI
-  - [ ] 2.4 Implement AIService with LangChain setup (OpenAI + Anthropic providers)
-  - [ ] 2.5 Configure environment variables for API keys (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`)
-  - [ ] 2.6 Implement provider fallback chain logic
-  - [ ] 2.7 Verify all tests pass
+- [x] 2. LangChain Integration Module ✅ **COMPLETED**
+  - [x] 2.1 Write tests for AIService with mocked LLM responses (7 tests passing)
+  - [x] 2.2 Install dependencies: `langchain`, `@langchain/openai`, `@langchain/anthropic`, `ioredis`, `zod`
+  - [x] 2.3 Create `apps/api/src/ai/` module with NestJS CLI
+  - [x] 2.4 Implement AIService with LangChain setup (OpenAI + Anthropic providers)
+  - [x] 2.5 Configure environment variables for API keys (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`)
+  - [x] 2.6 Implement provider fallback chain logic
+  - [x] 2.7 Verify all tests pass (7/7 tests passing)
 
-- [ ] 3. Prompt Engineering & Template System
-  - [ ] 3.1 Write tests for prompt building with various contact contexts
-  - [ ] 3.2 Create system prompt defining AI role as networking assistant
-  - [ ] 3.3 Build prompt template with variable substitution (name, company, role, notes, priority)
-  - [ ] 3.4 Create few-shot examples for high-quality email generation
-  - [ ] 3.5 Implement separate prompts for formal vs casual styles
-  - [ ] 3.6 Add conversation history injection into prompts
-  - [ ] 3.7 Implement input sanitization for prompt injection protection
-  - [ ] 3.8 Verify all tests pass
+- [x] 3. Prompt Engineering & Template System ✅ **COMPLETED**
+  - [x] 3.1 Write tests for prompt building with various contact contexts (18 comprehensive tests)
+  - [x] 3.2 Create system prompt defining AI role as networking assistant (already implemented, validated with tests)
+  - [x] 3.3 Build prompt template with variable substitution (already implemented, validated with tests)
+  - [x] 3.4 Create few-shot examples for high-quality email generation (already implemented, validated with tests)
+  - [x] 3.5 Implement separate prompts for formal vs casual styles (already implemented, validated with tests)
+  - [x] 3.6 Add conversation history injection into prompts (already implemented, validated with tests)
+  - [x] 3.7 Implement input sanitization for prompt injection protection (XML-style delimiters + explicit instructions)
+  - [x] 3.8 Verify all tests pass (25/25 tests passing)
 
-- [ ] 4. Email Generation Service
-  - [ ] 4.1 Write tests for email generation with formal/casual variants
-  - [ ] 4.2 Implement `generateEmailTemplate()` method in AIService
-  - [ ] 4.3 Fetch contact data from database (Prisma)
-  - [ ] 4.4 Fetch conversation history (last 5 entries)
-  - [ ] 4.5 Build AI prompt with full context
-  - [ ] 4.6 Call LangChain with formal style prompt
-  - [ ] 4.7 Call LangChain with casual style prompt
-  - [ ] 4.8 Parse LLM responses into structured format
-  - [ ] 4.9 Track providerId and tokensUsed
-  - [ ] 4.10 Verify all tests pass
+- [x] 4. Email Generation Service ✅ **COMPLETED**
+  - [x] 4.1 Write tests for email generation with formal/casual variants (6 integration tests added)
+  - [x] 4.2 Implement `generateEmailTemplate()` method in AIService (already implemented)
+  - [x] 4.3 Fetch contact data from database (Prisma) (already implemented)
+  - [x] 4.4 Fetch conversation history (last 5 entries) (already implemented)
+  - [x] 4.5 Build AI prompt with full context (already implemented with sanitization)
+  - [x] 4.6 Call LangChain with formal style prompt (already implemented)
+  - [x] 4.7 Call LangChain with casual style prompt (already implemented)
+  - [x] 4.8 Parse LLM responses into structured format (already implemented with Zod validation)
+  - [x] 4.9 Track providerId and tokensUsed (already implemented)
+  - [x] 4.10 Verify all tests pass (31/31 tests passing)
 
-- [ ] 5. Redis Caching Layer
-  - [ ] 5.1 Write tests for cache hit/miss scenarios
-  - [ ] 5.2 Configure Redis connection in app.module.ts
-  - [ ] 5.3 Implement cache key generation (hash of userId + contactId + context)
-  - [ ] 5.4 Implement cache lookup before LLM call
-  - [ ] 5.5 Implement cache storage with 1-hour TTL
-  - [ ] 5.6 Implement cache invalidation on contact data change
-  - [ ] 5.7 Add cache metrics logging (hit/miss rate)
-  - [ ] 5.8 Verify all tests pass
+- [x] 5. Redis Caching Layer ✅ **COMPLETED**
+  - [x] 5.1 Write tests for cache hit/miss scenarios
+  - [x] 5.2 Configure Redis connection in app.module.ts
+  - [x] 5.3 Implement cache key generation (hash of userId + contactId + context)
+  - [x] 5.4 Implement cache lookup before LLM call
+  - [x] 5.5 Implement cache storage with 1-hour TTL
+  - [x] 5.6 Implement cache invalidation on contact data change
+  - [x] 5.7 Add cache metrics logging (hit/miss rate)
+  - [x] 5.8 Verify all tests pass
 
-- [ ] 6. Email Module & Service
-  - [ ] 6.1 Write tests for EmailService CRUD operations
-  - [ ] 6.2 Create `apps/api/src/email/` module with NestJS CLI
-  - [ ] 6.3 Implement EmailService with Prisma for database operations
-  - [ ] 6.4 Implement `createEmail()` method
-  - [ ] 6.5 Implement `findUserEmails()` with pagination
-  - [ ] 6.6 Implement `updateEmail()` with validation (drafts only)
-  - [ ] 6.7 Implement `deleteEmail()` method
-  - [ ] 6.8 Implement `getConversationHistory()` method
-  - [ ] 6.9 Implement `createConversationEntry()` method
-  - [ ] 6.10 Verify all tests pass
+- [x] 6. Email Module & Service ✅ **COMPLETED**
+  - [x] 6.1 Write tests for EmailService CRUD operations
+  - [x] 6.2 Create `apps/api/src/email/` module with NestJS CLI
+  - [x] 6.3 Implement EmailService with Prisma for database operations
+  - [x] 6.4 Implement `createEmail()` method
+  - [x] 6.5 Implement `findUserEmails()` with pagination
+  - [x] 6.6 Implement `updateEmail()` with validation (drafts only)
+  - [x] 6.7 Implement `deleteEmail()` method
+  - [x] 6.8 Implement `getConversationHistory()` method
+  - [x] 6.9 Implement `createConversationEntry()` method
+  - [x] 6.10 Verify all tests pass
 
-- [ ] 7. GraphQL Schema & Types
-  - [ ] 7.1 Write tests for GraphQL type definitions
-  - [ ] 7.2 Define `Email` type with all fields
-  - [ ] 7.3 Define `EmailTemplate` type
-  - [ ] 7.4 Define `ConversationHistory` type
-  - [ ] 7.5 Define `GeneratedEmailTemplate` type (with formal/casual variants)
-  - [ ] 7.6 Define enums: `EmailStatus`, `TemplateType`, `Direction`
-  - [ ] 7.7 Define input types: `GenerateEmailInput`, `SaveEmailInput`, etc.
-  - [ ] 7.8 Generate GraphQL schema with NestJS code-first approach
-  - [ ] 7.9 Verify all tests pass
+- [x] 7. GraphQL Schema & Types ✅ **COMPLETED**
+  - [x] 7.1 Write tests for GraphQL type definitions (76 tests passing: 27 entity tests + 49 DTO tests)
+  - [x] 7.2 Define `Email` type with all fields
+  - [x] 7.3 Define `EmailTemplate` type
+  - [x] 7.4 Define `ConversationHistory` type
+  - [x] 7.5 Define `GeneratedEmailTemplate` type (with formal/casual variants)
+  - [x] 7.6 Define enums: `EmailStatus`, `TemplateType`, `Direction`
+  - [x] 7.7 Define input types: `GenerateEmailInput`, `SaveEmailInput`, etc.
+  - [x] 7.8 Generate GraphQL schema with NestJS code-first approach (automatically generated)
+  - [x] 7.9 Verify all tests pass (all 76 tests passing)
 
-- [ ] 8. GraphQL Resolvers - Queries
-  - [ ] 8.1 Write tests for all query resolvers
-  - [ ] 8.2 Implement `email(id: ID!)` query with authorization
-  - [ ] 8.3 Implement `emails()` query with pagination and filters
-  - [ ] 8.4 Implement `conversationHistory()` query
-  - [ ] 8.5 Implement `emailTemplates()` query
-  - [ ] 8.6 Add authorization guards (user must own resources)
-  - [ ] 8.7 Verify all tests pass
+- [x] 8. GraphQL Resolvers - Queries ✅ **COMPLETED**
+  - [x] 8.1 Write tests for all query resolvers (39 tests created)
+  - [x] 8.2 Implement `email(id: ID!)` query with authorization
+  - [x] 8.3 Implement `emails()` query with pagination and filters
+  - [x] 8.4 Implement `conversationHistory()` query
+  - [x] 8.5 Implement `emailTemplates()` query
+  - [x] 8.6 Add authorization guards (user must own resources)
+  - [x] 8.7 Verify all tests pass (all 39 tests passing)
 
-- [ ] 9. GraphQL Resolvers - Mutations (Core Feature)
-  - [ ] 9.1 Write tests for generateEmailTemplate mutation
-  - [ ] 9.2 Implement `generateEmailTemplate()` mutation
-  - [ ] 9.3 Connect to AIService for template generation
-  - [ ] 9.4 Store both formal and casual drafts in database
-  - [ ] 9.5 Return GeneratedEmailTemplate response
-  - [ ] 9.6 Add rate limiting (10 req/min per user)
-  - [ ] 9.7 Add error handling for AI service failures
-  - [ ] 9.8 Verify all tests pass
+- [x] 9. GraphQL Resolvers - Mutations (Core Feature) ✅ **COMPLETED**
+  - [x] 9.1 Write tests for generateEmailTemplate mutation (17 comprehensive tests, 55/55 tests passing)
+  - [x] 9.2 Implement `generateEmailTemplate()` mutation
+  - [x] 9.3 Connect to AIService for template generation
+  - [x] 9.4 ~~Store both formal and casual drafts in database~~ (NOT APPLICABLE - per spec, storage is handled by separate `saveEmail` mutation in Task 10)
+  - [x] 9.5 Return GeneratedEmailTemplate response
+  - [x] 9.6 Add rate limiting (10 req/min per user)
+  - [x] 9.7 Add error handling for AI service failures
+  - [x] 9.8 Verify all tests pass (55/55 tests passing)
 
-- [ ] 10. GraphQL Resolvers - Email CRUD Mutations
-  - [ ] 10.1 Write tests for email CRUD mutations
-  - [ ] 10.2 Implement `saveEmail()` mutation
-  - [ ] 10.3 Create conversation history entry when status=SENT
-  - [ ] 10.4 Implement `updateEmail()` mutation with draft-only validation
-  - [ ] 10.5 Implement `deleteEmail()` mutation
-  - [ ] 10.6 Add input sanitization (prevent XSS)
-  - [ ] 10.7 Verify all tests pass
+- [x] 10. GraphQL Resolvers - Email CRUD Mutations ✅ **COMPLETED**
+  - [x] 10.1 Write tests for email CRUD mutations (28 comprehensive tests written)
+  - [x] 10.2 Implement `saveEmail()` mutation (with XSS sanitization)
+  - [x] 10.3 Create conversation history entry when status=SENT
+  - [x] 10.4 Implement `updateEmail()` mutation with draft-only validation
+  - [x] 10.5 Implement `deleteEmail()` mutation
+  - [x] 10.6 Add input sanitization (prevent XSS with sanitize-html)
+  - [x] 10.7 Verify all tests pass (77/77 tests passing)
 
 - [ ] 11. GraphQL Resolvers - Template Mutations
   - [ ] 11.1 Write tests for template CRUD mutations
