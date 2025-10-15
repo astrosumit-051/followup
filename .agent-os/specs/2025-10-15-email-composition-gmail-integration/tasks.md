@@ -28,17 +28,17 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 2.7 Implement `deleteDraft()` with S3 cleanup job queuing
   - [x] 2.8 Verify all tests pass (unit tests for service layer)
 
-- [ ] 3. Backend - Email Signature Service
-  - [ ] 3.1 Write tests for EmailSignatureService (CRUD, default flags logic)
-  - [ ] 3.2 Create `apps/api/src/email-signature/` module with NestJS CLI
-  - [ ] 3.3 Implement EmailSignatureService with Prisma
-  - [ ] 3.4 Implement `createSignature()` with max 10 signatures enforcement
-  - [ ] 3.5 Implement `createSignature()` with default flag conflict resolution (unset others)
-  - [ ] 3.6 Implement `updateSignature()` with same default flag logic
-  - [ ] 3.7 Implement `listSignatures()` sorted alphabetically
-  - [ ] 3.8 Implement `deleteSignature()` with referential integrity (set drafts to null)
-  - [ ] 3.9 Implement `getDefaultSignature()` with context-based selection (formal/casual/global)
-  - [ ] 3.10 Verify all tests pass
+- [x] 3. Backend - Email Signature Service
+  - [x] 3.1 Write tests for EmailSignatureService (CRUD, default flags logic)
+  - [x] 3.2 Create `apps/api/src/email-signature/` module with NestJS CLI
+  - [x] 3.3 Implement EmailSignatureService with Prisma
+  - [x] 3.4 Implement `createSignature()` with max 10 signatures enforcement
+  - [x] 3.5 Implement `createSignature()` with default flag conflict resolution (unset others)
+  - [x] 3.6 Implement `updateSignature()` with same default flag logic
+  - [x] 3.7 Implement `listSignatures()` sorted alphabetically
+  - [x] 3.8 Implement `deleteSignature()` with referential integrity (set drafts to null)
+  - [x] 3.9 Implement `getDefaultSignature()` with context-based selection (formal/casual/global)
+  - [x] 3.10 Verify all tests pass
 
 - [ ] 4. Backend - Gmail OAuth Service
   - [ ] 4.1 Write tests for GmailOAuthService (auth URL, token exchange, refresh, disconnect)
