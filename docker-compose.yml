@@ -27,11 +27,29 @@ services:
       - '6379:6379'
     volumes:
       - redis_data:/data
+    # Optional: Enable password protection for production
+    # command: redis-server --requirepass ${REDIS_PASSWORD:-developmentpassword}
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
+    # Enable RDB persistence (saves to disk every 60s if 1+ keys changed)
+    command: redis-server --save 60 1 --loglevel warning
+
+  # Optional: Redis Commander for debugging (comment out for production)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: relationhub-redis-commander
+    restart: unless-stopped
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - '8081:8081'
+    depends_on:
+      - redis
+    profiles:
+      - debug  # Only starts when running: docker-compose --profile debug up
 
   web:
     build:
@@ -66,8 +84,29 @@ services:
       - /app/node_modules
       - /app/apps/api/node_modules
     environment:
+      # Database
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/relationhub_dev?schema=public
+
+      # Application
       - PORT=3001
+      - NODE_ENV=development
+
+      # Redis Cache
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # - REDIS_PASSWORD=${REDIS_PASSWORD}  # Uncomment if Redis password enabled
+
+      # LLM Providers (pass through from host .env)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - APP_URL=${APP_URL:-http://localhost:3001}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+      # Supabase (pass through from host .env)
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
     depends_on:
       postgres:
         condition: service_healthy

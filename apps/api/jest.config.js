@@ -1,7 +1,7 @@
 module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
-  testRegex: '.*\\.spec\\.ts$',
+  testRegex: '.*\\.(spec|e2e-spec)\\.ts$',
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
@@ -13,6 +13,7 @@ module.exports = {
     '^@relationhub/database$': '<rootDir>/../../packages/database/src',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(jose)/)',
+    'node_modules/(?!jose)',
   ],
+  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
 };

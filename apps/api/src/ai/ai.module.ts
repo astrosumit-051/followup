@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AIService } from './ai.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { MetricsModule } from '../metrics/metrics.module';
 
 /**
  * AI Module
@@ -21,7 +22,7 @@ import { ConfigModule } from '@nestjs/config';
  * - ANTHROPIC_API_KEY: Anthropic API key for Claude access
  */
 @Module({
-  imports: [PrismaModule, ConfigModule],
+  imports: [PrismaModule, ConfigModule, MetricsModule],
   providers: [AIService],
   exports: [AIService],
 })

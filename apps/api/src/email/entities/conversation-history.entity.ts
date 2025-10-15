@@ -25,7 +25,7 @@ export class ConversationHistory {
   @Field()
   contactId!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   emailId?: string | null;
 
   @Field()
@@ -34,7 +34,7 @@ export class ConversationHistory {
   @Field(() => Direction)
   direction!: Direction;
 
-  @Field()
+  @Field(() => Date)
   timestamp!: Date;
 
   @Field(() => GraphQLJSONObject, { nullable: true })

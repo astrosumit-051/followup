@@ -23,21 +23,21 @@ export class EmailTemplate {
   @Field()
   body!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   bodyHtml?: string | null;
 
   @Field()
   isDefault!: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   category?: string | null;
 
   @Field(() => Int)
   usageCount!: number;
 
-  @Field()
+  @Field(() => Date)
   createdAt!: Date;
 
-  @Field()
+  @Field(() => Date)
   updatedAt!: Date;
 }

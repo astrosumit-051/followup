@@ -15,6 +15,7 @@ import { AIModule } from './ai/ai.module';
 import { CacheModule } from './cache/cache.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EmailModule } from './email/email.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 
 /**
@@ -84,6 +85,7 @@ import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
     AIModule,
     CacheModule,
     EmailModule,
+    MetricsModule,
   ],
   controllers: [AppController],
   providers: [
