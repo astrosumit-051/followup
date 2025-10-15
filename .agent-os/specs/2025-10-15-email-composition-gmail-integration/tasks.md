@@ -40,17 +40,17 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 3.9 Implement `getDefaultSignature()` with context-based selection (formal/casual/global)
   - [x] 3.10 Verify all tests pass
 
-- [ ] 4. Backend - Gmail OAuth Service
-  - [ ] 4.1 Write tests for GmailOAuthService (auth URL, token exchange, refresh, disconnect)
-  - [ ] 4.2 Install `googleapis` package and configure Google API client
-  - [ ] 4.3 Create `apps/api/src/gmail-oauth/` module
-  - [ ] 4.4 Implement `getAuthorizationUrl()` with correct scopes (gmail.send, gmail.readonly)
-  - [ ] 4.5 Implement `handleCallback()` to exchange auth code for tokens
-  - [ ] 4.6 Implement token encryption with AES-256-GCM (encryption key from environment variable)
-  - [ ] 4.7 Implement token storage in `gmail_tokens` table
-  - [ ] 4.8 Implement `refreshTokenIfNeeded()` with expiry check
-  - [ ] 4.9 Implement `disconnect()` with Google API token revocation
-  - [ ] 4.10 Verify all tests pass
+- [x] 4. Backend - Gmail OAuth Service
+  - [x] 4.1 Write tests for GmailOAuthService (auth URL, token exchange, refresh, disconnect)
+  - [x] 4.2 Install `googleapis` package and configure Google API client
+  - [x] 4.3 Create `apps/api/src/gmail-oauth/` module
+  - [x] 4.4 Implement `getAuthorizationUrl()` with correct scopes (gmail.send, gmail.readonly)
+  - [x] 4.5 Implement `handleCallback()` to exchange auth code for tokens
+  - [x] 4.6 Implement token encryption with AES-256-GCM (encryption key from environment variable)
+  - [x] 4.7 Implement token storage in `gmail_tokens` table
+  - [x] 4.8 Implement `refreshTokenIfNeeded()` with expiry check
+  - [x] 4.9 Implement `disconnect()` with Google API token revocation
+  - [x] 4.10 Verify all tests pass
 
 - [ ] 5. Backend - Gmail Send Service
   - [ ] 5.1 Write tests for GmailSendService (MIME email construction, attachment handling, API sending)
