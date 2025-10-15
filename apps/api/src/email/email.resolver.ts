@@ -14,6 +14,7 @@ import { Email, EmailTemplate, ConversationHistory, EmailConnection, GeneratedEm
 import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput } from './dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { AuthenticatedUser } from '../auth/authenticated-user.interface';
 import { EmailStatus, Direction } from './enums';
 
 /**
@@ -55,22 +56,20 @@ export class EmailResolver {
    *
    * @param user - Current user from JWT (injected by @CurrentUser decorator)
    * @param id - Email ID
-   * @returns Email if found and owned by user, null otherwise
+   * @returns Email if found and owned by user
    * @throws NotFoundException if email not found or user doesn't own it
    */
-  @Query(() => Email, { name: 'email', nullable: true })
+  @Query(() => Email, { name: 'email' })
   async findOne(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
-  ): Promise<Email | null> {
-    // Find email and verify ownership
-    const email = await this.emailService['prisma'].email.findUnique({
-      where: { id },
-    });
+  ): Promise<Email> {
+    const email = await this.emailService.findEmailById(id, user.id);
 
-    // Return null if not found or user doesn't own it
-    if (!email || email.userId !== user.id) {
-      return null;
+    if (!email) {
+      throw new NotFoundException(
+        `Email with ID ${id} not found or you do not have access to it`
+      );
     }
 
     return email as Email;
@@ -85,7 +84,7 @@ export class EmailResolver {
    */
   @Query(() => EmailConnection, { name: 'emails' })
   async findAll(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Args('input', { type: () => FindEmailsInput, nullable: true })
     input?: FindEmailsInput,
   ): Promise<EmailConnection> {
@@ -115,7 +114,7 @@ export class EmailResolver {
    */
   @Query(() => [ConversationHistory], { name: 'conversationHistory' })
   async conversationHistory(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Args('contactId', { type: () => ID }) contactId: string,
     @Args('limit', { type: () => Number, nullable: true, defaultValue: 5 }) limit: number,
   ): Promise<ConversationHistory[]> {
@@ -130,16 +129,9 @@ export class EmailResolver {
    */
   @Query(() => [EmailTemplate], { name: 'emailTemplates' })
   async emailTemplates(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<EmailTemplate[]> {
-    return this.emailService['prisma'].emailTemplate.findMany({
-      where: { userId: user.id },
-      orderBy: [
-        { isDefault: 'desc' }, // Default templates first
-        { usageCount: 'desc' }, // Then by popularity
-        { createdAt: 'desc' }, // Then by creation date
-      ],
-    });
+    return this.emailService.findTemplatesByUserId(user.id) as Promise<EmailTemplate[]>;
   }
 
   /**
@@ -178,7 +170,7 @@ export class EmailResolver {
   @Mutation(() => GeneratedEmailTemplate)
   @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   async generateEmailTemplate(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Args('input', { type: () => GenerateEmailInput }) input: GenerateEmailInput,
   ): Promise<GeneratedEmailTemplate> {
     this.logger.log(`Generating email templates for user ${user.id}, contact ${input.contactId}`);
@@ -277,7 +269,7 @@ export class EmailResolver {
    */
   @Mutation(() => Email)
   async saveEmail(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Args('input', { type: () => SaveEmailInput }) input: SaveEmailInput,
   ): Promise<Email> {
     this.logger.log(`Saving email for user ${user.id}, contact ${input.contactId}`);
@@ -349,28 +341,10 @@ export class EmailResolver {
    */
   @Mutation(() => Email)
   async updateEmail(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Args('input', { type: () => UpdateEmailInput }) input: UpdateEmailInput,
   ): Promise<Email> {
     this.logger.log(`Updating email ${input.id} for user ${user.id}`);
-
-    // First, verify email exists and user owns it
-    const existingEmail = await this.emailService['prisma'].email.findUnique({
-      where: { id: input.id },
-    });
-
-    if (!existingEmail || existingEmail.userId !== user.id) {
-      throw new NotFoundException(
-        `Email with ID ${input.id} not found or you do not have access to it`,
-      );
-    }
-
-    // Verify email is a draft
-    if (existingEmail.status !== EmailStatus.DRAFT) {
-      throw new ForbiddenException(
-        `Cannot update email with status ${existingEmail.status}. Only draft emails can be updated.`,
-      );
-    }
 
     // Sanitize input to prevent XSS
     const sanitizedInput = {
@@ -381,13 +355,8 @@ export class EmailResolver {
       templateType: input.templateType,
     };
 
-    try {
-      const updatedEmail = await this.emailService.updateEmail(input.id, user.id, sanitizedInput);
-      return updatedEmail as Email;
-    } catch (error) {
-      this.logger.error(`Failed to update email ${input.id} for user ${user.id}`, error);
-      throw error;
-    }
+    // Service handles authorization and draft-only validation
+    return this.emailService.updateEmail(input.id, user.id, sanitizedInput) as Promise<Email>;
   }
 
   /**
@@ -410,28 +379,13 @@ export class EmailResolver {
    */
   @Mutation(() => Boolean)
   async deleteEmail(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
     this.logger.log(`Deleting email ${id} for user ${user.id}`);
 
-    // First, verify email exists and user owns it
-    const existingEmail = await this.emailService['prisma'].email.findUnique({
-      where: { id },
-    });
-
-    if (!existingEmail || existingEmail.userId !== user.id) {
-      throw new NotFoundException(
-        `Email with ID ${id} not found or you do not have access to it`,
-      );
-    }
-
-    try {
-      await this.emailService.deleteEmail(id, user.id);
-      return true;
-    } catch (error) {
-      this.logger.error(`Failed to delete email ${id} for user ${user.id}`, error);
-      throw error;
-    }
+    // Service handles authorization and deletion
+    await this.emailService.deleteEmail(id, user.id);
+    return true;
   }
 }

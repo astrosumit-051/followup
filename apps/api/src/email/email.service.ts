@@ -117,6 +117,58 @@ export class EmailService {
   }
 
   /**
+   * Finds a single email by ID with ownership verification
+   * @param emailId - Email ID
+   * @param userId - User ID (for authorization)
+   * @returns Email if found and owned by user, null otherwise
+   */
+  async findEmailById(emailId: string, userId: string): Promise<Email | null> {
+    this.logger.log(`Finding email ${emailId} for user ${userId}`);
+
+    try {
+      const email = await this.prisma.email.findUnique({
+        where: { id: emailId },
+      });
+
+      // Return null if email doesn't exist or user doesn't own it
+      if (!email || email.userId !== userId) {
+        return null;
+      }
+
+      return email;
+    } catch (error) {
+      this.logger.error(`Failed to find email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Finds all email templates for a user
+   * @param userId - User ID
+   * @returns Array of email templates owned by the user
+   */
+  async findTemplatesByUserId(userId: string): Promise<any[]> {
+    this.logger.log(`Finding email templates for user ${userId}`);
+
+    try {
+      const templates = await this.prisma.emailTemplate.findMany({
+        where: { userId },
+        orderBy: [
+          { isDefault: 'desc' }, // Default templates first
+          { usageCount: 'desc' }, // Then by popularity
+          { createdAt: 'desc' }, // Then by creation date
+        ],
+      });
+
+      this.logger.log(`Found ${templates.length} templates for user ${userId}`);
+      return templates;
+    } catch (error) {
+      this.logger.error(`Failed to find templates: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
+    }
+  }
+
+  /**
    * Updates an email (only drafts can be updated)
    * @param emailId - Email ID
    * @param userId - User ID (for authorization)

@@ -22,12 +22,9 @@ describe('EmailResolver', () => {
 
   const mockUser = {
     id: 'user-123',
-    supabaseId: 'supabase-user-123',
     email: 'test@example.com',
     name: 'Test User',
-    profilePicture: null,
-    provider: 'email',
-    role: 'authenticated',
+    profilePicture: undefined,
   };
 
   const mockEmail = {
@@ -70,22 +67,16 @@ describe('EmailResolver', () => {
     createdAt: new Date('2025-10-13'),
   };
 
-  // Mock EmailService with Prisma access
+  // Mock EmailService with new methods
   const mockEmailService = {
     findUserEmails: jest.fn(),
+    findEmailById: jest.fn(),
+    findTemplatesByUserId: jest.fn(),
     getConversationHistory: jest.fn(),
     createEmail: jest.fn(),
     updateEmail: jest.fn(),
     deleteEmail: jest.fn(),
     createConversationEntry: jest.fn(),
-    prisma: {
-      email: {
-        findUnique: jest.fn(),
-      },
-      emailTemplate: {
-        findMany: jest.fn(),
-      },
-    },
   };
 
   // Mock AIService
@@ -121,44 +112,36 @@ describe('EmailResolver', () => {
 
   describe('email query (single email retrieval)', () => {
     it('should return email when found and owned by user', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
+      mockEmailService.findEmailById.mockResolvedValue(mockEmail);
 
       const result = await resolver.findOne(mockUser, 'email-456');
 
       expect(result).toEqual(mockEmail);
-      expect(service['prisma'].email.findUnique).toHaveBeenCalledWith({
-        where: { id: 'email-456' },
-      });
-      expect(service['prisma'].email.findUnique).toHaveBeenCalledTimes(1);
+      expect(service.findEmailById).toHaveBeenCalledWith('email-456', 'user-123');
+      expect(service.findEmailById).toHaveBeenCalledTimes(1);
     });
 
-    it('should return null when email not found', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(null);
+    it('should throw NotFoundException when email not found', async () => {
+      mockEmailService.findEmailById.mockResolvedValue(null);
 
-      const result = await resolver.findOne(mockUser, 'nonexistent-id');
-
-      expect(result).toBeNull();
-      expect(service['prisma'].email.findUnique).toHaveBeenCalledWith({
-        where: { id: 'nonexistent-id' },
-      });
-    });
-
-    it('should return null when email belongs to different user', async () => {
-      const differentUserEmail = { ...mockEmail, userId: 'user-different' };
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(
-        differentUserEmail,
+      await expect(resolver.findOne(mockUser, 'nonexistent-id')).rejects.toThrow(
+        'Email with ID nonexistent-id not found or you do not have access to it'
       );
+      expect(service.findEmailById).toHaveBeenCalledWith('nonexistent-id', 'user-123');
+    });
 
-      const result = await resolver.findOne(mockUser, 'email-456');
+    it('should throw NotFoundException when email belongs to different user', async () => {
+      // Service returns null when user doesn't own the email
+      mockEmailService.findEmailById.mockResolvedValue(null);
 
-      expect(result).toBeNull();
-      expect(service['prisma'].email.findUnique).toHaveBeenCalledWith({
-        where: { id: 'email-456' },
-      });
+      await expect(resolver.findOne(mockUser, 'email-456')).rejects.toThrow(
+        'Email with ID email-456 not found or you do not have access to it'
+      );
+      expect(service.findEmailById).toHaveBeenCalledWith('email-456', 'user-123');
     });
 
     it('should verify user ownership before returning email', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
+      mockEmailService.findEmailById.mockResolvedValue(mockEmail);
 
       const result = await resolver.findOne(mockUser, 'email-456');
 
@@ -169,14 +152,13 @@ describe('EmailResolver', () => {
     it('should call service with correct user ID from @CurrentUser decorator', async () => {
       const differentUser = { ...mockUser, id: 'user-999' };
       const differentUserEmail = { ...mockEmail, userId: 'user-999' };
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(
-        differentUserEmail,
-      );
+      mockEmailService.findEmailById.mockResolvedValue(differentUserEmail);
 
       const result = await resolver.findOne(differentUser, 'email-456');
 
       expect(result).toEqual(differentUserEmail);
       expect(result?.userId).toBe('user-999');
+      expect(service.findEmailById).toHaveBeenCalledWith('email-456', 'user-999');
     });
   });
 
@@ -444,25 +426,19 @@ describe('EmailResolver', () => {
 
   describe('emailTemplates query', () => {
     it('should return all templates for user', async () => {
-      mockEmailService.prisma.emailTemplate.findMany.mockResolvedValue([
+      mockEmailService.findTemplatesByUserId.mockResolvedValue([
         mockEmailTemplate,
       ]);
 
       const result = await resolver.emailTemplates(mockUser);
 
       expect(result).toEqual([mockEmailTemplate]);
-      expect(service['prisma'].emailTemplate.findMany).toHaveBeenCalledWith({
-        where: { userId: 'user-123' },
-        orderBy: [
-          { isDefault: 'desc' },
-          { usageCount: 'desc' },
-          { createdAt: 'desc' },
-        ],
-      });
+      expect(service.findTemplatesByUserId).toHaveBeenCalledWith('user-123');
+      expect(service.findTemplatesByUserId).toHaveBeenCalledTimes(1);
     });
 
     it('should return empty array when no templates found', async () => {
-      mockEmailService.prisma.emailTemplate.findMany.mockResolvedValue([]);
+      mockEmailService.findTemplatesByUserId.mockResolvedValue([]);
 
       const result = await resolver.emailTemplates(mockUser);
 
@@ -483,7 +459,7 @@ describe('EmailResolver', () => {
         isDefault: false,
         usageCount: 20,
       };
-      mockEmailService.prisma.emailTemplate.findMany.mockResolvedValue([
+      mockEmailService.findTemplatesByUserId.mockResolvedValue([
         template1,
         template2,
       ]);
@@ -491,14 +467,7 @@ describe('EmailResolver', () => {
       const result = await resolver.emailTemplates(mockUser);
 
       expect(result).toHaveLength(2);
-      expect(service['prisma'].emailTemplate.findMany).toHaveBeenCalledWith({
-        where: { userId: 'user-123' },
-        orderBy: [
-          { isDefault: 'desc' },
-          { usageCount: 'desc' },
-          { createdAt: 'desc' },
-        ],
-      });
+      expect(service.findTemplatesByUserId).toHaveBeenCalledWith('user-123');
     });
 
     it('should return multiple templates', async () => {
@@ -507,55 +476,39 @@ describe('EmailResolver', () => {
         { ...mockEmailTemplate, id: 'template-2', name: 'Template 2' },
         { ...mockEmailTemplate, id: 'template-3', name: 'Template 3' },
       ];
-      mockEmailService.prisma.emailTemplate.findMany.mockResolvedValue(
-        templates,
-      );
+      mockEmailService.findTemplatesByUserId.mockResolvedValue(templates);
 
       const result = await resolver.emailTemplates(mockUser);
 
       expect(result).toHaveLength(3);
     });
 
-    it('should enforce user ownership via where clause', async () => {
-      mockEmailService.prisma.emailTemplate.findMany.mockResolvedValue([
+    it('should enforce user ownership via service layer', async () => {
+      mockEmailService.findTemplatesByUserId.mockResolvedValue([
         mockEmailTemplate,
       ]);
 
       await resolver.emailTemplates(mockUser);
 
-      expect(service['prisma'].emailTemplate.findMany).toHaveBeenCalledWith({
-        where: { userId: 'user-123' },
-        orderBy: [
-          { isDefault: 'desc' },
-          { usageCount: 'desc' },
-          { createdAt: 'desc' },
-        ],
-      });
+      expect(service.findTemplatesByUserId).toHaveBeenCalledWith('user-123');
     });
 
     it('should inject correct user ID from @CurrentUser decorator', async () => {
       const differentUser = { ...mockUser, id: 'user-different' };
-      mockEmailService.prisma.emailTemplate.findMany.mockResolvedValue([
+      mockEmailService.findTemplatesByUserId.mockResolvedValue([
         { ...mockEmailTemplate, userId: 'user-different' },
       ]);
 
       await resolver.emailTemplates(differentUser);
 
-      expect(service['prisma'].emailTemplate.findMany).toHaveBeenCalledWith({
-        where: { userId: 'user-different' },
-        orderBy: [
-          { isDefault: 'desc' },
-          { usageCount: 'desc' },
-          { createdAt: 'desc' },
-        ],
-      });
+      expect(service.findTemplatesByUserId).toHaveBeenCalledWith('user-different');
     });
   });
 
   describe('resolver integration with service layer', () => {
     it('should handle database errors on findOne', async () => {
       const dbError = new Error('Database connection failed');
-      mockEmailService.prisma.email.findUnique.mockRejectedValue(dbError);
+      mockEmailService.findEmailById.mockRejectedValue(dbError);
 
       await expect(resolver.findOne(mockUser, 'email-456')).rejects.toThrow(
         'Database connection failed',
@@ -582,9 +535,7 @@ describe('EmailResolver', () => {
 
     it('should handle database errors on emailTemplates', async () => {
       const dbError = new Error('Database connection lost');
-      mockEmailService.prisma.emailTemplate.findMany.mockRejectedValue(
-        dbError,
-      );
+      mockEmailService.findTemplatesByUserId.mockRejectedValue(dbError);
 
       await expect(resolver.emailTemplates(mockUser)).rejects.toThrow(
         'Database connection lost',
@@ -636,7 +587,7 @@ describe('EmailResolver', () => {
     });
 
     it('should only return emails owned by authenticated user', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
+      mockEmailService.findEmailById.mockResolvedValue(mockEmail);
 
       const result = await resolver.findOne(mockUser, 'email-456');
 
@@ -644,17 +595,13 @@ describe('EmailResolver', () => {
     });
 
     it('should filter templates by user ownership', async () => {
-      mockEmailService.prisma.emailTemplate.findMany.mockResolvedValue([
+      mockEmailService.findTemplatesByUserId.mockResolvedValue([
         mockEmailTemplate,
       ]);
 
       await resolver.emailTemplates(mockUser);
 
-      expect(service['prisma'].emailTemplate.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: mockUser.id },
-        }),
-      );
+      expect(service.findTemplatesByUserId).toHaveBeenCalledWith(mockUser.id);
     });
 
     it('should pass userId to service for authorization checks', async () => {
@@ -1130,11 +1077,9 @@ describe('EmailResolver', () => {
     beforeEach(() => {
       jest.clearAllMocks();
       mockEmailService.updateEmail = jest.fn();
-      mockEmailService.prisma.email.findUnique = jest.fn();
     });
 
     it('should update email draft successfully', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
       mockEmailService.updateEmail.mockResolvedValue(mockUpdatedEmail);
 
       const result = await resolver.updateEmail(mockUser, mockUpdateInput);
@@ -1153,7 +1098,6 @@ describe('EmailResolver', () => {
     it('should only update specified fields (partial update)', async () => {
       const partialUpdate = { id: 'email-456', subject: 'New Subject Only' };
 
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
       mockEmailService.updateEmail.mockResolvedValue({ ...mockEmail, subject: 'New Subject Only' });
 
       await resolver.updateEmail(mockUser, partialUpdate);
@@ -1167,34 +1111,32 @@ describe('EmailResolver', () => {
       );
     });
 
-    it('should reject update if email is not a draft', async () => {
-      const sentEmail = { ...mockEmail, status: EmailStatus.SENT };
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(sentEmail);
+    it('should delegate authorization checks to service layer', async () => {
+      // Service throws exception for unauthorized access
+      const authError = new Error('Unauthorized to update this email');
+      mockEmailService.updateEmail.mockRejectedValue(authError);
 
       await expect(
         resolver.updateEmail(mockUser, mockUpdateInput),
-      ).rejects.toThrow('Cannot update email with status SENT. Only draft emails can be updated.');
+      ).rejects.toThrow('Unauthorized to update this email');
 
-      expect(service.updateEmail).not.toHaveBeenCalled();
+      expect(service.updateEmail).toHaveBeenCalledWith(
+        'email-456',
+        'user-123',
+        expect.any(Object)
+      );
     });
 
-    it('should reject update if user does not own the email', async () => {
-      const differentUserEmail = { ...mockEmail, userId: 'user-different' };
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(differentUserEmail);
+    it('should delegate draft-only validation to service layer', async () => {
+      // Service throws exception for non-draft updates
+      const draftError = new Error('Only draft emails can be updated');
+      mockEmailService.updateEmail.mockRejectedValue(draftError);
 
       await expect(
         resolver.updateEmail(mockUser, mockUpdateInput),
-      ).rejects.toThrow('Email with ID email-456 not found or you do not have access to it');
+      ).rejects.toThrow('Only draft emails can be updated');
 
-      expect(service.updateEmail).not.toHaveBeenCalled();
-    });
-
-    it('should reject update if email not found', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(null);
-
-      await expect(
-        resolver.updateEmail(mockUser, mockUpdateInput),
-      ).rejects.toThrow('Email with ID email-456 not found or you do not have access to it');
+      expect(service.updateEmail).toHaveBeenCalled();
     });
 
     it('should sanitize updated content', async () => {
@@ -1204,7 +1146,6 @@ describe('EmailResolver', () => {
         body: 'Body with <img src=x onerror=alert("xss")>',
       };
 
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
       mockEmailService.updateEmail.mockResolvedValue(mockUpdatedEmail);
 
       await resolver.updateEmail(mockUser, inputWithXSS);
@@ -1217,7 +1158,6 @@ describe('EmailResolver', () => {
     it('should allow updating only body without subject', async () => {
       const bodyOnlyUpdate = { id: 'email-456', body: 'New body only' };
 
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
       mockEmailService.updateEmail.mockResolvedValue({ ...mockEmail, body: 'New body only' });
 
       await resolver.updateEmail(mockUser, bodyOnlyUpdate);
@@ -1233,9 +1173,7 @@ describe('EmailResolver', () => {
 
     it('should pass correct userId from @CurrentUser decorator', async () => {
       const differentUser = { ...mockUser, id: 'user-different' };
-      const differentUserEmail = { ...mockEmail, userId: 'user-different' };
 
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(differentUserEmail);
       mockEmailService.updateEmail.mockResolvedValue(mockUpdatedEmail);
 
       await resolver.updateEmail(differentUser, mockUpdateInput);
@@ -1254,11 +1192,9 @@ describe('EmailResolver', () => {
     beforeEach(() => {
       jest.clearAllMocks();
       mockEmailService.deleteEmail = jest.fn();
-      mockEmailService.prisma.email.findUnique = jest.fn();
     });
 
     it('should delete email successfully', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
       mockEmailService.deleteEmail.mockResolvedValue(undefined);
 
       const result = await resolver.deleteEmail(mockUser, 'email-456');
@@ -1268,9 +1204,7 @@ describe('EmailResolver', () => {
     });
 
     it('should delete draft emails', async () => {
-      const draftEmail = { ...mockEmail, status: EmailStatus.DRAFT };
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(draftEmail);
-      mockEmailService.deleteEmail.mockResolvedValue(true);
+      mockEmailService.deleteEmail.mockResolvedValue(undefined);
 
       const result = await resolver.deleteEmail(mockUser, 'email-456');
 
@@ -1279,39 +1213,41 @@ describe('EmailResolver', () => {
     });
 
     it('should delete sent emails', async () => {
-      const sentEmail = { ...mockEmail, status: EmailStatus.SENT };
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(sentEmail);
-      mockEmailService.deleteEmail.mockResolvedValue(true);
+      mockEmailService.deleteEmail.mockResolvedValue(undefined);
 
       const result = await resolver.deleteEmail(mockUser, 'email-456');
 
       expect(result).toBe(true);
+      expect(service.deleteEmail).toHaveBeenCalled();
     });
 
-    it('should reject delete if user does not own the email', async () => {
-      const differentUserEmail = { ...mockEmail, userId: 'user-different' };
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(differentUserEmail);
+    it('should delegate authorization checks to service layer', async () => {
+      // Service throws exception for unauthorized access
+      const authError = new Error('Unauthorized to delete this email');
+      mockEmailService.deleteEmail.mockRejectedValue(authError);
 
       await expect(
         resolver.deleteEmail(mockUser, 'email-456'),
-      ).rejects.toThrow('Email with ID email-456 not found or you do not have access to it');
+      ).rejects.toThrow('Unauthorized to delete this email');
 
-      expect(service.deleteEmail).not.toHaveBeenCalled();
+      expect(service.deleteEmail).toHaveBeenCalledWith('email-456', 'user-123');
     });
 
-    it('should reject delete if email not found', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(null);
+    it('should delegate not found check to service layer', async () => {
+      // Service throws NotFoundException
+      const notFoundError = new Error('Email not found');
+      mockEmailService.deleteEmail.mockRejectedValue(notFoundError);
 
       await expect(
         resolver.deleteEmail(mockUser, 'email-456'),
-      ).rejects.toThrow('Email with ID email-456 not found or you do not have access to it');
+      ).rejects.toThrow('Email not found');
+
+      expect(service.deleteEmail).toHaveBeenCalledWith('email-456', 'user-123');
     });
 
     it('should pass correct userId from @CurrentUser decorator', async () => {
       const differentUser = { ...mockUser, id: 'user-different' };
-      const differentUserEmail = { ...mockEmail, userId: 'user-different' };
 
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(differentUserEmail);
       mockEmailService.deleteEmail.mockResolvedValue(undefined);
 
       await resolver.deleteEmail(differentUser, 'email-456');
@@ -1320,7 +1256,6 @@ describe('EmailResolver', () => {
     });
 
     it('should handle database errors gracefully', async () => {
-      mockEmailService.prisma.email.findUnique.mockResolvedValue(mockEmail);
       const dbError = new Error('Database connection failed');
       mockEmailService.deleteEmail.mockRejectedValue(dbError);
 
