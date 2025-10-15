@@ -268,6 +268,7 @@ export class EmailResolver {
    * ```
    */
   @Mutation(() => Email)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
   async saveEmail(
     @CurrentUser() user: AuthenticatedUser,
     @Args('input', { type: () => SaveEmailInput }) input: SaveEmailInput,
@@ -340,6 +341,7 @@ export class EmailResolver {
    * ```
    */
   @Mutation(() => Email)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
   async updateEmail(
     @CurrentUser() user: AuthenticatedUser,
     @Args('input', { type: () => UpdateEmailInput }) input: UpdateEmailInput,
@@ -378,6 +380,7 @@ export class EmailResolver {
    * ```
    */
   @Mutation(() => Boolean)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
   async deleteEmail(
     @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
@@ -420,6 +423,7 @@ export class EmailResolver {
    * ```
    */
   @Mutation(() => EmailTemplate)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
   async createEmailTemplate(
     @CurrentUser() user: AuthenticatedUser,
     @Args('input', { type: () => CreateEmailTemplateInput }) input: CreateEmailTemplateInput,
@@ -477,6 +481,7 @@ export class EmailResolver {
    * ```
    */
   @Mutation(() => EmailTemplate)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
   async updateEmailTemplate(
     @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
@@ -521,6 +526,7 @@ export class EmailResolver {
    * ```
    */
   @Mutation(() => Boolean)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
   async deleteEmailTemplate(
     @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
