@@ -226,8 +226,9 @@ ${contact.linkedinUrl ? `- LinkedIn: ${contact.linkedinUrl}` : ''}
 
     const historyContext = conversationHistory.length > 0
       ? `\n\nPrevious Conversation History (most recent first):\n${conversationHistory.map((entry, idx) => {
-          const bodyPreview = entry.body.substring(0, 200);
-          return `${idx + 1}. [${entry.direction}] Subject: ${this.sanitizeInput(entry.subject, 'email-subject')}\n   Body: ${this.sanitizeInput(bodyPreview, 'email-body')}...`;
+          const bodyPreview = entry.content.substring(0, 200);
+          const subject = entry.metadata?.subject || 'No subject';
+          return `${idx + 1}. [${entry.direction}] Subject: ${this.sanitizeInput(subject, 'email-subject')}\n   Body: ${this.sanitizeInput(bodyPreview, 'email-body')}...`;
         }).join('\n')}`
       : '\n\nNo previous conversation history.';
 
