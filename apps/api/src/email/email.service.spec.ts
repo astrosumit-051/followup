@@ -13,6 +13,14 @@ const mockPrismaService = {
     delete: jest.fn(),
     count: jest.fn(),
   },
+  emailTemplate: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    updateMany: jest.fn(),
+    delete: jest.fn(),
+  },
   conversationHistory: {
     create: jest.fn(),
     findMany: jest.fn(),
@@ -104,6 +112,7 @@ describe('EmailService', () => {
           ...createDto,
           status: EmailStatus.DRAFT,
           generatedAt: expect.any(Date),
+          sentAt: null,
         },
       });
       expect(result).toEqual(mockEmail);
@@ -134,6 +143,7 @@ describe('EmailService', () => {
           ...minimalDto,
           status: EmailStatus.DRAFT,
           generatedAt: expect.any(Date),
+          sentAt: null,
         },
       });
       expect(result).toEqual(minimalEmail);
@@ -438,6 +448,380 @@ describe('EmailService', () => {
       const result = await service.createConversationEntry(entryDto);
 
       expect(result).toEqual(mockEntry);
+    });
+  });
+
+  describe('findTemplatesByUserId', () => {
+    const mockTemplate = {
+      id: 'template-123',
+      userId: 'user-123',
+      name: 'Follow-up Template',
+      subject: 'Following up on our conversation',
+      body: 'Hi {{name}},\n\nIt was great meeting you...',
+      bodyHtml: '<p>Hi {{name}},</p><p>It was great meeting you...</p>',
+      isDefault: false,
+      category: 'Networking',
+      usageCount: 5,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it('should return all templates for a user', async () => {
+      const templates = [
+        mockTemplate,
+        { ...mockTemplate, id: 'template-124', isDefault: true, usageCount: 10 },
+      ];
+
+      prisma.emailTemplate.findMany.mockResolvedValue(templates);
+
+      const result = await service.findTemplatesByUserId('user-123');
+
+      expect(prisma.emailTemplate.findMany).toHaveBeenCalledWith({
+        where: { userId: 'user-123' },
+        orderBy: [
+          { isDefault: 'desc' },
+          { usageCount: 'desc' },
+          { createdAt: 'desc' },
+        ],
+      });
+      expect(result).toEqual(templates);
+    });
+
+    it('should return empty array for user with no templates', async () => {
+      prisma.emailTemplate.findMany.mockResolvedValue([]);
+
+      const result = await service.findTemplatesByUserId('user-999');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle database errors gracefully', async () => {
+      prisma.emailTemplate.findMany.mockRejectedValue(new Error('Database error'));
+
+      await expect(service.findTemplatesByUserId('user-123')).rejects.toThrow('Database error');
+    });
+  });
+
+  describe('createTemplate', () => {
+    const mockTemplate = {
+      id: 'template-123',
+      userId: 'user-123',
+      name: 'Follow-up Template',
+      subject: 'Following up',
+      body: 'Template body',
+      bodyHtml: null,
+      isDefault: false,
+      category: 'Networking',
+      usageCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it('should create a new template', async () => {
+      const templateData = {
+        name: 'Follow-up Template',
+        subject: 'Following up',
+        body: 'Template body',
+        category: 'Networking',
+      };
+
+      prisma.emailTemplate.create.mockResolvedValue(mockTemplate);
+
+      const result = await service.createTemplate('user-123', templateData);
+
+      expect(prisma.emailTemplate.create).toHaveBeenCalledWith({
+        data: {
+          userId: 'user-123',
+          name: templateData.name,
+          subject: templateData.subject,
+          body: templateData.body,
+          bodyHtml: null,
+          isDefault: false,
+          category: templateData.category,
+          usageCount: 0,
+        },
+      });
+      expect(result).toEqual(mockTemplate);
+    });
+
+    it('should create template with isDefault=true and unset other defaults', async () => {
+      const templateData = {
+        name: 'Default Template',
+        subject: 'Test',
+        body: 'Body',
+        isDefault: true,
+      };
+
+      const defaultTemplate = {
+        ...mockTemplate,
+        name: 'Default Template',
+        isDefault: true,
+      };
+
+      prisma.emailTemplate.updateMany.mockResolvedValue({ count: 2 });
+      prisma.emailTemplate.create.mockResolvedValue(defaultTemplate);
+
+      const result = await service.createTemplate('user-123', templateData);
+
+      // Should first unset all existing defaults
+      expect(prisma.emailTemplate.updateMany).toHaveBeenCalledWith({
+        where: {
+          userId: 'user-123',
+          isDefault: true,
+        },
+        data: {
+          isDefault: false,
+        },
+      });
+
+      // Then create the new default template
+      expect(prisma.emailTemplate.create).toHaveBeenCalledWith({
+        data: {
+          userId: 'user-123',
+          name: templateData.name,
+          subject: templateData.subject,
+          body: templateData.body,
+          bodyHtml: null,
+          isDefault: true,
+          category: null,
+          usageCount: 0,
+        },
+      });
+      expect(result).toEqual(defaultTemplate);
+    });
+
+    it('should create template with optional bodyHtml', async () => {
+      const templateData = {
+        name: 'HTML Template',
+        subject: 'Test',
+        body: 'Plain text',
+        bodyHtml: '<p>HTML content</p>',
+      };
+
+      const htmlTemplate = {
+        ...mockTemplate,
+        bodyHtml: '<p>HTML content</p>',
+      };
+
+      prisma.emailTemplate.create.mockResolvedValue(htmlTemplate);
+
+      const result = await service.createTemplate('user-123', templateData);
+
+      expect(prisma.emailTemplate.create).toHaveBeenCalledWith({
+        data: {
+          userId: 'user-123',
+          name: templateData.name,
+          subject: templateData.subject,
+          body: templateData.body,
+          bodyHtml: templateData.bodyHtml,
+          isDefault: false,
+          category: null,
+          usageCount: 0,
+        },
+      });
+      expect(result).toEqual(htmlTemplate);
+    });
+
+    it('should handle database errors gracefully', async () => {
+      const templateData = {
+        name: 'Test',
+        subject: 'Test',
+        body: 'Body',
+      };
+
+      prisma.emailTemplate.create.mockRejectedValue(new Error('Database error'));
+
+      await expect(service.createTemplate('user-123', templateData)).rejects.toThrow('Database error');
+    });
+  });
+
+  describe('updateTemplate', () => {
+    const mockTemplate = {
+      id: 'template-123',
+      userId: 'user-123',
+      name: 'Original Template',
+      subject: 'Original Subject',
+      body: 'Original body',
+      bodyHtml: null,
+      isDefault: false,
+      category: 'Networking',
+      usageCount: 5,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it('should update a template', async () => {
+      const updateData = {
+        name: 'Updated Template',
+        subject: 'Updated Subject',
+      };
+
+      const updatedTemplate = {
+        ...mockTemplate,
+        ...updateData,
+      };
+
+      prisma.emailTemplate.findUnique.mockResolvedValue(mockTemplate);
+      prisma.emailTemplate.update.mockResolvedValue(updatedTemplate);
+
+      const result = await service.updateTemplate('template-123', 'user-123', updateData);
+
+      expect(prisma.emailTemplate.findUnique).toHaveBeenCalledWith({
+        where: { id: 'template-123' },
+      });
+      expect(prisma.emailTemplate.update).toHaveBeenCalledWith({
+        where: { id: 'template-123' },
+        data: updateData,
+      });
+      expect(result).toEqual(updatedTemplate);
+    });
+
+    it('should update template to isDefault=true and unset other defaults', async () => {
+      const updateData = {
+        isDefault: true,
+      };
+
+      const updatedTemplate = {
+        ...mockTemplate,
+        isDefault: true,
+      };
+
+      prisma.emailTemplate.findUnique.mockResolvedValue(mockTemplate);
+      prisma.emailTemplate.updateMany.mockResolvedValue({ count: 1 });
+      prisma.emailTemplate.update.mockResolvedValue(updatedTemplate);
+
+      const result = await service.updateTemplate('template-123', 'user-123', updateData);
+
+      // Should first unset all other defaults (excluding current template)
+      expect(prisma.emailTemplate.updateMany).toHaveBeenCalledWith({
+        where: {
+          userId: 'user-123',
+          isDefault: true,
+          id: { not: 'template-123' },
+        },
+        data: {
+          isDefault: false,
+        },
+      });
+
+      // Then update the template
+      expect(prisma.emailTemplate.update).toHaveBeenCalledWith({
+        where: { id: 'template-123' },
+        data: updateData,
+      });
+      expect(result).toEqual(updatedTemplate);
+    });
+
+    it('should not unset other defaults when isDefault is false', async () => {
+      const updateData = {
+        name: 'Updated Name',
+        isDefault: false,
+      };
+
+      const updatedTemplate = {
+        ...mockTemplate,
+        name: 'Updated Name',
+      };
+
+      prisma.emailTemplate.findUnique.mockResolvedValue(mockTemplate);
+      prisma.emailTemplate.update.mockResolvedValue(updatedTemplate);
+
+      await service.updateTemplate('template-123', 'user-123', updateData);
+
+      // Should NOT call updateMany when isDefault is false
+      expect(prisma.emailTemplate.updateMany).not.toHaveBeenCalled();
+      expect(prisma.emailTemplate.update).toHaveBeenCalledWith({
+        where: { id: 'template-123' },
+        data: updateData,
+      });
+    });
+
+    it('should throw error when template not found', async () => {
+      const updateData = { name: 'Updated' };
+
+      prisma.emailTemplate.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.updateTemplate('template-999', 'user-123', updateData)
+      ).rejects.toThrow('Template not found');
+    });
+
+    it('should throw error when user does not own the template', async () => {
+      const updateData = { name: 'Updated' };
+      const otherUserTemplate = { ...mockTemplate, userId: 'other-user' };
+
+      prisma.emailTemplate.findUnique.mockResolvedValue(otherUserTemplate);
+
+      await expect(
+        service.updateTemplate('template-123', 'user-123', updateData)
+      ).rejects.toThrow('Unauthorized to update this template');
+    });
+
+    it('should handle database errors gracefully', async () => {
+      const updateData = { name: 'Updated' };
+
+      prisma.emailTemplate.findUnique.mockResolvedValue(mockTemplate);
+      prisma.emailTemplate.update.mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        service.updateTemplate('template-123', 'user-123', updateData)
+      ).rejects.toThrow('Database error');
+    });
+  });
+
+  describe('deleteTemplate', () => {
+    const mockTemplate = {
+      id: 'template-123',
+      userId: 'user-123',
+      name: 'Template to Delete',
+      subject: 'Test',
+      body: 'Body',
+      bodyHtml: null,
+      isDefault: false,
+      category: null,
+      usageCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it('should delete a template', async () => {
+      prisma.emailTemplate.findUnique.mockResolvedValue(mockTemplate);
+      prisma.emailTemplate.delete.mockResolvedValue(mockTemplate);
+
+      await service.deleteTemplate('template-123', 'user-123');
+
+      expect(prisma.emailTemplate.findUnique).toHaveBeenCalledWith({
+        where: { id: 'template-123' },
+      });
+      expect(prisma.emailTemplate.delete).toHaveBeenCalledWith({
+        where: { id: 'template-123' },
+      });
+    });
+
+    it('should throw error when template not found', async () => {
+      prisma.emailTemplate.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.deleteTemplate('template-999', 'user-123')
+      ).rejects.toThrow('Template not found');
+    });
+
+    it('should throw error when user does not own the template', async () => {
+      const otherUserTemplate = { ...mockTemplate, userId: 'other-user' };
+      prisma.emailTemplate.findUnique.mockResolvedValue(otherUserTemplate);
+
+      await expect(
+        service.deleteTemplate('template-123', 'user-123')
+      ).rejects.toThrow('Unauthorized to delete this template');
+    });
+
+    it('should handle database errors gracefully', async () => {
+      prisma.emailTemplate.findUnique.mockResolvedValue(mockTemplate);
+      prisma.emailTemplate.delete.mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        service.deleteTemplate('template-123', 'user-123')
+      ).rejects.toThrow('Database error');
     });
   });
 });

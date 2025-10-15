@@ -169,6 +169,163 @@ export class EmailService {
   }
 
   /**
+   * Creates a new email template
+   * If isDefault is true, sets all other templates for this user to isDefault=false
+   * @param userId - User ID
+   * @param templateData - Template data
+   * @returns Created template
+   */
+  async createTemplate(
+    userId: string,
+    templateData: {
+      name: string;
+      subject: string;
+      body: string;
+      bodyHtml?: string | null;
+      isDefault?: boolean;
+      category?: string | null;
+    }
+  ): Promise<any> {
+    this.logger.log(`Creating email template for user ${userId}`);
+
+    try {
+      // If this template is being set as default, unset all other defaults for this user
+      if (templateData.isDefault) {
+        await this.prisma.emailTemplate.updateMany({
+          where: {
+            userId,
+            isDefault: true,
+          },
+          data: {
+            isDefault: false,
+          },
+        });
+
+        this.logger.log(`Unset previous default templates for user ${userId}`);
+      }
+
+      // Create the new template
+      const template = await this.prisma.emailTemplate.create({
+        data: {
+          userId,
+          name: templateData.name,
+          subject: templateData.subject,
+          body: templateData.body,
+          bodyHtml: templateData.bodyHtml || null,
+          isDefault: templateData.isDefault || false,
+          category: templateData.category || null,
+          usageCount: 0,
+        },
+      });
+
+      this.logger.log(`Email template created: ${template.id}`);
+      return template;
+    } catch (error) {
+      this.logger.error(`Failed to create template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Updates an existing email template
+   * If isDefault is set to true, unsets all other default templates for the user
+   * @param templateId - Template ID
+   * @param userId - User ID (for authorization)
+   * @param updateData - Update data
+   * @returns Updated template
+   */
+  async updateTemplate(
+    templateId: string,
+    userId: string,
+    updateData: {
+      name?: string;
+      subject?: string;
+      body?: string;
+      bodyHtml?: string | null;
+      isDefault?: boolean;
+      category?: string | null;
+    }
+  ): Promise<any> {
+    this.logger.log(`Updating template ${templateId}`);
+
+    // Check if template exists and user owns it
+    const existingTemplate = await this.prisma.emailTemplate.findUnique({
+      where: { id: templateId },
+    });
+
+    if (!existingTemplate) {
+      throw new NotFoundException('Template not found');
+    }
+
+    if (existingTemplate.userId !== userId) {
+      throw new ForbiddenException('Unauthorized to update this template');
+    }
+
+    try {
+      // If setting this as default, unset all other defaults first
+      if (updateData.isDefault === true) {
+        await this.prisma.emailTemplate.updateMany({
+          where: {
+            userId,
+            isDefault: true,
+            id: { not: templateId }, // Exclude current template
+          },
+          data: {
+            isDefault: false,
+          },
+        });
+
+        this.logger.log(`Unset previous default templates for user ${userId}`);
+      }
+
+      // Update the template
+      const updatedTemplate = await this.prisma.emailTemplate.update({
+        where: { id: templateId },
+        data: updateData,
+      });
+
+      this.logger.log(`Template ${templateId} updated successfully`);
+      return updatedTemplate;
+    } catch (error) {
+      this.logger.error(`Failed to update template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes an email template
+   * @param templateId - Template ID
+   * @param userId - User ID (for authorization)
+   */
+  async deleteTemplate(templateId: string, userId: string): Promise<void> {
+    this.logger.log(`Deleting template ${templateId}`);
+
+    // Check if template exists and user owns it
+    const existingTemplate = await this.prisma.emailTemplate.findUnique({
+      where: { id: templateId },
+    });
+
+    if (!existingTemplate) {
+      throw new NotFoundException('Template not found');
+    }
+
+    if (existingTemplate.userId !== userId) {
+      throw new ForbiddenException('Unauthorized to delete this template');
+    }
+
+    try {
+      await this.prisma.emailTemplate.delete({
+        where: { id: templateId },
+      });
+
+      this.logger.log(`Template ${templateId} deleted successfully`);
+    } catch (error) {
+      this.logger.error(`Failed to delete template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
+    }
+  }
+
+  /**
    * Updates an email (only drafts can be updated)
    * @param emailId - Email ID
    * @param userId - User ID (for authorization)

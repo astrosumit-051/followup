@@ -108,13 +108,13 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 10.6 Add input sanitization (prevent XSS with sanitize-html)
   - [x] 10.7 Verify all tests pass (77/77 tests passing)
 
-- [ ] 11. GraphQL Resolvers - Template Mutations
-  - [ ] 11.1 Write tests for template CRUD mutations
-  - [ ] 11.2 Implement `createEmailTemplate()` mutation
-  - [ ] 11.3 Handle isDefault toggle (set others to false)
-  - [ ] 11.4 Implement `updateEmailTemplate()` mutation
-  - [ ] 11.5 Implement `deleteEmailTemplate()` mutation
-  - [ ] 11.6 Verify all tests pass
+- [x] 11. GraphQL Resolvers - Template Mutations ✅ **COMPLETED**
+  - [x] 11.1 Write tests for template CRUD mutations (18 comprehensive tests added)
+  - [x] 11.2 Implement `createEmailTemplate()` mutation
+  - [x] 11.3 Handle isDefault toggle (set others to false)
+  - [x] 11.4 Implement `updateEmailTemplate()` mutation
+  - [x] 11.5 Implement `deleteEmailTemplate()` mutation
+  - [x] 11.6 Verify all tests pass (37/37 EmailService tests passing)
 
 - [ ] 12. Security Implementation
   - [ ] 12.1 Write security tests for prompt injection scenarios

@@ -11,7 +11,7 @@ import * as sanitizeHtml from 'sanitize-html';
 import { EmailService } from './email.service';
 import { AIService } from '../ai/ai.service';
 import { Email, EmailTemplate, ConversationHistory, EmailConnection, GeneratedEmailTemplate } from './entities';
-import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput } from './dto';
+import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput, CreateEmailTemplateInput, UpdateEmailTemplateInput } from './dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/authenticated-user.interface';
@@ -387,5 +387,152 @@ export class EmailResolver {
     // Service handles authorization and deletion
     await this.emailService.deleteEmail(id, user.id);
     return true;
+  }
+
+  /**
+   * Create a new email template
+   *
+   * This mutation creates reusable email templates with custom names and categories.
+   * Templates can be marked as default for quick access.
+   * If isDefault is true, all other templates will be set to isDefault=false.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param input - Template data (name, subject, body, isDefault, category)
+   * @returns Created email template
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   createEmailTemplate(input: {
+   *     name: "Follow-up Template"
+   *     subject: "Following up on our conversation"
+   *     body: "Hi {{name}},\n\nIt was great meeting you..."
+   *     isDefault: true
+   *     category: "Networking"
+   *   }) {
+   *     id
+   *     name
+   *     subject
+   *     isDefault
+   *     createdAt
+   *   }
+   * }
+   * ```
+   */
+  @Mutation(() => EmailTemplate)
+  async createEmailTemplate(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('input', { type: () => CreateEmailTemplateInput }) input: CreateEmailTemplateInput,
+  ): Promise<EmailTemplate> {
+    this.logger.log(`Creating email template for user ${user.id}`);
+
+    // Sanitize input to prevent XSS
+    const sanitizedInput = {
+      name: this.sanitizeContent(input.name),
+      subject: this.sanitizeContent(input.subject),
+      body: this.sanitizeContent(input.body),
+      bodyHtml: input.bodyHtml ? this.sanitizeContent(input.bodyHtml) : undefined,
+      isDefault: input.isDefault,
+      category: input.category ? this.sanitizeContent(input.category) : undefined,
+    };
+
+    try {
+      const template = await this.emailService.createTemplate(user.id, sanitizedInput);
+      return template as EmailTemplate;
+    } catch (error) {
+      this.logger.error(`Failed to create email template for user ${user.id}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing email template
+   *
+   * This mutation updates email templates with authorization checks.
+   * All fields are optional to allow partial updates.
+   * If isDefault is set to true, all other templates will be set to isDefault=false.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param id - Template ID to update
+   * @param input - Update data (name, subject, body, isDefault, category)
+   * @returns Updated email template
+   * @throws NotFoundException if template not found or user doesn't own it
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   updateEmailTemplate(
+   *     id: "template-123"
+   *     input: {
+   *       name: "Updated Template Name"
+   *       isDefault: true
+   *     }
+   *   ) {
+   *     id
+   *     name
+   *     isDefault
+   *     updatedAt
+   *   }
+   * }
+   * ```
+   */
+  @Mutation(() => EmailTemplate)
+  async updateEmailTemplate(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input', { type: () => UpdateEmailTemplateInput }) input: UpdateEmailTemplateInput,
+  ): Promise<EmailTemplate> {
+    this.logger.log(`Updating email template ${id} for user ${user.id}`);
+
+    // Sanitize input to prevent XSS
+    const sanitizedInput = {
+      name: input.name ? this.sanitizeContent(input.name) : undefined,
+      subject: input.subject ? this.sanitizeContent(input.subject) : undefined,
+      body: input.body ? this.sanitizeContent(input.body) : undefined,
+      bodyHtml: input.bodyHtml ? this.sanitizeContent(input.bodyHtml) : undefined,
+      isDefault: input.isDefault,
+      category: input.category ? this.sanitizeContent(input.category) : undefined,
+    };
+
+    try {
+      const template = await this.emailService.updateTemplate(id, user.id, sanitizedInput);
+      return template as EmailTemplate;
+    } catch (error) {
+      this.logger.error(`Failed to update email template ${id} for user ${user.id}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete an email template
+   *
+   * This mutation deletes email templates from the database with authorization checks.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param id - Template ID to delete
+   * @returns True if deleted successfully
+   * @throws NotFoundException if template not found or user doesn't own it
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   deleteEmailTemplate(id: "template-123")
+   * }
+   * ```
+   */
+  @Mutation(() => Boolean)
+  async deleteEmailTemplate(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    this.logger.log(`Deleting email template ${id} for user ${user.id}`);
+
+    try {
+      await this.emailService.deleteTemplate(id, user.id);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to delete email template ${id} for user ${user.id}`, error);
+      throw error;
+    }
   }
 }
