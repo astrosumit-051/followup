@@ -8,10 +8,61 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateSignatureInput } from './dto/create-signature.input';
 import { UpdateSignatureInput } from './dto/update-signature.input';
 import { EmailSignature } from './entities/email-signature.entity';
+import sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class EmailSignatureService {
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * Sanitize HTML content to prevent XSS attacks
+   *
+   * Allows safe HTML tags for email signatures while stripping
+   * potentially dangerous elements and attributes.
+   *
+   * Allowed tags: basic formatting (b, i, em, strong, u, s, sub, sup),
+   * paragraphs, line breaks, lists, links, images (for logos)
+   *
+   * @param html - Raw HTML content from user input
+   * @returns Sanitized HTML safe for storage and rendering
+   */
+  private sanitizeHtmlContent(html: string): string {
+    return sanitizeHtml(html, {
+      allowedTags: [
+        'b', 'i', 'em', 'strong', 'u', 's', 'sub', 'sup',
+        'p', 'br', 'ul', 'ol', 'li',
+        'a', 'img', 'span', 'div',
+      ],
+      allowedAttributes: {
+        'a': ['href', 'target', 'rel'],
+        'img': ['src', 'alt', 'width', 'height', 'style'],
+        'span': ['style'],
+        'div': ['style'],
+      },
+      allowedSchemes: ['http', 'https', 'mailto', 'data'], // data: for inline images
+      allowedStyles: {
+        '*': {
+          'color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/],
+          'font-size': [/^\d+(?:px|em|%)$/],
+          'font-weight': [/^bold|normal$/],
+          'text-align': [/^left|right|center$/],
+        },
+      },
+      // Automatically add rel="noopener noreferrer" to external links
+      transformTags: {
+        'a': (tagName, attribs) => {
+          return {
+            tagName: 'a',
+            attribs: {
+              ...attribs,
+              rel: 'noopener noreferrer',
+              target: attribs.target || '_blank',
+            },
+          };
+        },
+      },
+    });
+  }
 
   /**
    * Create new email signature
@@ -74,13 +125,16 @@ export class EmailSignatureService {
       });
     }
 
+    // Sanitize HTML content to prevent XSS attacks
+    const sanitizedContentHtml = input.contentHtml ? this.sanitizeHtmlContent(input.contentHtml) : '';
+
     // Create signature
     return this.prisma.emailSignature.create({
       data: {
         userId,
         name: input.name,
         contentJson: input.contentJson,
-        contentHtml: input.contentHtml,
+        contentHtml: sanitizedContentHtml,
         isDefaultForFormal: input.isDefaultForFormal ?? false,
         isDefaultForCasual: input.isDefaultForCasual ?? false,
         isGlobalDefault: input.isGlobalDefault ?? false,
@@ -160,13 +214,16 @@ export class EmailSignatureService {
       });
     }
 
+    // Sanitize HTML content to prevent XSS attacks
+    const sanitizedContentHtml = input.contentHtml ? this.sanitizeHtmlContent(input.contentHtml) : undefined;
+
     // Update signature
     return this.prisma.emailSignature.update({
       where: { id: signatureId },
       data: {
         name: input.name,
         contentJson: input.contentJson,
-        contentHtml: input.contentHtml,
+        contentHtml: sanitizedContentHtml,
         isDefaultForFormal: input.isDefaultForFormal,
         isDefaultForCasual: input.isDefaultForCasual,
         isGlobalDefault: input.isGlobalDefault,
