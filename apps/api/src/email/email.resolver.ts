@@ -14,7 +14,7 @@ import { EmailSignatureService } from './email-signature.service';
 import { AIService } from '../ai/ai.service';
 import { GmailOAuthService } from '../gmail/gmail-oauth.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { Email, EmailTemplate, ConversationHistory, EmailConnection, GeneratedEmailTemplate, EmailDraft, EmailSignature, PolishedDraft, BulkCampaignResult } from './entities';
+import { Email, EmailTemplate, ConversationHistory, EmailConnection, GeneratedEmailTemplate, EmailDraft, EmailSignature } from './entities';
 import { GmailConnection } from '../gmail/entities/gmail-connection.entity';
 import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput, CreateEmailTemplateInput, UpdateEmailTemplateInput, CreateDraftInput, UpdateDraftInput, CreateSignatureInput, UpdateSignatureInput, PaginationInput, EmailDraftConnection, SendEmailInput, SendBulkCampaignInput, PolishDraftInput } from './dto';
 import { AuthGuard } from '../auth/auth.guard';
@@ -897,80 +897,8 @@ export class EmailResolver {
   }
 
   // ==================== EMAIL SEND MUTATIONS ====================
-
-  /**
-   * Send email via Gmail (NOT IMPLEMENTED YET)
-   *
-   * Implementation pending:
-   * - Need to import GmailSendService from GmailModule
-   * - Need to inject GmailSendService in constructor
-   * - Need to implement ContactService to fetch contact email
-   * - Need to add daily rate limiting (100 emails/day)
-   *
-   * @param user - Current user from JWT
-   * @param input - Email data (contactId, subject, bodyJson, bodyHtml, attachments, signatureId)
-   * @returns Sent Email record
-   * @throws BadRequestException if Gmail not connected
-   * @throws NotFoundException if contact not found
-   */
-  // @Mutation(() => Email)
-  // @Throttle({ default: { limit: 100, ttl: 86400000 } }) // 100 requests per day
-  // async sendEmail(
-  //   @CurrentUser() user: AuthenticatedUser,
-  //   @Args('input', { type: () => SendEmailInput }) input: SendEmailInput,
-  // ): Promise<Email> {
-  //   this.logger.log(`Sending email for user ${user.id}, contact ${input.contactId}`);
-  //   // Implementation pending - requires GmailSendService and ContactService
-  //   throw new Error('Not implemented yet');
-  // }
-
-  /**
-   * Send bulk email campaign via Gmail (NOT IMPLEMENTED YET)
-   *
-   * Implementation pending:
-   * - Need to import GmailSendService from GmailModule
-   * - Need to inject GmailSendService and BullMQ Queue
-   * - Need to implement ContactService to fetch contact emails
-   * - Need to add daily rate limiting (100 emails/day total)
-   * - Need to implement placeholder replacement ({{firstName}}, {{company}})
-   *
-   * @param user - Current user from JWT
-   * @param input - Campaign data (contactIds, subject, bodyJson, bodyHtml, attachments, signatureId)
-   * @returns BulkCampaignResult with campaign tracking info
-   * @throws BadRequestException if Gmail not connected
-   */
-  // @Mutation(() => BulkCampaignResult)
-  // @Throttle({ default: { limit: 10, ttl: 86400000 } }) // 10 campaigns per day
-  // async sendBulkCampaign(
-  //   @CurrentUser() user: AuthenticatedUser,
-  //   @Args('input', { type: () => SendBulkCampaignInput }) input: SendBulkCampaignInput,
-  // ): Promise<BulkCampaignResult> {
-  //   this.logger.log(`Sending bulk campaign for user ${user.id}, ${input.contactIds.length} contacts`);
-  //   // Implementation pending - requires GmailSendService, ContactService, and BullMQ
-  //   throw new Error('Not implemented yet');
-  // }
-
-  /**
-   * Polish draft with AI (NOT IMPLEMENTED YET)
-   *
-   * Implementation pending:
-   * - Need to add polishDraft method to AIService
-   * - Method should take content and style, return polished content with word counts
-   * - Need to add rate limiting (20 requests/minute)
-   *
-   * @param user - Current user from JWT
-   * @param input - Content and polish style (FORMAL, CASUAL, ELABORATE, CONCISE)
-   * @returns PolishedDraft with refined content and word count metadata
-   * @throws Error if AI service fails
-   */
-  // @Mutation(() => PolishedDraft)
-  // @Throttle({ default: { limit: 20, ttl: 60000 } }) // 20 requests per minute
-  // async polishDraft(
-  //   @CurrentUser() user: AuthenticatedUser,
-  //   @Args('input', { type: () => PolishDraftInput }) input: PolishDraftInput,
-  // ): Promise<PolishedDraft> {
-  //   this.logger.log(`Polishing draft for user ${user.id}, style: ${input.style}`);
-  //   // Implementation pending - requires AIService.polishDraft method
-  //   throw new Error('Not implemented yet');
-  // }
+  // Email sending features (sendEmail, sendBulkCampaign, polishDraft) are documented in:
+  // - Product roadmap: .agent-os/product/roadmap.md (Phase 2)
+  // - Email composition spec: .agent-os/specs/2025-10-10-langchain-ai-email-generation/
+  // Implementation tracked in roadmap Phase 2 tasks
 }
