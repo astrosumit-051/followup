@@ -16,6 +16,7 @@ import { CacheModule } from './cache/cache.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EmailModule } from './email/email.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { AttachmentModule } from './attachment/attachment.module';
 import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 
 /**
@@ -86,6 +87,7 @@ import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
     CacheModule,
     EmailModule,
     MetricsModule,
+    AttachmentModule,
   ],
   controllers: [AppController],
   providers: [

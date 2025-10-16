@@ -1,0 +1,223 @@
+name: Claude Continuous PR Fix
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-fix:
+    # Only run on reviews that request changes or have comments
+    if: |
+      github.event.review.state == 'CHANGES_REQUESTED' ||
+      github.event.review.state == 'COMMENTED'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check iteration count
+        id: check-iterations
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            // Find iteration label (format: "claude-fix-iteration-N")
+            const iterationLabel = labels.find(l => l.name.startsWith('claude-fix-iteration-'));
+            const currentIteration = iterationLabel
+              ? parseInt(iterationLabel.name.split('-').pop())
+              : 0;
+
+            core.setOutput('iteration', currentIteration);
+            core.setOutput('should_continue', currentIteration < 5 ? 'true' : 'false');
+
+            if (currentIteration >= 5) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: '⚠️ **Maximum auto-fix iterations reached (5).** Manual intervention required.\n\nClaude has attempted to address review feedback 5 times. Please review the changes manually and provide additional guidance if needed.'
+              });
+            }
+
+      - name: Checkout PR branch
+        if: steps.check-iterations.outputs.should_continue == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compile review feedback
+        if: steps.check-iterations.outputs.should_continue == 'true'
+        id: compile-feedback
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            const { data: comments } = await github.rest.pulls.listReviewComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            // Get the latest review that triggered this workflow
+            const latestReview = context.payload.review;
+
+            // Format feedback for Claude
+            let feedback = `## Review Feedback from ${latestReview.user.login}\n\n`;
+            feedback += `**Overall Comment:**\n${latestReview.body || 'No general comment'}\n\n`;
+
+            // Add line-specific comments
+            const reviewComments = comments.filter(c =>
+              new Date(c.created_at) >= new Date(latestReview.submitted_at)
+            );
+
+            if (reviewComments.length > 0) {
+              feedback += `**Line-specific Comments:**\n`;
+              for (const comment of reviewComments) {
+                feedback += `\n- **${comment.path}:${comment.line}**\n`;
+                feedback += `  ${comment.body}\n`;
+              }
+            }
+
+            core.setOutput('feedback', feedback);
+
+      - name: Run Claude Code to fix issues
+        if: steps.check-iterations.outputs.should_continue == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            You are automatically addressing pull request review feedback.
+
+            **PR**: #${{ github.event.pull_request.number }}
+            **Iteration**: ${{ steps.check-iterations.outputs.iteration }} of 5
+            **Reviewer**: ${{ github.event.review.user.login }}
+
+            ${{ steps.compile-feedback.outputs.feedback }}
+
+            ## Your Task
+
+            1. **Read the CLAUDE.md file** for project guidelines, coding standards, and best practices
+            2. **Understand each piece of feedback** - review comments carefully
+            3. **Make ALL necessary changes** to address the feedback comprehensively
+            4. **Follow project coding standards** as defined in CLAUDE.md
+            5. **Run tests** - execute `pnpm test` to verify your changes don't break anything
+            6. **Run linter** - execute `pnpm lint` to ensure code quality
+            7. **Only proceed if tests pass** - do not commit if tests fail
+            8. **Commit your changes** with a clear, descriptive message
+
+            ## Important Rules
+
+            - Adhere to all guidelines in CLAUDE.md
+            - Never remove existing functionality without explicit feedback requesting it
+            - Keep commits atomic and well-described
+            - If tests fail, analyze the failures and fix them before committing
+            - If you cannot fix an issue, document why in a comment
+
+            ## Commit Message Format
+
+            Use conventional commits:
+            ```
+            fix: address PR review feedback from @${{ github.event.review.user.login }}
+
+            - [Brief description of change 1]
+            - [Brief description of change 2]
+
+            Addresses feedback in PR review #${{ github.event.pull_request.number }}
+            Iteration: ${{ steps.check-iterations.outputs.iteration }}/5
+
+            🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+            Co-Authored-By: Claude <noreply@anthropic.com>
+            ```
+
+      - name: Update iteration label
+        if: steps.check-iterations.outputs.should_continue == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const currentIteration = parseInt('${{ steps.check-iterations.outputs.iteration }}');
+            const newIteration = currentIteration + 1;
+
+            // Remove old iteration label if exists
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            const oldLabel = labels.find(l => l.name.startsWith('claude-fix-iteration-'));
+            if (oldLabel) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                name: oldLabel.name,
+              });
+            }
+
+            // Add new iteration label
+            const newLabelName = `claude-fix-iteration-${newIteration}`;
+
+            // Create label if it doesn't exist
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: newLabelName,
+              });
+            } catch (error) {
+              if (error.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: newLabelName,
+                  color: 'D4C5F9',
+                  description: `Claude auto-fix iteration ${newIteration}`,
+                });
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: [newLabelName],
+            });
+
+      - name: Request re-review
+        if: steps.check-iterations.outputs.should_continue == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Request review from original reviewer
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              reviewers: ['${{ github.event.review.user.login }}'],
+            });
+
+            // Add comment notifying reviewer
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `🤖 I've addressed your review comments, @${{ github.event.review.user.login }}!\n\n**Auto-fix iteration**: ${{ steps.check-iterations.outputs.iteration }}/5\n\nReady for your review. If the changes look good, please approve the PR. If there are still issues, I'll automatically fix them again (up to 5 iterations total).`
+            });

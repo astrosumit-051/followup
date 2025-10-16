@@ -211,6 +211,16 @@ export class EmailService {
           name: templateData.name,
           subject: templateData.subject,
           body: templateData.body,
+          bodyJson: {
+            type: 'doc',
+            content: [{
+              type: 'paragraph',
+              content: [{
+                type: 'text',
+                text: templateData.body,
+              }],
+            }],
+          },
           bodyHtml: templateData.bodyHtml || null,
           isDefault: templateData.isDefault || false,
           category: templateData.category || null,

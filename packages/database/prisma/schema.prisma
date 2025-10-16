@@ -74,6 +74,9 @@ model User {
   tags                Tag[]
   emailTemplates      EmailTemplate[]
   conversationHistory ConversationHistory[]
+  emailDrafts         EmailDraft[]
+  emailSignatures     EmailSignature[]
+  gmailToken          GmailToken?
 
   @@index([supabaseId])
   @@index([email])
@@ -106,6 +109,7 @@ model Contact {
   reminders           Reminder[]
   tags                ContactTag[]
   conversationHistory ConversationHistory[]
+  emailDrafts         EmailDraft[]
 
   // Performance indexes for frequently queried fields
   @@index([userId, createdAt(sort: Desc)]) // Default sort order (most common query)
@@ -159,17 +163,29 @@ model Email {
   sentAt       DateTime? // When email was actually sent (null for drafts)
   openedAt     DateTime? // Email tracking (Phase 4)
   repliedAt    DateTime? // Response received
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+
+  // NEW FIELDS for Gmail integration and campaign tracking
+  gmailMessageId String? // Gmail API message ID for tracking
+  gmailThreadId  String? // Gmail thread ID for conversations
+  signatureId    String? // Signature used in this email
+  attachments    Json[] // Array of S3 URLs
+  campaignId     String? // Bulk campaign ID (for analytics on bulk sends)
+  isColdEmail    Boolean @default(false) // True if no conversation history at send time
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   contact             Contact               @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  signature           EmailSignature?       @relation(fields: [signatureId], references: [id], onDelete: SetNull)
   conversationHistory ConversationHistory[]
 
   @@index([userId])
   @@index([contactId])
   @@index([status])
   @@index([sentAt])
+  @@index([gmailMessageId])
+  @@index([campaignId])
   @@map("emails")
 }
 
@@ -207,22 +223,27 @@ model Reminder {
 }
 
 model EmailTemplate {
-  id         String   @id @default(uuid())
-  userId     String
-  name       String // User-friendly template name
-  subject    String
-  body       String   @db.Text
-  bodyHtml   String?  @db.Text
-  isDefault  Boolean  @default(false) // User's default template
-  category   String? // e.g., "follow-up", "introduction", "thank-you"
-  usageCount Int      @default(0) // Track template popularity
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String       @id @default(uuid())
+  userId        String
+  name          String // User-friendly template name
+  subject       String
+  body          String       @db.Text
+  bodyJson      Json // TipTap document format
+  bodyHtml      String?      @db.Text
+  templateType  TemplateType @default(CUSTOM)
+  isDefault     Boolean      @default(false) // User's default template
+  isUserCreated Boolean      @default(false) // vs. AI-generated
+  category      String? // e.g., "follow-up", "introduction", "thank-you", "custom"
+  usageCount    Int          @default(0) // Track template popularity
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([isDefault])
+  @@index([userId, isUserCreated])
+  @@index([userId, category])
   @@map("email_templates")
 }
 
@@ -243,4 +264,91 @@ model ConversationHistory {
   @@index([userId, contactId]) // Composite index for efficient context retrieval
   @@index([timestamp])
   @@map("conversation_history")
+}
+
+model EmailSignature {
+  id     String @id @default(uuid())
+  userId String
+
+  // Signature content
+  name        String // User-friendly name: "Formal", "Casual", "Sales Pitch"
+  contentJson Json // TipTap document format
+  contentHtml String @db.Text // Rendered HTML
+
+  // Context-based selection
+  isDefaultForFormal Boolean @default(false)
+  isDefaultForCasual Boolean @default(false)
+  isGlobalDefault    Boolean @default(false)
+
+  // Metadata
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  usageCount Int      @default(0) // Track how often used
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailDrafts EmailDraft[]
+  sentEmails  Email[] // Reference to sent emails using this signature
+
+  @@index([userId])
+  @@index([userId, isGlobalDefault])
+  @@map("email_signatures")
+}
+
+model EmailDraft {
+  id        String @id @default(uuid())
+  userId    String
+  contactId String
+
+  // Email content
+  subject  String?
+  bodyJson Json // TipTap document JSON format
+  bodyHtml String? @db.Text // Rendered HTML for sending
+
+  // Attachments (S3 URLs)
+  attachments Json[] // Array of { key, filename, size, contentType, s3Url }
+
+  // Signature
+  signatureId String?
+
+  // Metadata
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastSyncedAt DateTime? // Last DB sync from localStorage
+
+  // Relations
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact   Contact         @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  signature EmailSignature? @relation(fields: [signatureId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, contactId]) // One draft per user-contact pair
+  @@index([userId, contactId])
+  @@index([userId, updatedAt])
+  @@map("email_drafts")
+}
+
+model GmailToken {
+  id     String @id @default(uuid())
+  userId String @unique // One Gmail account per user
+
+  // OAuth tokens (encrypted)
+  accessToken  String   @db.Text // Encrypted with AES-256-GCM
+  refreshToken String   @db.Text // Encrypted with AES-256-GCM
+  expiresAt    DateTime // Access token expiry
+
+  // Gmail account info
+  emailAddress String // user@gmail.com
+  scope        String[] // ["gmail.send", "gmail.readonly"]
+
+  // Metadata
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  lastUsedAt DateTime? // Last email sent timestamp
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt]) // Query for tokens needing refresh
+  @@map("gmail_tokens")
 }

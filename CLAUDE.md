@@ -667,5 +667,3 @@ A feature is considered complete when:
 See @.agent-os/product/roadmap.md for complete phased development plan.
 
 *This claude.md file works in conjunction with /context/mcp-instructions.md to provide comprehensive development guidance for the RelationHub platform.*
-
-
