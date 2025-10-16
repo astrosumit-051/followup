@@ -443,7 +443,7 @@ enum Priority {
 type Query {
   contact(id: ID!): Contact
   contacts(filters: ContactFilterInput, pagination: ContactPaginationInput, sortBy: ContactSortField = CREATED_AT, sortOrder: String = "desc"): ContactConnection!
-  conversationHistory(contactId: ID!, limit: Float = 5): [ConversationHistory!]!
+  conversationHistory(contactId: ID!, limit: Int = 5): [ConversationHistory!]!
   email(id: ID!): Email!
   emailTemplates: [EmailTemplate!]!
   emails(input: FindEmailsInput): EmailConnection!

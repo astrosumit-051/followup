@@ -154,6 +154,11 @@ export class EmailSignatureService {
       throw new BadRequestException('You cannot have more than 10 signatures');
     }
 
+    // If this is the first signature and no default flags are set, make it global default
+    const isFirstSignature = count === 0;
+    const hasNoDefaultFlags = !input.isGlobalDefault && !input.isDefaultForFormal && !input.isDefaultForCasual;
+    const shouldSetGlobalDefault = isFirstSignature && hasNoDefaultFlags;
+
     // Unset other default flags if setting new defaults
     await this.unsetDefaultFlags(userId, input);
 
@@ -169,7 +174,7 @@ export class EmailSignatureService {
         contentHtml: sanitizedContentHtml,
         isDefaultForFormal: input.isDefaultForFormal ?? false,
         isDefaultForCasual: input.isDefaultForCasual ?? false,
-        isGlobalDefault: input.isGlobalDefault ?? false,
+        isGlobalDefault: shouldSetGlobalDefault ? true : (input.isGlobalDefault ?? false),
         usageCount: 0,
       },
     }) as unknown as EmailSignature;

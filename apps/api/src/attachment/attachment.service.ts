@@ -302,15 +302,33 @@ export class AttachmentService {
   }
 
   /**
-   * List all objects in S3 bucket
+   * List all objects in S3 bucket with pagination
    *
-   * @returns S3 list objects response
+   * Iterates through all pages using ContinuationToken to ensure
+   * all objects are retrieved (not just first 1000).
+   *
+   * @returns Array of all S3 objects
    */
-  private async listS3Objects(): Promise<any> {
-    const command = new ListObjectsV2Command({
-      Bucket: this.bucketName,
-    });
-    return await this.s3Client.send(command);
+  private async listS3Objects(): Promise<{ Contents: any[] }> {
+    const allObjects: any[] = [];
+    let continuationToken: string | undefined;
+
+    do {
+      const command = new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        ContinuationToken: continuationToken,
+      });
+
+      const response = await this.s3Client.send(command);
+
+      if (response.Contents) {
+        allObjects.push(...response.Contents);
+      }
+
+      continuationToken = response.NextContinuationToken;
+    } while (continuationToken);
+
+    return { Contents: allObjects };
   }
 
   /**

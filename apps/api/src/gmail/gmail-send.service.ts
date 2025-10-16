@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, InternalServerErrorException } from '@
 import { PrismaService } from '../prisma/prisma.service';
 import { GmailOAuthService } from './gmail-oauth.service';
 import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 import { Email, ConversationHistory } from '@relationhub/database';
 
 interface EmailData {
@@ -270,14 +271,20 @@ export class GmailSendService {
   /**
    * Call Gmail API to send message
    *
-   * Uses googleapis library to send email.
+   * Uses googleapis library to send email with OAuth2 authentication.
    *
    * @param accessToken - OAuth2 access token
    * @param message - Gmail API message object
    * @returns Gmail API response with messageId and threadId
    */
   private async callGmailApi(accessToken: string, message: { raw: string }): Promise<any> {
-    const gmail = google.gmail({ version: 'v1', auth: accessToken });
+    // Create OAuth2Client and set credentials for proper authentication
+    const oauth2Client = new OAuth2Client();
+    oauth2Client.setCredentials({
+      access_token: accessToken,
+    });
+
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
     return gmail.users.messages.send({
       userId: 'me',

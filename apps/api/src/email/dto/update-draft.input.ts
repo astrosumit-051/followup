@@ -1,6 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-scalars';
-import { IsOptional, IsString, IsDate, MaxLength } from 'class-validator';
+import { IsOptional, IsString, IsDate, MaxLength, IsUUID } from 'class-validator';
 
 /**
  * Input for Updating Email Draft (Auto-Save)
@@ -32,7 +32,7 @@ export class UpdateDraftInput {
 
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsString()
+  @IsUUID()
   signatureId?: string;
 
   @Field(() => Date, { nullable: true, description: 'Timestamp of last local sync (for conflict detection)' })

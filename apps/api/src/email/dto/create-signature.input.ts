@@ -1,6 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-scalars';
-import { IsNotEmpty, IsString, IsBoolean, IsOptional, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, IsBoolean, IsOptional, MaxLength, IsObject } from 'class-validator';
 
 /**
  * Input for Creating Email Signature
@@ -18,6 +18,7 @@ export class CreateSignatureInput {
 
   @Field(() => GraphQLJSON, { description: 'TipTap document JSON format for rich text editing' })
   @IsNotEmpty()
+  @IsObject()
   contentJson!: Record<string, any>;
 
   @Field(() => String, { description: 'Pre-rendered HTML for email sending' })

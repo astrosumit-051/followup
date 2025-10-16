@@ -23,11 +23,13 @@ import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 export class GmailOAuthService {
   private oauth2Client: OAuth2Client;
   private encryptionKey: Buffer;
+  private stateStore: Map<string, { userId: string; expiresAt: Date }> = new Map();
 
   private readonly GMAIL_SCOPES = [
     'https://www.googleapis.com/auth/gmail.send',
     'https://www.googleapis.com/auth/gmail.readonly',
   ];
+  private readonly STATE_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 
   constructor(
     private prisma: PrismaService,
@@ -62,17 +64,29 @@ export class GmailOAuthService {
    * - Gmail send and readonly scopes
    * - Offline access for refresh tokens
    * - Force consent prompt to ensure refresh token
-   * - User ID in state for callback handling
+   * - Cryptographically random state token (prevents CSRF attacks)
    *
    * @param userId - ID of the authenticated user
-   * @returns Authorization URL to redirect user to
+   * @returns Authorization URL with secure state token
    */
   getAuthorizationUrl(userId: string): string {
+    // Generate cryptographically random state to prevent CSRF
+    const state = randomBytes(32).toString('hex');
+
+    // Store state with userId and expiry
+    this.stateStore.set(state, {
+      userId,
+      expiresAt: new Date(Date.now() + this.STATE_EXPIRY_MS),
+    });
+
+    // Clean up expired states
+    this.cleanupExpiredStates();
+
     const url = this.oauth2Client.generateAuthUrl({
       access_type: 'offline', // Request refresh token
       prompt: 'consent', // Force consent to get refresh token
       scope: this.GMAIL_SCOPES,
-      state: userId, // Pass userId for callback
+      state, // Cryptographically random state
     });
 
     return url;
@@ -88,12 +102,29 @@ export class GmailOAuthService {
    * Tokens are encrypted with AES-256-GCM and stored in database.
    * If user already has a Gmail connection, updates existing record.
    *
-   * @param userId - ID of the authenticated user
+   * @param state - OAuth state parameter to verify
    * @param authCode - Authorization code from OAuth2 redirect
    * @returns Created/updated GmailToken record
-   * @throws BadRequestException if auth code is invalid
+   * @throws BadRequestException if auth code is invalid or state doesn't match
    */
-  async handleCallback(userId: string, authCode: string) {
+  async handleCallback(state: string, authCode: string) {
+    // Verify state parameter
+    const stateData = this.stateStore.get(state);
+    if (!stateData) {
+      throw new BadRequestException('Invalid or expired state parameter');
+    }
+
+    // Check if state is expired
+    if (new Date() > stateData.expiresAt) {
+      this.stateStore.delete(state);
+      throw new BadRequestException('OAuth state expired');
+    }
+
+    // Extract userId from verified state
+    const userId = stateData.userId;
+
+    // Delete used state (one-time use)
+    this.stateStore.delete(state);
     try {
       // Exchange authorization code for tokens
       const { tokens } = await this.oauth2Client.getToken(authCode);
@@ -331,5 +362,20 @@ export class GmailOAuthService {
     decrypted += decipher.final('utf8');
 
     return decrypted;
+  }
+
+  /**
+   * Clean up expired OAuth states
+   *
+   * Removes states that have exceeded their expiry time.
+   * Called periodically to prevent memory leaks.
+   */
+  private cleanupExpiredStates(): void {
+    const now = new Date();
+    for (const [state, data] of this.stateStore.entries()) {
+      if (now > data.expiresAt) {
+        this.stateStore.delete(state);
+      }
+    }
   }
 }

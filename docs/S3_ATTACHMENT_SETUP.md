@@ -32,10 +32,16 @@ RelationHub uses AWS S3 for secure, scalable attachment storage for email compos
 
 ```bash
 # Create bucket
+# Note: us-east-1 doesn't need LocationConstraint, but other regions do
 aws s3api create-bucket \
   --bucket relationhub-attachments-production \
-  --region us-east-1 \
-  --create-bucket-configuration LocationConstraint=us-east-1
+  --region us-east-2 \
+  --create-bucket-configuration LocationConstraint=us-east-2
+
+# For us-east-1, omit LocationConstraint:
+# aws s3api create-bucket \
+#   --bucket relationhub-attachments-production \
+#   --region us-east-1
 
 # Enable versioning (optional)
 aws s3api put-bucket-versioning \
@@ -77,6 +83,7 @@ aws s3api put-bucket-encryption \
       "x-amz-security-token"
     ],
     "AllowedMethods": [
+      "GET",
       "PUT",
       "POST",
       "DELETE"
@@ -126,7 +133,7 @@ aws s3api put-bucket-cors \
         "x-amz-content-sha256",
         "x-amz-security-token"
       ],
-      "AllowedMethods": ["PUT", "POST", "DELETE"],
+      "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
       "AllowedOrigins": [
         "http://localhost:3000",
         "https://your-production-domain.com"

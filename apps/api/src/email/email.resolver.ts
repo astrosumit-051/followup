@@ -755,7 +755,7 @@ export class EmailResolver {
       bodyHtml: input.bodyHtml,
       attachments: input.attachments,
       signatureId: input.signatureId,
-      lastSyncedAt: new Date(),
+      lastSyncedAt: input.lastSyncedAt, // Pass client's lastSyncedAt for conflict detection
     };
 
     return this.emailDraftService.autoSaveDraft(user.id, input.contactId, updateInput);
