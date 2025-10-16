@@ -42,13 +42,22 @@ export class AttachmentService {
 
   constructor(private configService: ConfigService) {
     const region = this.configService.get<string>('AWS_REGION');
+    const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID');
+    const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY');
     this.bucketName = this.configService.get<string>('S3_BUCKET')!;
+
+    // Validate all required AWS credentials are present
+    if (!region || !accessKeyId || !secretAccessKey || !this.bucketName) {
+      throw new Error(
+        'Missing required AWS S3 configuration. Please set AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and S3_BUCKET environment variables.',
+      );
+    }
 
     this.s3Client = new S3Client({
       region,
       credentials: {
-        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID')!,
-        secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY')!,
+        accessKeyId,
+        secretAccessKey,
       },
     });
   }

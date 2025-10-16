@@ -84,10 +84,7 @@ export class EmailDraftService {
             contactId,
           },
         },
-        data: {
-          ...draftData,
-          lastSyncedAt: new Date(),
-        },
+        data: draftData,
         include: {
           user: true,
           contact: true,

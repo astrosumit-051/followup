@@ -33,12 +33,19 @@ export class GmailOAuthService {
     private prisma: PrismaService,
     private configService: ConfigService,
   ) {
+    // Validate Google OAuth configuration
+    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const redirectUri = this.configService.get<string>('GOOGLE_REDIRECT_URI');
+
+    if (!clientId || !clientSecret || !redirectUri) {
+      throw new Error(
+        'Missing required Google OAuth configuration. Please set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI environment variables.',
+      );
+    }
+
     // Initialize OAuth2 client
-    this.oauth2Client = new OAuth2Client(
-      this.configService.get<string>('GOOGLE_CLIENT_ID'),
-      this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
-      this.configService.get<string>('GOOGLE_REDIRECT_URI'),
-    );
+    this.oauth2Client = new OAuth2Client(clientId, clientSecret, redirectUri);
 
     // Initialize encryption key (32 bytes for AES-256)
     const hexKey = this.configService.get<string>('ENCRYPTION_KEY');
