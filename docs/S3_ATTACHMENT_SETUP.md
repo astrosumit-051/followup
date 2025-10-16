@@ -69,7 +69,12 @@ aws s3api put-bucket-encryption \
 [
   {
     "AllowedHeaders": [
-      "*"
+      "Content-Type",
+      "Content-Length",
+      "Authorization",
+      "x-amz-date",
+      "x-amz-content-sha256",
+      "x-amz-security-token"
     ],
     "AllowedMethods": [
       "PUT",
@@ -97,7 +102,7 @@ aws s3api put-bucket-encryption \
   - Production: `https://app.relationhub.com`
   - **Do NOT use wildcard (`*`) in production** for security reasons
 - **AllowedMethods**: `PUT` is required for presigned URL uploads
-- **AllowedHeaders**: `*` allows all headers (can be restricted to specific headers if needed)
+- **AllowedHeaders**: Specific headers required for S3 presigned URL operations (Content-Type, Content-Length, Authorization, x-amz-*)
 - **MaxAgeSeconds**: How long browser caches CORS preflight response (3000 = 50 minutes)
 
 ### Via AWS CLI
@@ -113,7 +118,14 @@ aws s3api put-bucket-cors \
 {
   "CORSRules": [
     {
-      "AllowedHeaders": ["*"],
+      "AllowedHeaders": [
+        "Content-Type",
+        "Content-Length",
+        "Authorization",
+        "x-amz-date",
+        "x-amz-content-sha256",
+        "x-amz-security-token"
+      ],
       "AllowedMethods": ["PUT", "POST", "DELETE"],
       "AllowedOrigins": [
         "http://localhost:3000",
@@ -370,15 +382,16 @@ aws s3 rm s3://relationhub-attachments-production/test-user/attachments/test-fil
 ## Security Best Practices
 
 1. **Never use wildcard (`*`) for AllowedOrigins in production**
-2. **Enable S3 bucket encryption** (SSE-S3 or SSE-KMS)
-3. **Block all public access** to bucket (enabled by default)
-4. **Rotate IAM access keys** every 90 days
-5. **Use presigned URLs** instead of making bucket public
-6. **Implement file type validation** on backend (already implemented in AttachmentService)
-7. **Set file size limits** (25MB enforced in AttachmentService)
-8. **Log all S3 API calls** with CloudTrail (production requirement)
-9. **Enable S3 versioning** for accidental deletion recovery
-10. **Use separate buckets** for dev/staging/production environments
+2. **Never use wildcard (`*`) for AllowedHeaders** - specify only required headers (Content-Type, Content-Length, Authorization, x-amz-*)
+3. **Enable S3 bucket encryption** (SSE-S3 or SSE-KMS)
+4. **Block all public access** to bucket (enabled by default)
+5. **Rotate IAM access keys** every 90 days
+6. **Use presigned URLs** instead of making bucket public
+7. **Implement file type validation** on backend (already implemented in AttachmentService)
+8. **Set file size limits** (25MB enforced in AttachmentService)
+9. **Log all S3 API calls** with CloudTrail (production requirement)
+10. **Enable S3 versioning** for accidental deletion recovery
+11. **Use separate buckets** for dev/staging/production environments
 
 ## Cost Estimation
 
