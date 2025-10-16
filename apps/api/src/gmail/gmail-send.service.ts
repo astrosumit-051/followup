@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, InternalServerErrorException } from '@
 import { PrismaService } from '../prisma/prisma.service';
 import { GmailOAuthService } from './gmail-oauth.service';
 import { google } from 'googleapis';
+import { Email, ConversationHistory } from '@relationhub/database';
 
 interface EmailData {
   to: string;
@@ -69,7 +70,7 @@ export class GmailSendService {
     signatureId: string | null,
     campaignId: string | null,
     isColdEmail: boolean,
-  ) {
+  ): Promise<Email> {
     // Step 1: Refresh token if needed
     const accessToken = await this.gmailOAuthService.refreshTokenIfNeeded(userId);
 
@@ -325,7 +326,7 @@ export class GmailSendService {
     emailId: string,
     subject: string,
     bodyText: string,
-  ) {
+  ): Promise<ConversationHistory> {
     const content = `${subject}\n\n${bodyText}`;
 
     return this.prisma.conversationHistory.create({

@@ -1,3 +1,4 @@
+
 # Spec Tasks
 
 These are the tasks to be completed for the spec detailed in @.agent-os/specs/2025-10-15-email-composition-gmail-integration/spec.md
@@ -64,17 +65,17 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 5.9 Implement conversation history entry creation
   - [x] 5.10 Verify all tests pass
 
-- [ ] 6. Backend - Attachment Service
-  - [ ] 6.1 Write tests for AttachmentService (presigned URL generation, file validation, S3 deletion)
-  - [ ] 6.2 Install AWS SDK packages (`@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`)
-  - [ ] 6.3 Create `apps/api/src/attachment/` module
-  - [ ] 6.4 Implement `generatePresignedUploadUrl()` with file type whitelist validation
-  - [ ] 6.5 Implement file size validation (≤25MB) before presigned URL generation
-  - [ ] 6.6 Implement S3 PUT presigned URL generation (15-minute expiry)
-  - [ ] 6.7 Implement `deleteAttachment()` with user authorization check
-  - [ ] 6.8 Implement `cleanupOrphanedAttachments()` background job (deletes attachments >30 days old)
-  - [ ] 6.9 Configure S3 bucket CORS for PUT from app domain
-  - [ ] 6.10 Verify all tests pass
+- [x] 6. Backend - Attachment Service
+  - [x] 6.1 Write tests for AttachmentService (presigned URL generation, file validation, S3 deletion)
+  - [x] 6.2 Install AWS SDK packages (`@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`)
+  - [x] 6.3 Create `apps/api/src/attachment/` module
+  - [x] 6.4 Implement `generatePresignedUploadUrl()` with file type whitelist validation
+  - [x] 6.5 Implement file size validation (≤25MB) before presigned URL generation
+  - [x] 6.6 Implement S3 PUT presigned URL generation (15-minute expiry)
+  - [x] 6.7 Implement `deleteAttachment()` with user authorization check
+  - [x] 6.8 Implement `cleanupOrphanedAttachments()` background job (deletes attachments >30 days old)
+  - [x] 6.9 Configure S3 bucket CORS for PUT from app domain
+  - [x] 6.10 Verify all tests pass
 
 - [ ] 7. Backend - GraphQL Schema & Resolvers
   - [ ] 7.1 Write tests for GraphQL resolvers (EmailDraft, EmailSignature, Gmail mutations/queries)

@@ -2,10 +2,10 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { EmailDraft } from '../entities/email-draft.entity';
 
 /**
- * Page Info for paginated results
+ * Page Info for paginated email draft results
  */
 @ObjectType()
-export class PageInfo {
+export class EmailDraftPageInfo {
   @Field(() => Boolean, { description: 'Whether there are more results available' })
   hasNextPage!: boolean;
 
@@ -23,6 +23,6 @@ export class EmailDraftConnection {
   @Field(() => [EmailDraft], { description: 'Array of email drafts in this page' })
   edges!: EmailDraft[];
 
-  @Field(() => PageInfo, { description: 'Pagination metadata (hasNextPage, total)' })
-  pageInfo!: PageInfo;
+  @Field(() => EmailDraftPageInfo, { description: 'Pagination metadata (hasNextPage, total)' })
+  pageInfo!: EmailDraftPageInfo;
 }
