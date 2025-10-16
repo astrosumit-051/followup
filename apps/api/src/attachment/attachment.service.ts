@@ -28,7 +28,7 @@ export class AttachmentService {
   private bucketName: string;
 
   private readonly MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB in bytes
-  private readonly PRESIGNED_URL_EXPIRY = 15 * 60; // 15 minutes in seconds
+  private readonly PRESIGNED_URL_EXPIRY = 60 * 60; // 60 minutes in seconds
   private readonly ORPHAN_AGE_DAYS = 30;
 
   private readonly ALLOWED_CONTENT_TYPES = [
@@ -73,7 +73,7 @@ export class AttachmentService {
    * 1. Validate file type against whitelist
    * 2. Validate file size (≤25MB)
    * 3. Generate S3 key: userId/attachments/uuid.extension
-   * 4. Create presigned PUT URL with 15-minute expiry
+   * 4. Create presigned PUT URL with 60-minute expiry
    * 5. Return URL, key, and expiry timestamp
    *
    * @param userId - ID of the authenticated user

@@ -362,12 +362,12 @@ aws s3 rm s3://relationhub-attachments-production/test-user/attachments/test-fil
 
 ### Error: `Presigned URL Expired`
 
-**Cause**: URL accessed after 15-minute expiry
+**Cause**: URL accessed after 60-minute expiry
 
 **Solution**:
 - Generate new presigned URL
-- Ensure client uploads within 15 minutes
-- Consider increasing expiry if needed (not recommended for security)
+- Ensure client uploads within 60 minutes
+- Consider decreasing expiry if needed for enhanced security
 
 ### Performance: Slow Uploads
 
