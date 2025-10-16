@@ -9,10 +9,51 @@ import { UpdateDraftInput } from './dto/update-draft.input';
 import { EmailDraft } from './entities/email-draft.entity';
 import { EmailDraftConnection } from './dto/email-draft-connection.output';
 import { PaginationInput, DraftSortField, SortOrder } from './dto/pagination.input';
+import sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class EmailDraftService {
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * Sanitize HTML content to prevent XSS attacks
+   *
+   * Allows safe HTML tags for email composition while stripping
+   * potentially dangerous elements and attributes.
+   *
+   * Allowed tags: basic formatting (b, i, em, strong, u, s, sub, sup),
+   * paragraphs, line breaks, lists, headings, links, code blocks
+   *
+   * @param html - Raw HTML content from user input
+   * @returns Sanitized HTML safe for storage and rendering
+   */
+  private sanitizeHtmlContent(html: string): string {
+    return sanitizeHtml(html, {
+      allowedTags: [
+        'b', 'i', 'em', 'strong', 'u', 's', 'sub', 'sup',
+        'p', 'br', 'ul', 'ol', 'li', 'blockquote',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'a', 'code', 'pre', 'hr',
+      ],
+      allowedAttributes: {
+        'a': ['href', 'target', 'rel'],
+      },
+      allowedSchemes: ['http', 'https', 'mailto'],
+      // Automatically add rel="noopener noreferrer" to external links
+      transformTags: {
+        'a': (tagName, attribs) => {
+          return {
+            tagName: 'a',
+            attribs: {
+              ...attribs,
+              rel: 'noopener noreferrer',
+              target: attribs.target || '_blank',
+            },
+          };
+        },
+      },
+    });
+  }
 
   /**
    * Auto-save email draft (create or update)
@@ -66,10 +107,13 @@ export class EmailDraftService {
     }
 
     // Prepare draft data (ensure bodyJson is not undefined)
+    // Sanitize bodyHtml to prevent XSS attacks
+    const sanitizedBodyHtml = input.bodyHtml ? this.sanitizeHtmlContent(input.bodyHtml) : '';
+
     const draftData = {
       subject: input.subject ?? '',
       bodyJson: input.bodyJson ?? { type: 'doc', content: [] },
-      bodyHtml: input.bodyHtml ?? '',
+      bodyHtml: sanitizedBodyHtml,
       attachments: input.attachments ?? [],
       signatureId: input.signatureId ?? null,
       lastSyncedAt: input.lastSyncedAt ?? new Date(),
