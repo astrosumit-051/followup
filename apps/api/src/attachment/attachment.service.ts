@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../prisma/prisma.service';
 import { S3Client, DeleteObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -40,7 +41,10 @@ export class AttachmentService {
     'image/jpeg',
   ];
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private prisma: PrismaService,
+  ) {
     const region = this.configService.get<string>('AWS_REGION');
     const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID');
     const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY');
@@ -144,20 +148,38 @@ export class AttachmentService {
    * Cleanup orphaned attachments
    *
    * Background job that:
-   * 1. Lists all objects in S3 bucket
-   * 2. Identifies attachments older than 30 days
-   * 3. Batch deletes orphaned attachments
+   * 1. Queries database for all active attachment keys (from drafts and sent emails)
+   * 2. Lists all objects in S3 bucket
+   * 3. Identifies attachments that are both old (>30 days) AND not referenced in database
+   * 4. Batch deletes truly orphaned attachments
+   *
+   * Important: Preserves attachments referenced in sent emails and drafts indefinitely
    *
    * @returns Count of deleted attachments
    */
   async cleanupOrphanedAttachments(): Promise<{ deletedCount: number }> {
+    // Step 1: Get all active attachment keys from database
+    const activeKeys = await this.getActiveAttachmentKeys();
+
+    // Step 2: List all S3 objects
     const objects = await this.listS3Objects();
 
     if (!objects.Contents || objects.Contents.length === 0) {
       return { deletedCount: 0 };
     }
 
-    const orphanedKeys = objects.Contents.filter((obj: any) => this.isOrphanedAttachment(obj.LastModified!))
+    // Step 3: Find truly orphaned attachments (old AND not in database)
+    const orphanedKeys = objects.Contents
+      .filter((obj: any) => {
+        const key = obj.Key!;
+        const lastModified = obj.LastModified!;
+
+        // Must be both old AND not referenced in database
+        const isOld = this.isOrphanedAttachment(lastModified);
+        const isNotReferenced = !activeKeys.has(key);
+
+        return isOld && isNotReferenced;
+      })
       .map((obj: any) => obj.Key!)
       .filter((key: string | undefined) => key !== undefined);
 
@@ -165,9 +187,60 @@ export class AttachmentService {
       return { deletedCount: 0 };
     }
 
+    // Step 4: Delete orphaned objects
     await this.deleteS3Objects(orphanedKeys);
 
     return { deletedCount: orphanedKeys.length };
+  }
+
+  /**
+   * Get all active attachment keys from database
+   *
+   * Queries EmailDraft and Email tables to extract all attachment keys
+   * that are currently referenced. These attachments should never be deleted.
+   *
+   * @returns Set of active S3 keys
+   */
+  private async getActiveAttachmentKeys(): Promise<Set<string>> {
+    const activeKeys = new Set<string>();
+
+    // Get all draft attachments
+    const drafts = await this.prisma.emailDraft.findMany({
+      select: {
+        attachments: true,
+      },
+    });
+
+    for (const draft of drafts) {
+      if (Array.isArray(draft.attachments)) {
+        for (const attachment of draft.attachments) {
+          // Each attachment is { key, filename, size, contentType, s3Url }
+          if (attachment && typeof attachment === 'object' && 'key' in attachment) {
+            activeKeys.add(attachment.key as string);
+          }
+        }
+      }
+    }
+
+    // Get all email attachments (especially sent emails which should be preserved)
+    const emails = await this.prisma.email.findMany({
+      select: {
+        attachments: true,
+      },
+    });
+
+    for (const email of emails) {
+      if (Array.isArray(email.attachments)) {
+        for (const attachment of email.attachments) {
+          // Each attachment is { key, filename, size, contentType, s3Url }
+          if (attachment && typeof attachment === 'object' && 'key' in attachment) {
+            activeKeys.add(attachment.key as string);
+          }
+        }
+      }
+    }
+
+    return activeKeys;
   }
 
   /**
