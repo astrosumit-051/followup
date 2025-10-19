@@ -3,3 +3,8 @@ export { EmailTemplate } from './email-template.entity';
 export { ConversationHistory } from './conversation-history.entity';
 export { GeneratedEmailTemplate, EmailVariant } from './generated-email-template.entity';
 export { EmailConnection, EmailPageInfo } from './email-connection.entity';
+export { EmailDraft } from './email-draft.entity';
+export { EmailSignature } from './email-signature.entity';
+export { Attachment } from './attachment.entity';
+export { PolishedDraft } from './polished-draft.entity';
+export { BulkCampaignResult } from './bulk-campaign-result.entity';

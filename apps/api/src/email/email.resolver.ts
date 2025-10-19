@@ -9,9 +9,14 @@ import { UseGuards, UsePipes, ValidationPipe, Logger, NotFoundException, Forbidd
 import { Throttle } from '@nestjs/throttler';
 import * as sanitizeHtml from 'sanitize-html';
 import { EmailService } from './email.service';
+import { EmailDraftService } from './email-draft.service';
+import { EmailSignatureService } from './email-signature.service';
 import { AIService } from '../ai/ai.service';
-import { Email, EmailTemplate, ConversationHistory, EmailConnection, GeneratedEmailTemplate } from './entities';
-import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput, CreateEmailTemplateInput, UpdateEmailTemplateInput } from './dto';
+import { GmailOAuthService } from '../gmail/gmail-oauth.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { Email, EmailTemplate, ConversationHistory, EmailConnection, GeneratedEmailTemplate, EmailDraft, EmailSignature } from './entities';
+import { GmailConnection } from '../gmail/entities/gmail-connection.entity';
+import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput, CreateEmailTemplateInput, UpdateEmailTemplateInput, CreateDraftInput, UpdateDraftInput, CreateSignatureInput, UpdateSignatureInput, PaginationInput, EmailDraftConnection, SendEmailInput, SendBulkCampaignInput, PolishDraftInput } from './dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/authenticated-user.interface';
@@ -48,7 +53,11 @@ export class EmailResolver {
 
   constructor(
     private readonly emailService: EmailService,
+    private readonly emailDraftService: EmailDraftService,
+    private readonly emailSignatureService: EmailSignatureService,
     private readonly aiService: AIService,
+    private readonly gmailOAuthService: GmailOAuthService,
+    private readonly prisma: PrismaService,
   ) {}
 
   /**
@@ -541,4 +550,355 @@ export class EmailResolver {
       throw error;
     }
   }
+
+  // ==================== EMAIL COMPOSITION QUERIES ====================
+
+  /**
+   * Get email draft for a specific contact
+   *
+   * Returns the email draft for a contact if it exists.
+   * Each user-contact pair can have only one draft at a time.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param contactId - Contact ID to get draft for
+   * @returns EmailDraft or null if no draft exists
+   * @throws NotFoundException if contact doesn't exist
+   * @throws ForbiddenException if contact doesn't belong to user
+   *
+   * @example
+   * ```graphql
+   * query {
+   *   emailDraft(contactId: "contact-123") {
+   *     id
+   *     subject
+   *     bodyJson
+   *     attachments
+   *     lastSyncedAt
+   *   }
+   * }
+   * ```
+   */
+  @Query(() => EmailDraft, { name: 'emailDraft', nullable: true })
+  async getEmailDraft(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('contactId', { type: () => ID }) contactId: string,
+  ): Promise<EmailDraft | null> {
+    this.logger.log(`Getting email draft for user ${user.id}, contact ${contactId}`);
+    return this.emailDraftService.getDraftByContact(user.id, contactId);
+  }
+
+  /**
+   * List all email drafts for the authenticated user
+   *
+   * Returns paginated list of email drafts sorted by update time.
+   * Supports pagination via skip/take parameters.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param pagination - Optional pagination parameters (skip, take)
+   * @returns EmailDraftConnection with drafts and pagination metadata
+   *
+   * @example
+   * ```graphql
+   * query {
+   *   emailDrafts(pagination: { skip: 0, take: 10 }) {
+   *     edges {
+   *       id
+   *       subject
+   *       contact { name }
+   *       updatedAt
+   *     }
+   *     pageInfo {
+   *       hasNextPage
+   *       total
+   *     }
+   *   }
+   * }
+   * ```
+   */
+  @Query(() => EmailDraftConnection, { name: 'emailDrafts' })
+  async listEmailDrafts(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ): Promise<EmailDraftConnection> {
+    this.logger.log(`Listing email drafts for user ${user.id}`);
+    return this.emailDraftService.listDrafts(user.id, pagination);
+  }
+
+  /**
+   * Get all email signatures for the authenticated user
+   *
+   * Returns signatures sorted alphabetically by name.
+   * Maximum 10 signatures per user.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @returns Array of email signatures
+   *
+   * @example
+   * ```graphql
+   * query {
+   *   emailSignatures {
+   *     id
+   *     name
+   *     contentHtml
+   *     isDefaultForFormal
+   *     isDefaultForCasual
+   *   }
+   * }
+   * ```
+   */
+  @Query(() => [EmailSignature], { name: 'emailSignatures' })
+  async listEmailSignatures(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<EmailSignature[]> {
+    this.logger.log(`Listing email signatures for user ${user.id}`);
+    return this.emailSignatureService.listSignatures(user.id);
+  }
+
+  /**
+   * Get Gmail OAuth connection status
+   *
+   * Returns connection status without exposing tokens.
+   * Shows if user has connected Gmail, email address, scopes, and expiry.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @returns GmailConnection status
+   *
+   * @example
+   * ```graphql
+   * query {
+   *   gmailConnection {
+   *     isConnected
+   *     email
+   *     scopes
+   *     expiresAt
+   *   }
+   * }
+   * ```
+   */
+  @Query(() => GmailConnection, { name: 'gmailConnection' })
+  async getGmailConnection(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<GmailConnection> {
+    this.logger.log(`Getting Gmail connection status for user ${user.id}`);
+
+    const status = await this.gmailOAuthService.getConnectionStatus(user.id);
+
+    // Get scopes from gmailToken record if connected
+    let scopes: string[] = [];
+    let connectedAt: Date | null = null;
+
+    if (status.connected) {
+      const tokenRecord = await this.prisma.gmailToken.findUnique({
+        where: { userId: user.id },
+      });
+
+      if (tokenRecord) {
+        scopes = tokenRecord.scope;
+        connectedAt = tokenRecord.createdAt;
+      }
+    }
+
+    return {
+      isConnected: status.connected,
+      email: status.emailAddress,
+      scopes,
+      connectedAt,
+      expiresAt: status.expiresAt,
+    };
+  }
+
+  // ==================== EMAIL COMPOSITION MUTATIONS ====================
+
+  /**
+   * Auto-save email draft
+   *
+   * Creates or updates email draft for a contact with conflict detection.
+   * Only one draft per user-contact pair. Auto-save has high rate limit (60/min).
+   *
+   * Rate limit: 60 requests per minute per user
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param input - Draft content (contactId, subject, bodyJson, bodyHtml, attachments, signatureId)
+   * @returns Created or updated EmailDraft
+   * @throws NotFoundException if contact doesn't exist
+   * @throws ForbiddenException if contact doesn't belong to user
+   * @throws ConflictException if concurrent modification detected
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   autoSaveDraft(input: {
+   *     contactId: "contact-123"
+   *     subject: "Follow-up"
+   *     bodyJson: { type: "doc", content: [] }
+   *     lastSyncedAt: "2025-10-15T10:00:00Z"
+   *   }) {
+   *     id
+   *     subject
+   *     lastSyncedAt
+   *   }
+   * }
+   * ```
+   */
+  @Mutation(() => EmailDraft)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
+  async autoSaveDraft(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('input', { type: () => CreateDraftInput }) input: CreateDraftInput,
+  ): Promise<EmailDraft> {
+    this.logger.log(`Auto-saving draft for user ${user.id}, contact ${input.contactId}`);
+
+    const updateInput: UpdateDraftInput = {
+      subject: input.subject,
+      bodyJson: input.bodyJson,
+      bodyHtml: input.bodyHtml,
+      attachments: input.attachments,
+      signatureId: input.signatureId,
+      lastSyncedAt: input.lastSyncedAt, // Pass client's lastSyncedAt for conflict detection
+    };
+
+    return this.emailDraftService.autoSaveDraft(user.id, input.contactId, updateInput);
+  }
+
+  /**
+   * Delete email draft
+   *
+   * Deletes draft for a specific contact. S3 attachment cleanup handled by background job.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param contactId - Contact ID to delete draft for
+   * @returns True if deleted, false if draft didn't exist
+   * @throws NotFoundException if contact doesn't exist
+   * @throws ForbiddenException if contact doesn't belong to user
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   deleteDraft(contactId: "contact-123")
+   * }
+   * ```
+   */
+  @Mutation(() => Boolean)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
+  async deleteDraft(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('contactId', { type: () => ID }) contactId: string,
+  ): Promise<boolean> {
+    this.logger.log(`Deleting draft for user ${user.id}, contact ${contactId}`);
+    return this.emailDraftService.deleteDraft(user.id, contactId);
+  }
+
+  /**
+   * Create email signature
+   *
+   * Creates new email signature with optional default flags.
+   * Maximum 10 signatures per user. If default flags are set,
+   * other signatures with same flag are automatically unset.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param input - Signature content and default flags
+   * @returns Created EmailSignature
+   * @throws BadRequestException if user already has 10 signatures
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   createSignature(input: {
+   *     name: "Professional"
+   *     contentJson: { type: "doc", content: [] }
+   *     contentHtml: "<p>Best regards,<br>John Doe</p>"
+   *     isDefaultForFormal: true
+   *   }) {
+   *     id
+   *     name
+   *     isDefaultForFormal
+   *   }
+   * }
+   * ```
+   */
+  @Mutation(() => EmailSignature)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
+  async createSignature(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('input', { type: () => CreateSignatureInput }) input: CreateSignatureInput,
+  ): Promise<EmailSignature> {
+    this.logger.log(`Creating signature for user ${user.id}`);
+    return this.emailSignatureService.createSignature(user.id, input);
+  }
+
+  /**
+   * Update email signature
+   *
+   * Updates existing signature. If default flags are changed,
+   * other signatures with same flag are automatically unset.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param id - Signature ID to update
+   * @param input - Updated signature content and flags
+   * @returns Updated EmailSignature
+   * @throws NotFoundException if signature doesn't exist
+   * @throws ForbiddenException if signature doesn't belong to user
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   updateSignature(
+   *     id: "signature-123"
+   *     input: {
+   *       name: "Updated Professional"
+   *       isGlobalDefault: true
+   *     }
+   *   ) {
+   *     id
+   *     name
+   *     isGlobalDefault
+   *   }
+   * }
+   * ```
+   */
+  @Mutation(() => EmailSignature)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
+  async updateSignature(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input', { type: () => UpdateSignatureInput }) input: UpdateSignatureInput,
+  ): Promise<EmailSignature> {
+    this.logger.log(`Updating signature ${id} for user ${user.id}`);
+    return this.emailSignatureService.updateSignature(user.id, id, input);
+  }
+
+  /**
+   * Delete email signature
+   *
+   * Deletes signature and sets all drafts using it to null (referential integrity).
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param id - Signature ID to delete
+   * @returns True if deleted successfully
+   * @throws NotFoundException if signature doesn't exist
+   * @throws ForbiddenException if signature doesn't belong to user
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   deleteSignature(id: "signature-123")
+   * }
+   * ```
+   */
+  @Mutation(() => Boolean)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
+  async deleteSignature(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    this.logger.log(`Deleting signature ${id} for user ${user.id}`);
+    return this.emailSignatureService.deleteSignature(user.id, id);
+  }
+
+  // ==================== EMAIL SEND MUTATIONS ====================
+  // Email sending features (sendEmail, sendBulkCampaign, polishDraft) are documented in:
+  // - Product roadmap: .agent-os/product/roadmap.md (Phase 2)
+  // - Email composition spec: .agent-os/specs/2025-10-10-langchain-ai-email-generation/
+  // Implementation tracked in roadmap Phase 2 tasks
 }

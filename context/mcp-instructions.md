@@ -91,65 +91,7 @@ CRITICAL: Always use Ref instead of relying on memory for:
 
 ---
 
-### 2. **Linear** (`linear-server`)
-**Purpose:** Issue tracking and project management integration with Linear's API
-
-**Tools Available:**
-- Issue Management: Create, update, delete, search issues
-- Project Management: Create projects, get project info, associate issues
-- Team Operations: Get team information, workflow states, labels
-- Comments: Create and read issue comments (including threaded)
-- Batch Operations: Bulk issue creation and deletion
-- Relationships: Create parent/child issue hierarchies
-
-**Key Features:**
-- **Rich Text Support**: Proper handling of Linear's document content format
-- **Batch Processing**: Parallel operations for better performance
-- **Team Integration**: Access to workflow states and team configurations
-- **Type Safety**: Full TypeScript support across all operations
-- **API Key Auth**: Secure authentication with Personal API keys
-
-**Use Cases:**
-- Creating Linear issues from code TODOs or bug reports
-- Tracking feature implementation progress
-- Managing sprint planning and project workflows
-- Linking code changes to Linear issues
-- Automating issue status updates
-- Searching and filtering issues by team, project, or state
-- Creating issue hierarchies for epic tracking
-
-**When to Trigger:**
-- User mentions "issue", "Linear", "ticket", or "task"
-- Creating work items from conversations or code analysis
-- Need to track implementation progress
-- Sprint planning or project management activities
-- Linking development work to project tracking
-- Searching for existing issues or projects
-- Updating issue status or priority
-
-**Best Practice:**
-```
-Use Linear for project management workflow:
-1. Create issues for planned features from specs
-2. Link commits/PRs to Linear issues
-3. Update issue status as work progresses
-4. Use batch operations for bulk updates
-5. Maintain issue hierarchies for epics
-```
-
-**Example Prompts:**
-```
-"Create a Linear issue for implementing user authentication"
-"Search for open issues in the frontend team"
-"Update issue status to 'In Progress' for AUTH-123"
-"Create a project for Q1 2025 roadmap items"
-"Show me all high priority issues assigned to me"
-"Create parent issue for email generation feature with subtasks"
-```
-
----
-
-### 3. **Playwright** (`playwright`)
+### 2. **Playwright** (`playwright`)
 **Purpose:** Broad browser automation and end-to-end testing (use for high-level E2E tests and workflow validation)
 
 **Tools Available:**
@@ -209,7 +151,7 @@ Use Linear for project management workflow:
 
 ---
 
-### 4. **Chrome DevTools** (`chrome-devtools`)
+### 3. **Chrome DevTools** (`chrome-devtools`)
 **Purpose:** Deep Chrome-specific diagnostics and performance analysis (use for detailed debugging)
 
 **Complementary Relationship with Playwright:**
@@ -322,7 +264,7 @@ Use `take_snapshot` to get accessibility tree with element identifiers:
 
 ---
 
-### 5. **Semgrep** (`semgrep`)
+### 4. **Semgrep** (`semgrep`)
 **Purpose:** Static code analysis for security vulnerabilities and code quality
 
 **Tools Available:**
@@ -369,7 +311,7 @@ Always scan security-critical code with Semgrep before finalizing:
 
 ---
 
-### 6. **GitHub** (`github`)
+### 5. **GitHub** (`github`)
 **Purpose:** Repository management, PR automation, and CI/CD integration
 
 **Tools Available:**
@@ -440,7 +382,7 @@ Always scan security-critical code with Semgrep before finalizing:
 
 ---
 
-### 7. **Sequential Thinking** (`sequential-thinking`)
+### 6. **Sequential Thinking** (`sequential-thinking`)
 **Purpose:** Structured, step-by-step problem-solving and complex reasoning
 
 **Tools Available:**
@@ -487,7 +429,7 @@ Use sequential thinking for problems that require:
 
 ---
 
-### 8. **PostgreSQL** (`postgres`)
+### 7. **PostgreSQL** (`postgres`)
 **Purpose:** Direct read-only database query execution for debugging, analysis, and schema verification
 
 **Tools Available:**
@@ -550,7 +492,7 @@ CRITICAL RULES:
 
 ---
 
-### 9. **shadcn** (`shadcn`)
+### 8. **shadcn** (`shadcn`)
 **Purpose:** UI component registry for browsing, searching, and installing shadcn/ui components and blocks
 
 **Tools Available:**
@@ -619,11 +561,10 @@ Component discovery workflow:
 ### 1. **Proactive Tool Usage**
 Don't wait for explicit permission to use MCP tools. If the task clearly benefits from a specific server, use it:
 - Ref: For ANY technical documentation (PRIMARY - use this first)
-- Linear: For issue tracking and project management
 - Playwright: For broad E2E testing and workflow validation
 - Chrome DevTools: For deep performance profiling and debugging
 - Semgrep: For all security-sensitive code
-- GitHub: For repository operations
+- GitHub: For repository operations and issue tracking
 - Sequential Thinking: For complex planning
 - PostgreSQL: For database debugging and verification
 - shadcn: For UI component discovery and installation
@@ -640,7 +581,7 @@ If you encounter ANY of the following situations, you MUST use the appropriate M
 6. **Security concerns** → Use **Semgrep** to scan for vulnerabilities
 7. **Performance problems** → Use **Chrome DevTools** to profile
 8. **Code examples needed** → Use **Ref** → **GitHub** search
-9. **Project context unclear** → Use **Linear** to check related issues
+9. **Project context unclear** → Use **GitHub Issues** to check related issues
 10. **Testing approach unclear** → Use **Sequential Thinking** to plan test strategy
 
 **Never guess, assume, or hallucinate solutions when an MCP server can provide accurate information.**
@@ -650,7 +591,7 @@ When looking up technical information, follow this hierarchy:
 ```
 1. Ref (Official docs, APIs, frameworks) ← START HERE
 2. shadcn (UI component documentation and examples)
-3. Linear (Project specs and issue tracking)
+3. GitHub Issues (Project specs and issue tracking)
 ```
 **Never hallucinate API signatures or configuration options - always check Ref first.**
 
@@ -659,7 +600,7 @@ Combine multiple MCP servers for comprehensive solutions:
 
 ```
 Example: Building a new authenticated feature with Stripe
-1. Linear → Check for existing auth issues and tasks
+1. GitHub Issues → Check for existing auth issues and tasks
 2. Ref → Look up Stripe API subscription documentation
 3. Sequential Thinking → Plan architecture
 4. Ref → Check Next.js auth patterns documentation
@@ -670,7 +611,7 @@ Example: Building a new authenticated feature with Stripe
 9. PostgreSQL → Verify database schema
 10. Playwright → Create E2E tests
 11. Chrome DevTools → Profile performance and Core Web Vitals
-12. Linear → Update issue status and document decisions
+12. GitHub Issues → Update issue status and document decisions
 ```
 
 ### 4. **Context Preservation**
@@ -722,7 +663,7 @@ For database work:
 
 ### Pattern 1: New Feature Development
 ```
-1. Linear: Check for existing issues and feature specs
+1. GitHub Issues: Check for existing issues and feature specs
 2. Ref: Look up relevant API documentation
 3. Sequential Thinking: Plan feature architecture
 4. shadcn: Find UI components for the feature
@@ -732,13 +673,13 @@ For database work:
 8. Semgrep: Security scan
 9. Playwright: E2E tests (broad validation)
 10. Chrome DevTools: Performance profiling (deep analysis)
-11. Linear: Update issue status and document decisions
-12. GitHub: Create PR and link to Linear issue
+11. GitHub Issues: Update issue status and document decisions
+12. GitHub: Create PR and link to issue
 ```
 
 ### Pattern 2: Bug Investigation & Performance Debugging
 ```
-1. Linear: Search for existing bug reports or related issues
+1. GitHub Issues: Search for existing bug reports or related issues
 2. Chrome DevTools: Profile page performance and inspect network
 3. PostgreSQL: Check database state if data-related
 4. Ref: Search official docs for expected behavior
@@ -747,8 +688,8 @@ For database work:
 7. [Implement Fix]
 8. Playwright: Add regression test
 9. Chrome DevTools: Verify performance improvements
-10. Linear: Update bug issue with root cause and fix details
-11. GitHub: Create PR with fix and link to Linear issue
+10. GitHub Issues: Update bug issue with root cause and fix details
+11. GitHub: Create PR with fix and link to issue
 ```
 
 ### Pattern 3: UI Component Implementation
@@ -776,19 +717,19 @@ For database work:
 
 ### Pattern 5: API Integration
 ```
-1. Linear: Check for existing API integration issues
+1. GitHub Issues: Check for existing API integration issues
 2. Ref: Search for API documentation (PRIMARY)
 3. Ref: Read specific endpoint documentation
 4. Sequential Thinking: Plan integration architecture
 5. [Generate Integration Code]
 6. Semgrep: Scan for security issues
 7. Playwright: Create integration tests
-8. Linear: Document API integration details and close issue
+8. GitHub Issues: Document API integration details and close issue
 ```
 
 ### Pattern 6: Database Migration
 ```
-1. Linear: Check migration issues and plans
+1. GitHub Issues: Check migration issues and plans
 2. Sequential Thinking: Plan migration strategy
 3. Ref: Look up Prisma migration documentation
 4. [Generate Migration]
@@ -796,7 +737,7 @@ For database work:
 6. Semgrep: Scan migration code for security issues
 7. Playwright: Test affected features after migration
 8. PostgreSQL: Verify production schema after deployment
-9. Linear: Update migration issue with completion details
+9. GitHub Issues: Update migration issue with completion details
 ```
 
 ---
@@ -811,13 +752,6 @@ Ensure these MCP servers are configured in `.claude.json`:
     "ref": {
       "type": "http",
       "url": "https://api.ref.tools/mcp?apiKey=${REF_API_KEY}"
-    },
-    "linear-server": {
-      "type": "sse",
-      "url": "https://mcp.linear.app/sse",
-      "env": {
-        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
-      }
     },
     "playwright": {
       "command": "npx",
@@ -859,7 +793,6 @@ Ensure these MCP servers are configured in `.claude.json`:
 
 **Get API Keys:**
 - Ref: Sign up at https://ref.tools
-- Linear: Get Personal API key from Linear Settings → Security & access
 - Semgrep: https://semgrep.dev/
 - GitHub: https://github.com/settings/tokens
 - PostgreSQL: Use connection string from your database provider
@@ -883,8 +816,8 @@ Ensure these MCP servers are configured in `.claude.json`:
 | Test slow network/device | Chrome DevTools | mcp__chrome-devtools__emulate_* |
 | Debug network requests | Chrome DevTools | mcp__chrome-devtools__list_network_requests |
 | Manage repository | GitHub | mcp__github__* |
-| Track issues/tasks | Linear | mcp__linear__create_issue, mcp__linear__search_issues |
-| Update project status | Linear | mcp__linear__update_issue |
+| Track issues/tasks | GitHub | mcp__github__create_issue, mcp__github__search_issues |
+| Update issue status | GitHub | mcp__github__update_issue |
 | Plan complex feature | Sequential Thinking | mcp__sequential-thinking__sequentialthinking |
 | Read documentation page | Ref | mcp__Ref__ref_read_url |
 | Create PR | GitHub | mcp__github__create_pull_request |
@@ -909,7 +842,7 @@ Ensure these MCP servers are configured in `.claude.json`:
 - Create E2E tests with Playwright for critical flows (broad validation)
 - Profile with Chrome DevTools for performance optimization (deep analysis)
 - Use Playwright + Chrome DevTools together for comprehensive testing
-- Track work with Linear issues and link to PRs
+- Track work with GitHub Issues and link to PRs
 - Verify documentation with Ref before making assumptions
 
 ❌ **DON'T:**
@@ -921,7 +854,7 @@ Ensure these MCP servers are configured in `.claude.json`:
 - Ignore existing code patterns in the repository
 - Use outdated documentation (Ref always has latest)
 - Skip performance profiling for user-facing features
-- Forget to link Linear issues to PRs
+- Forget to link GitHub Issues to PRs
 
 ---
 

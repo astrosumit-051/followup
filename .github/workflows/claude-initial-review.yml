@@ -1,0 +1,31 @@
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Review this pull request thoroughly:
+            
+            1. Check for code quality issues
+            2. Identify potential bugs
+            3. Suggest improvements
+            4. Verify tests are adequate
+            5. Check documentation
+            
+            If you find issues, post them as review comments with "REQUEST_CHANGES".
+            If everything looks good, approve the PR.

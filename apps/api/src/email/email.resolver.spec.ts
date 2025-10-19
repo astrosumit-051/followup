@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmailResolver } from './email.resolver';
 import { EmailService } from './email.service';
+import { EmailDraftService } from './email-draft.service';
+import { EmailSignatureService } from './email-signature.service';
 import { AIService } from '../ai/ai.service';
+import { GmailOAuthService } from '../gmail/gmail-oauth.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { EmailStatus } from './enums/email-status.enum';
 import { TemplateType } from './enums/template-type.enum';
 import { Direction } from './enums/direction.enum';
@@ -79,11 +83,39 @@ describe('EmailResolver', () => {
     createConversationEntry: jest.fn(),
   };
 
+  // Mock EmailDraftService
+  const mockEmailDraftService = {
+    getDraftByContact: jest.fn(),
+    listDrafts: jest.fn(),
+    autoSaveDraft: jest.fn(),
+    deleteDraft: jest.fn(),
+  };
+
+  // Mock EmailSignatureService
+  const mockEmailSignatureService = {
+    listSignatures: jest.fn(),
+    createSignature: jest.fn(),
+    updateSignature: jest.fn(),
+    deleteSignature: jest.fn(),
+  };
+
   // Mock AIService
   const mockAIService = {
     generateEmailTemplate: jest.fn(),
     isOpenAIAvailable: jest.fn().mockReturnValue(true),
     isAnthropicAvailable: jest.fn().mockReturnValue(true),
+  };
+
+  // Mock GmailOAuthService
+  const mockGmailOAuthService = {
+    getConnectionStatus: jest.fn(),
+  };
+
+  // Mock PrismaService
+  const mockPrismaService = {
+    gmailToken: {
+      findUnique: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -95,8 +127,24 @@ describe('EmailResolver', () => {
           useValue: mockEmailService,
         },
         {
+          provide: EmailDraftService,
+          useValue: mockEmailDraftService,
+        },
+        {
+          provide: EmailSignatureService,
+          useValue: mockEmailSignatureService,
+        },
+        {
           provide: AIService,
           useValue: mockAIService,
+        },
+        {
+          provide: GmailOAuthService,
+          useValue: mockGmailOAuthService,
+        },
+        {
+          provide: PrismaService,
+          useValue: mockPrismaService,
         },
       ],
     }).compile();
@@ -1262,6 +1310,293 @@ describe('EmailResolver', () => {
       await expect(
         resolver.deleteEmail(mockUser, 'email-456'),
       ).rejects.toThrow('Database connection failed');
+    });
+  });
+
+  // ==================== EMAIL COMPOSITION TESTS ====================
+
+  describe('Email Composition - Additional Services', () => {
+    let emailDraftService: any;
+    let emailSignatureService: any;
+    let gmailOAuthService: any;
+    let prismaService: any;
+
+    const mockEmailDraft = {
+      id: 'draft-123',
+      userId: 'user-123',
+      contactId: 'contact-789',
+      subject: 'Test Draft Subject',
+      bodyJson: { type: 'doc', content: [] },
+      bodyHtml: '<p>Test draft content</p>',
+      attachments: [],
+      signatureId: undefined,
+      lastSyncedAt: new Date('2025-10-15T10:00:00Z'),
+      createdAt: new Date('2025-10-15T09:00:00Z'),
+      updatedAt: new Date('2025-10-15T10:00:00Z'),
+    };
+
+    const mockEmailSignature = {
+      id: 'signature-123',
+      userId: 'user-123',
+      name: 'Professional',
+      contentJson: { type: 'doc', content: [] },
+      contentHtml: '<p>Best regards,<br>John Doe</p>',
+      isDefaultForFormal: true,
+      isDefaultForCasual: false,
+      isGlobalDefault: false,
+      createdAt: new Date('2025-10-15T09:00:00Z'),
+      updatedAt: new Date('2025-10-15T09:00:00Z'),
+    };
+
+    beforeEach(() => {
+      // Create mock services
+      emailDraftService = {
+        getDraftByContact: jest.fn(),
+        listDrafts: jest.fn(),
+        autoSaveDraft: jest.fn(),
+        deleteDraft: jest.fn(),
+      };
+
+      emailSignatureService = {
+        listSignatures: jest.fn(),
+        createSignature: jest.fn(),
+        updateSignature: jest.fn(),
+        deleteSignature: jest.fn(),
+      };
+
+      gmailOAuthService = {
+        getConnectionStatus: jest.fn(),
+      };
+
+      prismaService = {
+        gmailToken: {
+          findUnique: jest.fn(),
+        },
+      };
+
+      // Replace resolver's services with mocks
+      (resolver as any).emailDraftService = emailDraftService;
+      (resolver as any).emailSignatureService = emailSignatureService;
+      (resolver as any).gmailOAuthService = gmailOAuthService;
+      (resolver as any).prisma = prismaService;
+    });
+
+    describe('emailDraft query', () => {
+      it('should return email draft for a specific contact', async () => {
+        emailDraftService.getDraftByContact.mockResolvedValue(mockEmailDraft);
+
+        const result = await resolver.getEmailDraft(mockUser, 'contact-789');
+
+        expect(result).toEqual(mockEmailDraft);
+        expect(emailDraftService.getDraftByContact).toHaveBeenCalledWith('user-123', 'contact-789');
+      });
+
+      it('should return null when draft does not exist', async () => {
+        emailDraftService.getDraftByContact.mockResolvedValue(null);
+
+        const result = await resolver.getEmailDraft(mockUser, 'contact-789');
+
+        expect(result).toBeNull();
+      });
+    });
+
+    describe('emailDrafts query', () => {
+      it('should return paginated list of email drafts', async () => {
+        const mockConnection = {
+          edges: [mockEmailDraft],
+          pageInfo: { hasNextPage: false, total: 1 },
+        };
+
+        emailDraftService.listDrafts.mockResolvedValue(mockConnection);
+
+        const result = await resolver.listEmailDrafts(mockUser, { skip: 0, take: 10 });
+
+        expect(result).toEqual(mockConnection);
+        expect(emailDraftService.listDrafts).toHaveBeenCalledWith('user-123', { skip: 0, take: 10 });
+      });
+
+      it('should return empty list when no drafts exist', async () => {
+        const emptyConnection = {
+          edges: [],
+          pageInfo: { hasNextPage: false, total: 0 },
+        };
+
+        emailDraftService.listDrafts.mockResolvedValue(emptyConnection);
+
+        const result = await resolver.listEmailDrafts(mockUser);
+
+        expect(result.edges).toHaveLength(0);
+        expect(result.pageInfo.total).toBe(0);
+      });
+    });
+
+    describe('emailSignatures query', () => {
+      it('should return all signatures for user', async () => {
+        emailSignatureService.listSignatures.mockResolvedValue([mockEmailSignature]);
+
+        const result = await resolver.listEmailSignatures(mockUser);
+
+        expect(result).toEqual([mockEmailSignature]);
+        expect(emailSignatureService.listSignatures).toHaveBeenCalledWith('user-123');
+      });
+
+      it('should return empty array when no signatures exist', async () => {
+        emailSignatureService.listSignatures.mockResolvedValue([]);
+
+        const result = await resolver.listEmailSignatures(mockUser);
+
+        expect(result).toHaveLength(0);
+      });
+    });
+
+    describe('gmailConnection query', () => {
+      it('should return connection status when Gmail is connected', async () => {
+        const mockStatus = {
+          connected: true,
+          emailAddress: 'test@gmail.com',
+          expiresAt: new Date('2025-10-16T10:00:00Z'),
+        };
+
+        const mockTokenRecord = {
+          userId: 'user-123',
+          scope: ['https://www.googleapis.com/auth/gmail.send'],
+          createdAt: new Date('2025-10-15T09:00:00Z'),
+        };
+
+        gmailOAuthService.getConnectionStatus.mockResolvedValue(mockStatus);
+        prismaService.gmailToken.findUnique.mockResolvedValue(mockTokenRecord);
+
+        const result = await resolver.getGmailConnection(mockUser);
+
+        expect(result).toEqual({
+          isConnected: true,
+          email: 'test@gmail.com',
+          scopes: ['https://www.googleapis.com/auth/gmail.send'],
+          connectedAt: mockTokenRecord.createdAt,
+          expiresAt: mockStatus.expiresAt,
+        });
+      });
+
+      it('should return disconnected status when Gmail is not connected', async () => {
+        gmailOAuthService.getConnectionStatus.mockResolvedValue({
+          connected: false,
+          emailAddress: null,
+          expiresAt: null,
+        });
+
+        const result = await resolver.getGmailConnection(mockUser);
+
+        expect(result.isConnected).toBe(false);
+        expect(result.scopes).toEqual([]);
+      });
+    });
+
+    describe('autoSaveDraft mutation', () => {
+      const mockCreateDraftInput = {
+        contactId: 'contact-789',
+        subject: 'Test Subject',
+        bodyJson: { type: 'doc', content: [] },
+        bodyHtml: '<p>Test content</p>',
+        attachments: [],
+        signatureId: undefined,
+      };
+
+      it('should create or update draft successfully', async () => {
+        emailDraftService.autoSaveDraft.mockResolvedValue(mockEmailDraft);
+
+        const result = await resolver.autoSaveDraft(mockUser, mockCreateDraftInput);
+
+        expect(result).toEqual(mockEmailDraft);
+        expect(emailDraftService.autoSaveDraft).toHaveBeenCalledWith(
+          'user-123',
+          'contact-789',
+          expect.objectContaining({
+            subject: 'Test Subject',
+            bodyJson: mockCreateDraftInput.bodyJson,
+            lastSyncedAt: expect.any(Date),
+          })
+        );
+      });
+
+      it('should set lastSyncedAt to current date', async () => {
+        emailDraftService.autoSaveDraft.mockResolvedValue(mockEmailDraft);
+
+        const beforeCall = new Date();
+        await resolver.autoSaveDraft(mockUser, mockCreateDraftInput);
+        const afterCall = new Date();
+
+        const callArgs = emailDraftService.autoSaveDraft.mock.calls[0][2];
+        expect(callArgs.lastSyncedAt).toBeInstanceOf(Date);
+        expect(callArgs.lastSyncedAt.getTime()).toBeGreaterThanOrEqual(beforeCall.getTime());
+        expect(callArgs.lastSyncedAt.getTime()).toBeLessThanOrEqual(afterCall.getTime());
+      });
+    });
+
+    describe('deleteDraft mutation', () => {
+      it('should delete draft successfully', async () => {
+        emailDraftService.deleteDraft.mockResolvedValue(true);
+
+        const result = await resolver.deleteDraft(mockUser, 'contact-789');
+
+        expect(result).toBe(true);
+        expect(emailDraftService.deleteDraft).toHaveBeenCalledWith('user-123', 'contact-789');
+      });
+
+      it('should return false when draft does not exist', async () => {
+        emailDraftService.deleteDraft.mockResolvedValue(false);
+
+        const result = await resolver.deleteDraft(mockUser, 'contact-789');
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('createSignature mutation', () => {
+      const mockCreateSignatureInput = {
+        name: 'Professional',
+        contentJson: { type: 'doc', content: [] },
+        contentHtml: '<p>Best regards</p>',
+        isDefaultForFormal: true,
+        isDefaultForCasual: false,
+        isGlobalDefault: false,
+      };
+
+      it('should create signature successfully', async () => {
+        emailSignatureService.createSignature.mockResolvedValue(mockEmailSignature);
+
+        const result = await resolver.createSignature(mockUser, mockCreateSignatureInput);
+
+        expect(result).toEqual(mockEmailSignature);
+        expect(emailSignatureService.createSignature).toHaveBeenCalledWith('user-123', mockCreateSignatureInput);
+      });
+    });
+
+    describe('updateSignature mutation', () => {
+      const mockUpdateInput = {
+        name: 'Updated Professional',
+        isDefaultForFormal: true,
+      };
+
+      it('should update signature successfully', async () => {
+        const updatedSignature = { ...mockEmailSignature, name: 'Updated Professional' };
+        emailSignatureService.updateSignature.mockResolvedValue(updatedSignature);
+
+        const result = await resolver.updateSignature(mockUser, 'signature-123', mockUpdateInput);
+
+        expect(result.name).toBe('Updated Professional');
+        expect(emailSignatureService.updateSignature).toHaveBeenCalledWith('user-123', 'signature-123', mockUpdateInput);
+      });
+    });
+
+    describe('deleteSignature mutation', () => {
+      it('should delete signature successfully', async () => {
+        emailSignatureService.deleteSignature.mockResolvedValue(true);
+
+        const result = await resolver.deleteSignature(mockUser, 'signature-123');
+
+        expect(result).toBe(true);
+        expect(emailSignatureService.deleteSignature).toHaveBeenCalledWith('user-123', 'signature-123');
+      });
     });
   });
 });
