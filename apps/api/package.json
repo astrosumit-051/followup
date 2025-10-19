@@ -8,9 +8,10 @@
     "start": "nest start",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test": "NODE_OPTIONS='--max-old-space-size=4096' jest",
+    "test:watch": "NODE_OPTIONS='--max-old-space-size=4096' jest --watch",
+    "test:cov": "NODE_OPTIONS='--max-old-space-size=4096' jest --coverage",
+    "test:ci": "NODE_OPTIONS='--max-old-space-size=4096' jest --ci --runInBand --coverage",
     "db:seed:performance": "ts-node prisma/seeds/performance-seed.ts"
   },
   "dependencies": {
