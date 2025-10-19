@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Client, DeleteObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } from '@aws-sdk/client-s3';
@@ -24,11 +24,12 @@ import { randomUUID } from 'crypto';
  */
 @Injectable()
 export class AttachmentService {
+  private readonly logger = new Logger(AttachmentService.name);
   private s3Client: S3Client;
   private bucketName: string;
 
   private readonly MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB in bytes
-  private readonly PRESIGNED_URL_EXPIRY = 60 * 60; // 60 minutes in seconds
+  private readonly PRESIGNED_URL_EXPIRY = 15 * 60; // 15 minutes in seconds (900)
   private readonly ORPHAN_AGE_DAYS = 30;
 
   private readonly ALLOWED_CONTENT_TYPES = [
@@ -103,24 +104,34 @@ export class AttachmentService {
     const uuid = randomUUID();
     const key = `${userId}/attachments/${uuid}${extension}`;
 
-    // Create presigned URL for PUT operation
-    const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: key,
-      ContentType: contentType,
-    });
+    try {
+      // Create presigned URL for PUT operation
+      const command = new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+        ContentType: contentType,
+      });
 
-    const uploadUrl = await getSignedUrl(this.s3Client, command, {
-      expiresIn: this.PRESIGNED_URL_EXPIRY,
-    });
+      const uploadUrl = await getSignedUrl(this.s3Client, command, {
+        expiresIn: this.PRESIGNED_URL_EXPIRY,
+      });
 
-    const expiresAt = new Date(Date.now() + this.PRESIGNED_URL_EXPIRY * 1000);
+      const expiresAt = new Date(Date.now() + this.PRESIGNED_URL_EXPIRY * 1000);
 
-    return {
-      uploadUrl,
-      key,
-      expiresAt,
-    };
+      this.logger.log(`Generated presigned upload URL for user ${userId}: ${key}`);
+
+      return {
+        uploadUrl,
+        key,
+        expiresAt,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to generate presigned upload URL for user ${userId}: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException('Failed to generate upload URL. Please try again.');
+    }
   }
 
   /**
@@ -140,8 +151,17 @@ export class AttachmentService {
       throw new ForbiddenException('You do not have permission to delete this attachment');
     }
 
-    await this.deleteFromS3(key);
-    return true;
+    try {
+      await this.deleteFromS3(key);
+      this.logger.log(`Successfully deleted attachment for user ${userId}: ${key}`);
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Failed to delete attachment ${key} for user ${userId}: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException('Failed to delete attachment. Please try again.');
+    }
   }
 
   /**
@@ -158,39 +178,47 @@ export class AttachmentService {
    * @returns Count of deleted attachments
    */
   async cleanupOrphanedAttachments(): Promise<{ deletedCount: number }> {
-    // Step 1: Get all active attachment keys from database
-    const activeKeys = await this.getActiveAttachmentKeys();
+    try {
+      // Step 1: Get all active attachment keys from database
+      const activeKeys = await this.getActiveAttachmentKeys();
 
-    // Step 2: List all S3 objects
-    const objects = await this.listS3Objects();
+      // Step 2: List all S3 objects
+      const objects = await this.listS3Objects();
 
-    if (!objects.Contents || objects.Contents.length === 0) {
-      return { deletedCount: 0 };
+      if (!objects.Contents || objects.Contents.length === 0) {
+        this.logger.log('No S3 objects found during cleanup');
+        return { deletedCount: 0 };
+      }
+
+      // Step 3: Find truly orphaned attachments (old AND not in database)
+      const orphanedKeys = objects.Contents
+        .filter((obj: any) => {
+          const key = obj.Key!;
+          const lastModified = obj.LastModified!;
+
+          // Must be both old AND not referenced in database
+          const isOld = this.isOrphanedAttachment(lastModified);
+          const isNotReferenced = !activeKeys.has(key);
+
+          return isOld && isNotReferenced;
+        })
+        .map((obj: any) => obj.Key!)
+        .filter((key: string | undefined) => key !== undefined);
+
+      if (orphanedKeys.length === 0) {
+        this.logger.log('No orphaned attachments found during cleanup');
+        return { deletedCount: 0 };
+      }
+
+      // Step 4: Delete orphaned objects
+      await this.deleteS3Objects(orphanedKeys);
+
+      this.logger.log(`Successfully cleaned up ${orphanedKeys.length} orphaned attachments`);
+      return { deletedCount: orphanedKeys.length };
+    } catch (error) {
+      this.logger.error(`Failed to cleanup orphaned attachments: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to cleanup orphaned attachments');
     }
-
-    // Step 3: Find truly orphaned attachments (old AND not in database)
-    const orphanedKeys = objects.Contents
-      .filter((obj: any) => {
-        const key = obj.Key!;
-        const lastModified = obj.LastModified!;
-
-        // Must be both old AND not referenced in database
-        const isOld = this.isOrphanedAttachment(lastModified);
-        const isNotReferenced = !activeKeys.has(key);
-
-        return isOld && isNotReferenced;
-      })
-      .map((obj: any) => obj.Key!)
-      .filter((key: string | undefined) => key !== undefined);
-
-    if (orphanedKeys.length === 0) {
-      return { deletedCount: 0 };
-    }
-
-    // Step 4: Delete orphaned objects
-    await this.deleteS3Objects(orphanedKeys);
-
-    return { deletedCount: orphanedKeys.length };
   }
 
   /**
@@ -292,13 +320,19 @@ export class AttachmentService {
    * Delete single object from S3
    *
    * @param key - S3 key to delete
+   * @throws InternalServerErrorException if S3 deletion fails
    */
   private async deleteFromS3(key: string): Promise<void> {
-    const command = new DeleteObjectCommand({
-      Bucket: this.bucketName,
-      Key: key,
-    });
-    await this.s3Client.send(command);
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+      });
+      await this.s3Client.send(command);
+    } catch (error) {
+      this.logger.error(`Failed to delete S3 object ${key}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException(`Failed to delete S3 object: ${key}`);
+    }
   }
 
   /**
@@ -308,41 +342,53 @@ export class AttachmentService {
    * all objects are retrieved (not just first 1000).
    *
    * @returns Array of all S3 objects
+   * @throws InternalServerErrorException if S3 listing fails
    */
   private async listS3Objects(): Promise<{ Contents: any[] }> {
-    const allObjects: any[] = [];
-    let continuationToken: string | undefined;
+    try {
+      const allObjects: any[] = [];
+      let continuationToken: string | undefined;
 
-    do {
-      const command = new ListObjectsV2Command({
-        Bucket: this.bucketName,
-        ContinuationToken: continuationToken,
-      });
+      do {
+        const command = new ListObjectsV2Command({
+          Bucket: this.bucketName,
+          ContinuationToken: continuationToken,
+        });
 
-      const response = await this.s3Client.send(command);
+        const response = await this.s3Client.send(command);
 
-      if (response.Contents) {
-        allObjects.push(...response.Contents);
-      }
+        if (response.Contents) {
+          allObjects.push(...response.Contents);
+        }
 
-      continuationToken = response.NextContinuationToken;
-    } while (continuationToken);
+        continuationToken = response.NextContinuationToken;
+      } while (continuationToken);
 
-    return { Contents: allObjects };
+      return { Contents: allObjects };
+    } catch (error) {
+      this.logger.error(`Failed to list S3 objects in bucket ${this.bucketName}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to list S3 objects');
+    }
   }
 
   /**
    * Batch delete multiple objects from S3
    *
    * @param keys - Array of S3 keys to delete
+   * @throws InternalServerErrorException if S3 batch deletion fails
    */
   private async deleteS3Objects(keys: string[]): Promise<void> {
-    const command = new DeleteObjectsCommand({
-      Bucket: this.bucketName,
-      Delete: {
-        Objects: keys.map(key => ({ Key: key })),
-      },
-    });
-    await this.s3Client.send(command);
+    try {
+      const command = new DeleteObjectsCommand({
+        Bucket: this.bucketName,
+        Delete: {
+          Objects: keys.map(key => ({ Key: key })),
+        },
+      });
+      await this.s3Client.send(command);
+    } catch (error) {
+      this.logger.error(`Failed to batch delete ${keys.length} S3 objects: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to batch delete S3 objects');
+    }
   }
 }

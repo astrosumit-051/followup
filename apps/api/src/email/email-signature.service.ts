@@ -159,25 +159,62 @@ export class EmailSignatureService {
     const hasNoDefaultFlags = !input.isGlobalDefault && !input.isDefaultForFormal && !input.isDefaultForCasual;
     const shouldSetGlobalDefault = isFirstSignature && hasNoDefaultFlags;
 
-    // Unset other default flags if setting new defaults
-    await this.unsetDefaultFlags(userId, input);
-
     // Sanitize HTML content to prevent XSS attacks
     const sanitizedContentHtml = input.contentHtml ? this.sanitizeHtmlContent(input.contentHtml) : '';
 
-    // Create signature
-    return this.prisma.emailSignature.create({
-      data: {
-        userId,
-        name: input.name,
-        contentJson: input.contentJson,
-        contentHtml: sanitizedContentHtml,
-        isDefaultForFormal: input.isDefaultForFormal ?? false,
-        isDefaultForCasual: input.isDefaultForCasual ?? false,
-        isGlobalDefault: shouldSetGlobalDefault ? true : (input.isGlobalDefault ?? false),
-        usageCount: 0,
-      },
-    }) as unknown as EmailSignature;
+    // Wrap in transaction to ensure atomicity
+    return await this.prisma.$transaction(async (tx) => {
+      // Unset other default flags if setting new defaults
+      if (input.isGlobalDefault) {
+        await tx.emailSignature.updateMany({
+          where: {
+            userId,
+            isGlobalDefault: true,
+          },
+          data: {
+            isGlobalDefault: false,
+          },
+        });
+      }
+
+      if (input.isDefaultForFormal) {
+        await tx.emailSignature.updateMany({
+          where: {
+            userId,
+            isDefaultForFormal: true,
+          },
+          data: {
+            isDefaultForFormal: false,
+          },
+        });
+      }
+
+      if (input.isDefaultForCasual) {
+        await tx.emailSignature.updateMany({
+          where: {
+            userId,
+            isDefaultForCasual: true,
+          },
+          data: {
+            isDefaultForCasual: false,
+          },
+        });
+      }
+
+      // Create signature
+      return tx.emailSignature.create({
+        data: {
+          userId,
+          name: input.name,
+          contentJson: input.contentJson,
+          contentHtml: sanitizedContentHtml,
+          isDefaultForFormal: input.isDefaultForFormal ?? false,
+          isDefaultForCasual: input.isDefaultForCasual ?? false,
+          isGlobalDefault: shouldSetGlobalDefault ? true : (input.isGlobalDefault ?? false),
+          usageCount: 0,
+        },
+      }) as unknown as EmailSignature;
+    });
   }
 
   /**
@@ -211,24 +248,64 @@ export class EmailSignatureService {
       throw new ForbiddenException('You do not have permission to update this signature');
     }
 
-    // Unset other default flags if setting new defaults (excluding current signature)
-    await this.unsetDefaultFlags(userId, input, signatureId);
-
     // Sanitize HTML content to prevent XSS attacks
     const sanitizedContentHtml = input.contentHtml ? this.sanitizeHtmlContent(input.contentHtml) : undefined;
 
-    // Update signature
-    return this.prisma.emailSignature.update({
-      where: { id: signatureId },
-      data: {
-        name: input.name,
-        contentJson: input.contentJson,
-        contentHtml: sanitizedContentHtml,
-        isDefaultForFormal: input.isDefaultForFormal,
-        isDefaultForCasual: input.isDefaultForCasual,
-        isGlobalDefault: input.isGlobalDefault,
-      },
-    }) as unknown as EmailSignature;
+    // Wrap in transaction to ensure atomicity
+    return await this.prisma.$transaction(async (tx) => {
+      // Unset other default flags if setting new defaults (excluding current signature)
+      if (input.isGlobalDefault) {
+        await tx.emailSignature.updateMany({
+          where: {
+            userId,
+            isGlobalDefault: true,
+            id: { not: signatureId },
+          },
+          data: {
+            isGlobalDefault: false,
+          },
+        });
+      }
+
+      if (input.isDefaultForFormal) {
+        await tx.emailSignature.updateMany({
+          where: {
+            userId,
+            isDefaultForFormal: true,
+            id: { not: signatureId },
+          },
+          data: {
+            isDefaultForFormal: false,
+          },
+        });
+      }
+
+      if (input.isDefaultForCasual) {
+        await tx.emailSignature.updateMany({
+          where: {
+            userId,
+            isDefaultForCasual: true,
+            id: { not: signatureId },
+          },
+          data: {
+            isDefaultForCasual: false,
+          },
+        });
+      }
+
+      // Update signature
+      return tx.emailSignature.update({
+        where: { id: signatureId },
+        data: {
+          name: input.name,
+          contentJson: input.contentJson,
+          contentHtml: sanitizedContentHtml,
+          isDefaultForFormal: input.isDefaultForFormal,
+          isDefaultForCasual: input.isDefaultForCasual,
+          isGlobalDefault: input.isGlobalDefault,
+        },
+      }) as unknown as EmailSignature;
+    });
   }
 
   /**

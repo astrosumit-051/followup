@@ -71,34 +71,33 @@ Guide: `~/.agent-os/instructions/execute-tasks.md`
 
 All MCP server details including full tool lists, usage patterns, and workflows are documented in the comprehensive guide. Below is a quick reference of available servers:
 
-### Quick Reference - 9 MCP Servers Available
+### Quick Reference - 8 MCP Servers Available
 
 | # | Server | Primary Purpose | Key Tools |
 |---|--------|-----------------|-----------|
 | 1 | **Ref** | Token-efficient documentation search (USE FIRST) | `ref_search_documentation`, `ref_read_url` |
-| 2 | **Linear** | Issue tracking & project management | Issue/project CRUD, search, comments, batch ops |
-| 3 | **Playwright** | Broad E2E testing & workflow validation | 20 tools for navigation, interaction, testing |
-| 4 | **Chrome DevTools** | Deep performance profiling & debugging | 25+ tools for performance, network, emulation |
-| 5 | **Semgrep** | Security scanning & static analysis | 7 tools for vulnerability detection |
-| 6 | **GitHub** | Repository management & PR automation | 30+ tools for code, issues, PRs, workflows |
-| 7 | **Sequential Thinking** | Complex multi-step problem solving | `sequentialthinking` |
-| 8 | **PostgreSQL** | Read-only database queries for debugging | `query` |
-| 9 | **shadcn** | UI component registry & installation | Browse/search/install components, examples |
+| 2 | **Playwright** | Broad E2E testing & workflow validation | 20 tools for navigation, interaction, testing |
+| 3 | **Chrome DevTools** | Deep performance profiling & debugging | 25+ tools for performance, network, emulation |
+| 4 | **Semgrep** | Security scanning & static analysis | 7 tools for vulnerability detection |
+| 5 | **GitHub** | Repository management & PR automation | 30+ tools for code, issues, PRs, workflows |
+| 6 | **Sequential Thinking** | Complex multi-step problem solving | `sequentialthinking` |
+| 7 | **PostgreSQL** | Read-only database queries for debugging | `query` |
+| 8 | **shadcn** | UI component registry & installation | Browse/search/install components, examples |
 
 ### Priority Rules
 
 **ALWAYS start with Ref** for any technical documentation lookup - never hallucinate API signatures.
 
 **For every feature:**
-1. 🔍 **Research**: Ref → Sequential Thinking → Linear (check existing issues)
+1. 🔍 **Research**: Ref → Sequential Thinking → GitHub Issues (check existing issues)
 2. 🎨 **UI Components**: shadcn for pre-built components
 3. 🛠️ **Implement**: Follow tech-stack.md with continuous Ref lookups
 4. 🔒 **Security**: Semgrep scan on auth/database/API code
 5. 🗄️ **Database**: PostgreSQL to verify schema after migrations
 6. 🧪 **Testing**: Playwright E2E tests (broad validation)
 7. ⚡ **Performance**: Chrome DevTools profiling (deep analysis)
-8. 📋 **Track**: Linear to update issue status and document decisions
-9. 🚀 **Deploy**: GitHub PR creation linked to Linear issue
+8. 📋 **Track**: GitHub Issues to update status and document decisions
+9. 🚀 **Deploy**: GitHub PR creation linked to issue
 
 **📚 See `/context/mcp-instructions.md` for:**
 - Complete tool lists for each server
@@ -140,9 +139,6 @@ The following MCP tools can be used without requiring user approval for automate
 - `mcp__Ref__ref_search_documentation` - Search documentation
 - `mcp__Ref__ref_read_url` - Read documentation URLs
 
-**Linear MCP:**
-- Linear tools (issue tracking) - Used with explicit user permission
-
 **shadcn MCP:**
 - `mcp__shadcn__get_project_registries` - Get configured registries
 - `mcp__shadcn__list_items_in_registries` - List components
@@ -171,7 +167,7 @@ The following MCP tools can be used without requiring user approval for automate
 #### Step 1: Research & Planning
 ```
 1. Check .agent-os/product/roadmap.md for current priorities
-2. Check Linear for existing issues and feature specs
+2. Check GitHub Issues for existing issues and feature specs
 3. Use Ref to research required APIs and frameworks
 4. Use Sequential Thinking for complex feature planning
 5. Use shadcn to find UI components for the feature
@@ -210,32 +206,32 @@ The following MCP tools can be used without requiring user approval for automate
 
 #### Contact Management Features
 ```
-Linear (check issues) → Ref (Prisma) → Sequential Thinking →
+GitHub (check issues) → Ref (Prisma) → Sequential Thinking →
 shadcn (forms/tables) → Ref (Next.js) → Implement →
 Semgrep → PostgreSQL → Playwright → Chrome DevTools →
-Linear (update issue)
+GitHub (update issue)
 ```
 
 #### AI Email Generation Features
 ```
-Linear (check issues) → Sequential Thinking → Ref (LangChain + OpenAI) →
+GitHub (check issues) → Sequential Thinking → Ref (LangChain + OpenAI) →
 shadcn (email editor components) → Implement →
 Semgrep (prompt injection) → PostgreSQL → Playwright →
-Chrome DevTools (performance testing) → Linear (update issue)
+Chrome DevTools (performance testing) → GitHub (update issue)
 ```
 
 #### Calendar Integration Features
 ```
-Linear (check issues) → Sequential Thinking → Ref (Calendar APIs + OAuth) →
+GitHub (check issues) → Sequential Thinking → Ref (Calendar APIs + OAuth) →
 shadcn (calendar UI) → Implement → Semgrep (OAuth) →
-Playwright → Chrome DevTools → Linear (update issue)
+Playwright → Chrome DevTools → GitHub (update issue)
 ```
 
 #### Dashboard & Analytics Features
 ```
-Linear (check issues) → Ref (Recharts + TanStack Query) →
+GitHub (check issues) → Ref (Recharts + TanStack Query) →
 shadcn (charts/cards) → Implement → PostgreSQL (query testing) →
-Playwright → Chrome DevTools (Core Web Vitals) → Linear (update issue)
+Playwright → Chrome DevTools (Core Web Vitals) → GitHub (update issue)
 ```
 
 **💡 For complete workflows with detailed steps, see the comprehensive workflow patterns in `/context/mcp-instructions.md`**
@@ -397,7 +393,7 @@ When conflicts arise, follow this priority hierarchy:
 - Use **shadcn** to find UI components before building from scratch
 - Verify with **Ref** before implementing any API/library
 - Check **PostgreSQL** schema before and after migrations
-- Track work with **Linear** issues and link to PRs
+- Track work with **GitHub Issues** and link to PRs
 - Use **Playwright + Chrome DevTools** together for comprehensive testing
 
 ❌ **NEVER:**
@@ -408,7 +404,7 @@ When conflicts arise, follow this priority hierarchy:
 - Skip performance profiling for user-facing features
 - Make assumptions about library usage without checking Ref
 - Run destructive queries with PostgreSQL MCP (READ-ONLY - use Prisma for writes)
-- Forget to link Linear issues to PRs
+- Forget to link GitHub Issues to PRs
 
 **🚨 CRITICAL: When Stuck or Encountering Problems**
 
@@ -422,7 +418,7 @@ When conflicts arise, follow this priority hierarchy:
 6. **Security concerns** → **Semgrep** (scan for vulnerabilities)
 7. **Performance problems** → **Chrome DevTools** (profile performance)
 8. **Code examples needed** → **Ref** → **GitHub** (search code)
-9. **Project context unclear** → **Linear** (check related issues)
+9. **Project context unclear** → **GitHub Issues** (check related issues)
 10. **Testing approach unclear** → **Sequential Thinking** (plan test strategy)
 
 **Never guess, assume, or hallucinate solutions when an MCP server can provide accurate information.**
@@ -479,14 +475,14 @@ When conflicts arise, follow this priority hierarchy:
 ```
 1. Follow: ~/.agent-os/instructions/execute-tasks.md
 2. Reference: /context/mcp-instructions.md for MCP workflows and tool lists
-3. Check Linear for existing issues
+3. Check GitHub Issues for existing issues
 4. Find UI components with shadcn
 5. Implement with continuous Ref lookups (never hallucinate)
 6. Scan with Semgrep (security-critical code)
 7. Verify with PostgreSQL (schema changes)
 8. Test with Playwright (E2E user flows - broad validation)
 9. Profile with Chrome DevTools (performance - deep analysis)
-10. Update Linear issue with status and decisions
+10. Update GitHub Issue with status and decisions
 ```
 
 ### Visual Changes
@@ -615,7 +611,7 @@ pnpm dev  # Starts both frontend (3000) and backend (4000)
 **📖 PRIMARY REFERENCE:** `/context/mcp-instructions.md`
 
 This comprehensive guide contains:
-- **Complete tool lists** for all 9 MCP servers (80+ tools total)
+- **Complete tool lists** for all 8 MCP servers (80+ tools total)
 - **Detailed usage patterns** and when to trigger each server
 - **Tool chaining workflows** for common development patterns
 - **Security scanning requirements** and best practices

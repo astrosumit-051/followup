@@ -315,6 +315,7 @@ model EmailDraft {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   lastSyncedAt DateTime? // Last DB sync from localStorage
+  version      Int       @default(0) // Optimistic locking version
 
   // Relations
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -323,7 +324,7 @@ model EmailDraft {
 
   @@unique([userId, contactId]) // One draft per user-contact pair
   @@index([userId, contactId])
-  @@index([userId, updatedAt])
+  @@index([userId, updatedAt(sort: Desc)]) // For draft listing (most recent first)
   @@map("email_drafts")
 }
 

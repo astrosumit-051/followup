@@ -87,25 +87,6 @@ export class EmailDraftService {
       throw new ForbiddenException('You do not have permission to create a draft for this contact');
     }
 
-    // Check if draft already exists
-    const existingDraft = await this.prisma.emailDraft.findUnique({
-      where: {
-        userId_contactId: {
-          userId,
-          contactId,
-        },
-      },
-    });
-
-    // Conflict detection: check if lastSyncedAt is older than existing draft
-    if (existingDraft && input.lastSyncedAt) {
-      if (existingDraft.lastSyncedAt && input.lastSyncedAt < existingDraft.lastSyncedAt) {
-        throw new ConflictException(
-          'Draft has been modified by another client. Please refresh and try again.',
-        );
-      }
-    }
-
     // Prepare draft data (ensure bodyJson is not undefined)
     // Sanitize bodyHtml to prevent XSS attacks
     const sanitizedBodyHtml = input.bodyHtml ? this.sanitizeHtmlContent(input.bodyHtml) : '';
@@ -119,29 +100,24 @@ export class EmailDraftService {
       lastSyncedAt: input.lastSyncedAt ?? new Date(),
     };
 
-    if (existingDraft) {
-      // Update existing draft
-      return this.prisma.emailDraft.update({
+    // Use upsert with optimistic locking via version field
+    try {
+      return await this.prisma.emailDraft.upsert({
         where: {
           userId_contactId: {
             userId,
             contactId,
           },
         },
-        data: draftData,
-        include: {
-          user: true,
-          contact: true,
-          signature: true,
+        update: {
+          ...draftData,
+          version: { increment: 1 }, // Increment version on update
         },
-      }) as unknown as EmailDraft;
-    } else {
-      // Create new draft
-      return this.prisma.emailDraft.create({
-        data: {
+        create: {
           userId,
           contactId,
           ...draftData,
+          version: 1, // Start at version 1 for new drafts
         },
         include: {
           user: true,
@@ -149,6 +125,14 @@ export class EmailDraftService {
           signature: true,
         },
       }) as unknown as EmailDraft;
+    } catch (error) {
+      // Check if error is due to concurrent modification
+      if (error.code === 'P2034') {
+        throw new ConflictException(
+          'Draft has been modified by another client. Please refresh and try again.',
+        );
+      }
+      throw error;
     }
   }
 
