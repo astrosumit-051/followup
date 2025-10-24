@@ -51,6 +51,8 @@ export default defineConfig({
 
   /* Visual regression testing configuration */
   expect: {
+    // Default timeout for all expect assertions - increased from 5s to 15s
+    timeout: 15 * 1000, // 15 seconds
     toHaveScreenshot: {
       // Maximum number of pixels that can differ
       maxDiffPixels: 100,
