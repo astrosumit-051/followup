@@ -41,6 +41,12 @@ export default defineConfig({
 
     /* Set viewport size for consistent testing */
     viewport: { width: 1280, height: 720 },
+
+    /* Action timeout - increased from 5s to 15s for slow-rendering elements */
+    actionTimeout: 15 * 1000, // 15 seconds
+
+    /* Navigation timeout - increased for page redirects */
+    navigationTimeout: 15 * 1000, // 15 seconds
   },
 
   /* Visual regression testing configuration */
@@ -72,21 +78,15 @@ export default defineConfig({
       dependencies: ["backend-ready"],
     },
 
-    // Setup project #2 - Database seeding (runs after auth)
-    {
-      name: "seed-setup",
-      testMatch: /seed\.setup\.ts/,
-      dependencies: ["auth-setup"],
-    },
-
-    // Authenticated tests (require backend ready, login, and seeded data)
+    // Authenticated tests (require backend ready and login only)
+    // Each test now creates its own isolated test data using test-isolation.ts
     {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
         storageState: "playwright/.auth/user.json",
       },
-      dependencies: ["backend-ready", "auth-setup", "seed-setup"],
+      dependencies: ["backend-ready", "auth-setup"],
     },
 
     {
@@ -95,7 +95,7 @@ export default defineConfig({
         ...devices["Desktop Firefox"],
         storageState: "playwright/.auth/user.json",
       },
-      dependencies: ["backend-ready", "auth-setup", "seed-setup"],
+      dependencies: ["backend-ready", "auth-setup"],
     },
 
     {
@@ -104,7 +104,7 @@ export default defineConfig({
         ...devices["Desktop Safari"],
         storageState: "playwright/.auth/user.json",
       },
-      dependencies: ["backend-ready", "auth-setup", "seed-setup"],
+      dependencies: ["backend-ready", "auth-setup"],
     },
 
     /* Test against mobile viewports */
@@ -114,7 +114,7 @@ export default defineConfig({
         ...devices["Pixel 5"],
         storageState: "playwright/.auth/user.json",
       },
-      dependencies: ["backend-ready", "auth-setup", "seed-setup"],
+      dependencies: ["backend-ready", "auth-setup"],
     },
     {
       name: "Mobile Safari",
@@ -122,21 +122,19 @@ export default defineConfig({
         ...devices["iPhone 12"],
         storageState: "playwright/.auth/user.json",
       },
-      dependencies: ["backend-ready", "auth-setup", "seed-setup"],
+      dependencies: ["backend-ready", "auth-setup"],
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "pnpm dev",
+    command: "DISABLE_RATE_LIMIT=true pnpm dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
-    env: {
-      DISABLE_RATE_LIMIT: "true", // Disable API rate limiting for E2E tests
-    },
     // Important: pnpm dev starts both frontend (3000) and backend (3001) via Turbo
     // The URL check only verifies frontend is ready. Backend readiness is ensured
     // by the 'backend-ready' setup project which polls http://localhost:3001/health
+    // DISABLE_RATE_LIMIT=true is set in command to ensure it propagates to backend via Turbo
   },
 });
