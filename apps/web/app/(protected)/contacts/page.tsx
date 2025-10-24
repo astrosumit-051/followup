@@ -307,6 +307,7 @@ function ContactsPageContent() {
                   variant="outline"
                   onClick={() => fetchNextPage()}
                   disabled={isFetchingNextPage}
+                  data-testid="contacts-load-more"
                 >
                   {isFetchingNextPage ? (
                     <>

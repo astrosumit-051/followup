@@ -105,6 +105,7 @@ export function ContactSearchBar({
         placeholder={placeholder}
         className="pl-10 pr-10"
         aria-label="Search contacts"
+        data-testid="contact-search-input"
       />
 
       {/* Loading Indicator or Clear Button */}

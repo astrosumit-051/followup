@@ -147,7 +147,7 @@ export function ContactFilters({
                   })
                 }
               >
-                <SelectTrigger id="filter-priority">
+                <SelectTrigger id="filter-priority" data-testid="contact-filter-priority">
                   <SelectValue placeholder="All priorities" />
                 </SelectTrigger>
                 <SelectContent>

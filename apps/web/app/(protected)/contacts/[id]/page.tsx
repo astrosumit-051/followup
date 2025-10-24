@@ -149,6 +149,7 @@ export default function ContactDetailPage() {
                          text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
                          focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
                          sm:flex-none sm:py-2"
+              data-testid="contact-detail-edit-button"
             >
               Edit
             </button>

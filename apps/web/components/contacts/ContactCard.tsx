@@ -69,7 +69,10 @@ export function ContactCard({ contact }: ContactCardProps) {
       href={`/contacts/${contact.id}`}
       data-testid={`contact-card-${contact.id}`}
     >
-      <Card className="transition-shadow hover:shadow-md">
+      <Card
+        className="transition-shadow hover:shadow-md"
+        data-testid="contact-card"
+      >
         <CardHeader className="p-4 sm:p-6">
           <div
             className="flex flex-col space-y-3 mb-4

@@ -94,6 +94,7 @@ export function ContactSortDropdown({
         className="block w-full rounded-md border-gray-300 shadow-sm
                    focus:border-blue-500 focus:ring-blue-500 sm:text-sm
                    py-1.5 pl-3 pr-10"
+        data-testid="contact-sort"
       >
         {sortOptions.map((option) => (
           <option key={option.value} value={option.value}>
