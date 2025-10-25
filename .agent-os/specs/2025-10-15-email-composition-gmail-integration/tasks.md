@@ -197,21 +197,21 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 15.13 Implement max 10 signatures enforcement (disable "Create" button)
   - [x] 15.14 Verify all tests pass (32 tests passing: SignatureSelector 17/22, SignatureManager 15/24, 14 skipped due to JSDOM limitations)
 
-- [ ] 16. Frontend - A/B Template Modal (Side-by-Side Display)
-  - [ ] 16.1 Write tests for AITemplateModal component (loading, side-by-side display, regeneration)
-  - [ ] 16.2 Create `apps/web/components/email/AITemplateModal.tsx` component
-  - [ ] 16.3 Implement "Generate with AI" button in composer
-  - [ ] 16.4 Implement modal with 80% viewport width, max 1200px
-  - [ ] 16.5 Implement two-column grid: Template A (left 50%) | Template B (right 50%)
-  - [ ] 16.6 Implement vertical divider between templates
-  - [ ] 16.7 Implement responsive design (mobile: tabs instead of columns)
-  - [ ] 16.8 Implement template cards with header badges (blue for Formal, green for Casual)
-  - [ ] 16.9 Implement loading skeletons for both columns during AI generation (2-5s)
-  - [ ] 16.10 Implement "Use Template A" and "Use Template B" action buttons
-  - [ ] 16.11 Implement "Regenerate Both" button below templates
-  - [ ] 16.12 Implement error state (AI generation failed)
-  - [ ] 16.13 Implement modal close on "Cancel" or template selection
-  - [ ] 16.14 Verify all tests pass
+- [x] 16. Frontend - A/B Template Modal (Side-by-Side Display) ✅ **COMPLETED**
+  - [x] 16.1 Write tests for AITemplateModal component (loading, side-by-side display, regeneration)
+  - [x] 16.2 Create `apps/web/components/email/AITemplateModal.tsx` component
+  - [x] 16.3 Implement "Generate with AI" button in composer
+  - [x] 16.4 Implement modal with 80% viewport width, max 1200px
+  - [x] 16.5 Implement two-column grid: Template A (left 50%) | Template B (right 50%)
+  - [x] 16.6 Implement vertical divider between templates
+  - [x] 16.7 Implement responsive design (mobile: tabs instead of columns)
+  - [x] 16.8 Implement template cards with header badges (blue for Formal, green for Casual)
+  - [x] 16.9 Implement loading skeletons for both columns during AI generation (2-5s)
+  - [x] 16.10 Implement "Use Template A" and "Use Template B" action buttons
+  - [x] 16.11 Implement "Regenerate Both" button below templates
+  - [x] 16.12 Implement error state (AI generation failed)
+  - [x] 16.13 Implement modal close on "Cancel" or template selection
+  - [x] 16.14 Verify all tests pass
 
 - [ ] 17. Frontend - Polish Draft Modal
   - [ ] 17.1 Write tests for PolishDraftModal component (4-style grid, word count)
