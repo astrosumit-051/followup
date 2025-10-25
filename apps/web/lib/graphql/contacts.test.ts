@@ -101,6 +101,7 @@ describe("Contact API Functions", () => {
         {
           ok: false,
           statusText: "Network error",
+          json: async () => ({ errors: [{ message: "Network error" }] }),
         } as Response,
       );
 

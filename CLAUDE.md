@@ -633,6 +633,15 @@ This comprehensive guide contains:
 - Principles: `/context/design-principles.md`
 - Style Guide: `/context/style-guide.md`
 
+### Testing
+- **E2E Testing Guide**: `/context/e2e-testing-guide.md`
+  - shadcn/ui component testing best practices
+  - Common test failure patterns and solutions
+  - Selector strategies for accessible components
+  - Data loading and async handling
+  - Debugging failing tests
+  - Prevention strategies for UI refactors
+
 ### Troubleshooting
 - **Error Knowledge Base**: `/context/errors-solved.md`
   - Database & Prisma errors (P1010, P1012, connection issues)
