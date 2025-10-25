@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
+import { cleanupContact } from "../helpers/test-isolation";
 
 /**
- * E2E Tests for Contact Creation Page
+ * E2E Tests for Contact Creation Page - WITH TEST ISOLATION
+ *
+ * MIGRATION STATUS: ✅ Partially migrated (cleanup added for future backend integration)
  *
  * Tests cover:
  * - Page layout and form structure
@@ -14,6 +17,9 @@ import { test, expect } from "@playwright/test";
  * - Toast notification verification
  * - Redirect after creation
  * - Responsive design across viewports
+ *
+ * NOTE: Most tests are UI-only and don't need fixtures. Cleanup logic has been
+ * added to "Success Flow" tests for when backend integration is complete.
  */
 
 test.describe("Contact Creation Page", () => {
@@ -39,7 +45,7 @@ test.describe("Contact Creation Page", () => {
 
     test("should display all required form fields", async ({ page }) => {
       // Name field (required)
-      const nameInput = page.locator("#name");
+      const nameInput = page.getByLabel('Name *');
       await expect(nameInput).toBeVisible();
 
       // Verify name field has required attribute or indicator
@@ -49,39 +55,39 @@ test.describe("Contact Creation Page", () => {
 
     test("should display all optional form fields", async ({ page }) => {
       // Email field
-      const emailInput = page.locator('input[name="email"]');
+      const emailInput = page.getByLabel('Email');
       await expect(emailInput).toBeVisible();
 
       // Phone field
-      const phoneInput = page.locator('input[name="phone"]');
+      const phoneInput = page.getByLabel('Phone');
       await expect(phoneInput).toBeVisible();
 
       // LinkedIn URL field
-      const linkedInInput = page.locator('input[name="linkedInUrl"]');
+      const linkedInInput = page.getByLabel('LinkedIn Profile');
       await expect(linkedInInput).toBeVisible();
 
       // Company field
-      const companyInput = page.locator('input[name="company"]');
+      const companyInput = page.getByLabel('Company');
       await expect(companyInput).toBeVisible();
 
       // Industry field
-      const industryInput = page.locator('input[name="industry"]');
+      const industryInput = page.getByLabel('Industry');
       await expect(industryInput).toBeVisible();
 
       // Role field
-      const roleInput = page.locator('input[name="role"]');
+      const roleInput = page.getByLabel('Role');
       await expect(roleInput).toBeVisible();
 
       // Priority field
-      const prioritySelect = page.locator('select[name="priority"]');
+      const prioritySelect = page.getByRole('combobox', { name: 'Priority *' });
       await expect(prioritySelect).toBeVisible();
 
       // Gender field
-      const genderSelect = page.locator('select[name="gender"]');
+      const genderSelect = page.getByRole('combobox', { name: 'Gender' });
       await expect(genderSelect).toBeVisible();
 
       // Notes field
-      const notesTextarea = page.locator('textarea[name="notes"]');
+      const notesTextarea = page.getByLabel('Notes');
       await expect(notesTextarea).toBeVisible();
     });
 
@@ -120,8 +126,8 @@ test.describe("Contact Creation Page", () => {
     });
 
     test("should show error for invalid email format", async ({ page }) => {
-      const nameInput = page.locator('input[name="name"]');
-      const emailInput = page.locator('input[name="email"]');
+      const nameInput = page.getByLabel('Name *');
+      const emailInput = page.getByLabel('Email');
 
       // Fill name (valid) and email (invalid)
       await nameInput.fill("John Doe");
@@ -147,8 +153,8 @@ test.describe("Contact Creation Page", () => {
     test("should show error for invalid LinkedIn URL format", async ({
       page,
     }) => {
-      const nameInput = page.locator('input[name="name"]');
-      const linkedInInput = page.locator('input[name="linkedInUrl"]');
+      const nameInput = page.getByLabel('Name *');
+      const linkedInInput = page.getByLabel('LinkedIn Profile');
 
       // Fill name (valid) and LinkedIn URL (invalid)
       await nameInput.fill("John Doe");
@@ -172,7 +178,7 @@ test.describe("Contact Creation Page", () => {
     });
 
     test("should enforce maximum length for name field", async ({ page }) => {
-      const nameInput = page.locator('input[name="name"]');
+      const nameInput = page.getByLabel('Name *');
 
       // Fill name with 256 characters (exceeds 255 limit)
       const longName = "A".repeat(256);
@@ -198,7 +204,7 @@ test.describe("Contact Creation Page", () => {
     });
 
     test("should reject name with only whitespace", async ({ page }) => {
-      const nameInput = page.locator('input[name="name"]');
+      const nameInput = page.getByLabel('Name *');
 
       // Fill name with only whitespace
       await nameInput.fill("   ");
@@ -224,11 +230,14 @@ test.describe("Contact Creation Page", () => {
   });
 
   test.describe("Form Submission - Success Flow", () => {
+    // Note: When backend is integrated, these tests will create real contacts.
+    // Cleanup logic has been added to prevent test data pollution.
+
     test("should submit form with only required fields", async ({ page }) => {
-      const nameInput = page.locator('input[name="name"]');
+      const nameInput = page.getByLabel('Name *');
 
       // Fill only name (required field)
-      await nameInput.fill("John Doe");
+      await nameInput.fill("Create Test 1 - Required Only");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -237,29 +246,46 @@ test.describe("Contact Creation Page", () => {
       // Wait for submission
       await page.waitForTimeout(1000);
 
-      // In real test with backend:
-      // - Verify success toast appears
-      // - Verify redirect to /contacts/[id]
-      // For now, check button is disabled during submission
-      // (Button might be briefly disabled)
+      // When backend is integrated:
+      // - Success toast appears: "Contact created successfully"
+      // - Redirect to /contacts/[id] happens
+      // - Extract contact ID from URL for cleanup
+
+      // Cleanup logic for when backend works
+      const currentUrl = page.url();
+      const urlParts = currentUrl.split('/');
+      const contactId = urlParts[urlParts.length - 1];
+
+      // Only cleanup if we actually created a contact (URL changed to detail page)
+      if (contactId && contactId.startsWith('test-contact-')) {
+        await cleanupContact(contactId);
+        console.log(`✅ Cleaned up contact created by test: ${contactId}`);
+      }
     });
 
     test("should submit form with all fields filled", async ({ page }) => {
       // Fill all form fields
-      await page.locator('input[name="name"]').fill("Jane Smith");
-      await page.locator('input[name="email"]').fill("jane.smith@example.com");
-      await page.locator('input[name="phone"]').fill("+1-555-123-4567");
+      await page.getByLabel('Name *').fill("Create Test 2 - All Fields");
+      await page.getByLabel('Email').fill("createtest2@example.com");
+      await page.getByLabel('Phone').fill("+1-555-123-4567");
       await page
-        .locator('input[name="linkedInUrl"]')
-        .fill("https://linkedin.com/in/janesmith");
-      await page.locator('input[name="company"]').fill("Acme Corporation");
-      await page.locator('input[name="industry"]').fill("Technology");
-      await page.locator('input[name="role"]').fill("Software Engineer");
-      await page.locator('select[name="priority"]').selectOption("HIGH");
-      await page.locator('select[name="gender"]').selectOption("FEMALE");
+        .getByLabel('LinkedIn Profile')
+        .fill("https://linkedin.com/in/createtest2");
+      await page.getByLabel('Company').fill("Test Corporation");
+      await page.getByLabel('Industry').fill("Technology");
+      await page.getByLabel('Role').fill("Software Engineer");
+
+      // Select Priority (shadcn Select requires clicking trigger then option)
+      await page.getByRole('combobox', { name: 'Priority *' }).click();
+      await page.getByRole('option', { name: 'High' }).first().click();
+
+      // Select Gender (shadcn Select requires clicking trigger then option)
+      await page.getByRole('combobox', { name: 'Gender' }).click();
+      await page.getByRole('option', { name: 'Female' }).first().click();
+
       await page
-        .locator('textarea[name="notes"]')
-        .fill("Met at tech conference 2024");
+        .getByLabel('Notes')
+        .fill("Test contact with all fields populated");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -268,18 +294,22 @@ test.describe("Contact Creation Page", () => {
       // Wait for submission
       await page.waitForTimeout(1000);
 
-      // In real test:
-      // - Verify API call was made
-      // - Verify success toast
-      // - Verify redirect to detail page
+      // Cleanup logic for when backend works
+      const currentUrl = page.url();
+      const urlParts = currentUrl.split('/');
+      const contactId = urlParts[urlParts.length - 1];
+
+      if (contactId && contactId.startsWith('test-contact-')) {
+        await cleanupContact(contactId);
+        console.log(`✅ Cleaned up contact created by test: ${contactId}`);
+      }
     });
 
     test("should display success toast after contact creation", async ({
       page,
     }) => {
-      // This test requires backend mock or real API
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.getByLabel('Name *').fill("Create Test 3 - Toast");
 
       // Submit form
       await page.locator('button[type="submit"]').click();
@@ -292,20 +322,29 @@ test.describe("Contact Creation Page", () => {
         .locator("text=/contact created successfully/i")
         .first();
 
-      // In real test with backend, this would be visible
+      // When backend is integrated, this toast will be visible
       const isVisible = await successToast.isVisible().catch(() => false);
 
       if (isVisible) {
         await expect(successToast).toBeVisible();
+      }
+
+      // Cleanup logic for when backend works
+      const currentUrl = page.url();
+      const urlParts = currentUrl.split('/');
+      const contactId = urlParts[urlParts.length - 1];
+
+      if (contactId && contactId.startsWith('test-contact-')) {
+        await cleanupContact(contactId);
+        console.log(`✅ Cleaned up contact created by test: ${contactId}`);
       }
     });
 
     test("should redirect to contact detail page after creation", async ({
       page,
     }) => {
-      // This test requires backend mock or real API
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.getByLabel('Name *').fill("Create Test 4 - Redirect");
 
       // Submit form
       await page.locator('button[type="submit"]').click();
@@ -313,12 +352,21 @@ test.describe("Contact Creation Page", () => {
       // Wait for redirect
       await page.waitForTimeout(2000);
 
-      // In real test with backend, verify URL is /contacts/[uuid]
-      // For now, just check we're not still on /contacts/new
+      // When backend is integrated, verify URL is /contacts/[uuid]
       const currentUrl = page.url();
 
-      // In integration test, this would redirect
-      // For now, URL will stay the same without backend
+      // Extract contact ID for cleanup
+      const urlParts = currentUrl.split('/');
+      const contactId = urlParts[urlParts.length - 1];
+
+      if (contactId && contactId.startsWith('test-contact-')) {
+        // Verify redirect happened
+        await expect(page).toHaveURL(/\/contacts\/test-contact-[a-f0-9-]+$/);
+
+        // Cleanup
+        await cleanupContact(contactId);
+        console.log(`✅ Cleaned up contact created by test: ${contactId}`);
+      }
     });
   });
 
@@ -334,7 +382,7 @@ test.describe("Contact Creation Page", () => {
       // });
 
       // Fill form
-      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.getByLabel('Name *').fill("Error Test Contact");
 
       // Submit
       await page.locator('button[type="submit"]').click();
@@ -352,12 +400,14 @@ test.describe("Contact Creation Page", () => {
       if (isVisible) {
         await expect(errorToast).toBeVisible();
       }
+
+      // No cleanup needed - contact creation failed
     });
 
     test("should remain on page when submission fails", async ({ page }) => {
       // This test requires API mocking to simulate failure
       // Fill form
-      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.getByLabel('Name *').fill("Error Test Contact 2");
 
       // Submit
       await page.locator('button[type="submit"]').click();
@@ -367,6 +417,8 @@ test.describe("Contact Creation Page", () => {
 
       // Verify still on /contacts/new
       await expect(page).toHaveURL(/\/contacts\/new/);
+
+      // No cleanup needed - contact creation failed
     });
   });
 
@@ -375,7 +427,7 @@ test.describe("Contact Creation Page", () => {
       page,
     }) => {
       // Fill some form data
-      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.getByLabel('Name *').fill("Cancel Test Contact");
 
       // Click Cancel button
       const cancelButton = page.locator('button:has-text("Cancel")');
@@ -390,8 +442,8 @@ test.describe("Contact Creation Page", () => {
 
     test("should not save data when cancel is clicked", async ({ page }) => {
       // Fill form with data
-      await page.locator('input[name="name"]').fill("Test Contact");
-      await page.locator('input[name="email"]').fill("test@example.com");
+      await page.getByLabel('Name *').fill("Cancel Test Contact 2");
+      await page.getByLabel('Email').fill("canceltest@example.com");
 
       // Click Cancel
       await page.locator('button:has-text("Cancel")').click();
@@ -403,7 +455,7 @@ test.describe("Contact Creation Page", () => {
       await page.goto("/contacts/new");
 
       // Verify form is empty
-      const nameInput = page.locator('input[name="name"]');
+      const nameInput = page.getByLabel('Name *');
       await expect(nameInput).toHaveValue("");
     });
   });
@@ -413,7 +465,7 @@ test.describe("Contact Creation Page", () => {
       page,
     }) => {
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.getByLabel('Name *').fill("Loading Test Contact");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -428,7 +480,7 @@ test.describe("Contact Creation Page", () => {
 
     test("should show loading indicator on submit button", async ({ page }) => {
       // Fill minimum required fields
-      await page.locator('input[name="name"]').fill("Test Contact");
+      await page.getByLabel('Name *').fill("Loading Test Contact 2");
 
       // Submit form
       const submitButton = page.locator('button[type="submit"]');
@@ -446,58 +498,66 @@ test.describe("Contact Creation Page", () => {
   test.describe("Form Field Interactions", () => {
     test("should allow typing in all text inputs", async ({ page }) => {
       // Test all text inputs
-      await page.locator('input[name="name"]').fill("John Doe");
-      await expect(page.locator('input[name="name"]')).toHaveValue("John Doe");
+      await page.getByLabel('Name *').fill("John Doe");
+      await expect(page.getByLabel('Name *')).toHaveValue("John Doe");
 
-      await page.locator('input[name="email"]').fill("john@example.com");
-      await expect(page.locator('input[name="email"]')).toHaveValue(
+      await page.getByLabel('Email').fill("john@example.com");
+      await expect(page.getByLabel('Email')).toHaveValue(
         "john@example.com",
       );
 
-      await page.locator('input[name="phone"]').fill("+1-555-0100");
-      await expect(page.locator('input[name="phone"]')).toHaveValue(
+      await page.getByLabel('Phone').fill("+1-555-0100");
+      await expect(page.getByLabel('Phone')).toHaveValue(
         "+1-555-0100",
       );
 
-      await page.locator('input[name="company"]').fill("Tech Corp");
-      await expect(page.locator('input[name="company"]')).toHaveValue(
+      await page.getByLabel('Company').fill("Tech Corp");
+      await expect(page.getByLabel('Company')).toHaveValue(
         "Tech Corp",
       );
     });
 
     test("should allow selecting priority options", async ({ page }) => {
-      const prioritySelect = page.locator('select[name="priority"]');
+      const prioritySelect = page.getByRole('combobox', { name: 'Priority *' });
 
       // Test selecting each priority option
-      await prioritySelect.selectOption("HIGH");
-      await expect(prioritySelect).toHaveValue("HIGH");
+      await prioritySelect.click();
+      await page.getByRole('option', { name: 'High' }).first().click();
+      // Verify selection
+      await expect(prioritySelect).toContainText("High");
 
-      await prioritySelect.selectOption("MEDIUM");
-      await expect(prioritySelect).toHaveValue("MEDIUM");
+      await prioritySelect.click();
+      await page.getByRole('option', { name: 'Medium' }).first().click();
+      await expect(prioritySelect).toContainText("Medium");
 
-      await prioritySelect.selectOption("LOW");
-      await expect(prioritySelect).toHaveValue("LOW");
+      await prioritySelect.click();
+      await page.getByRole('option', { name: 'Low' }).first().click();
+      await expect(prioritySelect).toContainText("Low");
     });
 
     test("should allow selecting gender options", async ({ page }) => {
-      const genderSelect = page.locator('select[name="gender"]');
+      const genderSelect = page.getByRole('combobox', { name: 'Gender' });
 
       // Test selecting each gender option
-      await genderSelect.selectOption("MALE");
-      await expect(genderSelect).toHaveValue("MALE");
+      await genderSelect.click();
+      await page.getByRole('option', { name: 'Male' }).first().click();
+      await expect(genderSelect).toContainText("Male");
 
-      await genderSelect.selectOption("FEMALE");
-      await expect(genderSelect).toHaveValue("FEMALE");
+      await genderSelect.click();
+      await page.getByRole('option', { name: 'Female' }).first().click();
+      await expect(genderSelect).toContainText("Female");
 
-      await genderSelect.selectOption("OTHER");
-      await expect(genderSelect).toHaveValue("OTHER");
+      await genderSelect.click();
+      await page.getByRole('option', { name: 'Other' }).first().click();
+      await expect(genderSelect).toContainText("Other");
 
-      await genderSelect.selectOption("PREFER_NOT_TO_SAY");
-      await expect(genderSelect).toHaveValue("PREFER_NOT_TO_SAY");
+      await genderSelect.click();
+      await page.getByRole('option', { name: 'Prefer not to say' }).first().click();
+      await expect(genderSelect).toContainText("Prefer not to say");
     });
 
     test("should allow typing in notes textarea", async ({ page }) => {
-      const notesTextarea = page.locator('textarea[name="notes"]');
+      const notesTextarea = page.getByLabel('Notes');
 
       const longNote =
         "This is a long note about the contact. " +
@@ -520,7 +580,7 @@ test.describe("Contact Creation Page", () => {
       await expect(heading).toBeVisible();
 
       // Verify form fields are accessible
-      const nameInput = page.locator('input[name="name"]');
+      const nameInput = page.getByLabel('Name *');
       await expect(nameInput).toBeVisible();
 
       // Verify buttons are accessible
@@ -562,22 +622,22 @@ test.describe("Contact Creation Page", () => {
       page,
     }) => {
       // Fill form with invalid email
-      await page.locator('input[name="name"]').fill("John Doe");
-      await page.locator('input[name="email"]').fill("invalid-email");
-      await page.locator('input[name="company"]').fill("Tech Corp");
+      await page.getByLabel('Name *').fill("John Doe");
+      await page.getByLabel('Email').fill("invalid-email");
+      await page.getByLabel('Company').fill("Tech Corp");
 
       // Submit (should fail validation)
       await page.locator('button[type="submit"]').click();
       await page.waitForTimeout(300);
 
       // Verify name and company are still filled
-      await expect(page.locator('input[name="name"]')).toHaveValue("John Doe");
-      await expect(page.locator('input[name="company"]')).toHaveValue(
+      await expect(page.getByLabel('Name *')).toHaveValue("John Doe");
+      await expect(page.getByLabel('Company')).toHaveValue(
         "Tech Corp",
       );
 
       // Email should still be there (even if invalid)
-      await expect(page.locator('input[name="email"]')).toHaveValue(
+      await expect(page.getByLabel('Email')).toHaveValue(
         "invalid-email",
       );
     });
