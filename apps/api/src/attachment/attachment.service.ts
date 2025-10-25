@@ -126,9 +126,11 @@ export class AttachmentService {
         expiresAt,
       };
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const stack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to generate presigned upload URL for user ${userId}: ${error.message}`,
-        error.stack,
+        `Failed to generate presigned upload URL for user ${userId}: ${message}`,
+        stack,
       );
       throw new InternalServerErrorException('Failed to generate upload URL. Please try again.');
     }
@@ -156,9 +158,11 @@ export class AttachmentService {
       this.logger.log(`Successfully deleted attachment for user ${userId}: ${key}`);
       return true;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const stack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to delete attachment ${key} for user ${userId}: ${error.message}`,
-        error.stack,
+        `Failed to delete attachment ${key} for user ${userId}: ${message}`,
+        stack,
       );
       throw new InternalServerErrorException('Failed to delete attachment. Please try again.');
     }
@@ -216,7 +220,9 @@ export class AttachmentService {
       this.logger.log(`Successfully cleaned up ${orphanedKeys.length} orphaned attachments`);
       return { deletedCount: orphanedKeys.length };
     } catch (error) {
-      this.logger.error(`Failed to cleanup orphaned attachments: ${error.message}`, error.stack);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const stack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to cleanup orphaned attachments: ${message}`, stack);
       throw new InternalServerErrorException('Failed to cleanup orphaned attachments');
     }
   }
@@ -330,7 +336,9 @@ export class AttachmentService {
       });
       await this.s3Client.send(command);
     } catch (error) {
-      this.logger.error(`Failed to delete S3 object ${key}: ${error.message}`, error.stack);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const stack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to delete S3 object ${key}: ${message}`, stack);
       throw new InternalServerErrorException(`Failed to delete S3 object: ${key}`);
     }
   }
@@ -366,7 +374,9 @@ export class AttachmentService {
 
       return { Contents: allObjects };
     } catch (error) {
-      this.logger.error(`Failed to list S3 objects in bucket ${this.bucketName}: ${error.message}`, error.stack);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const stack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to list S3 objects in bucket ${this.bucketName}: ${message}`, stack);
       throw new InternalServerErrorException('Failed to list S3 objects');
     }
   }
@@ -387,7 +397,9 @@ export class AttachmentService {
       });
       await this.s3Client.send(command);
     } catch (error) {
-      this.logger.error(`Failed to batch delete ${keys.length} S3 objects: ${error.message}`, error.stack);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      const stack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to batch delete ${keys.length} S3 objects: ${message}`, stack);
       throw new InternalServerErrorException('Failed to batch delete S3 objects');
     }
   }
