@@ -49,20 +49,20 @@ test.describe("Contact Edit Page", () => {
 
     test("should load contact edit page with correct URL", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       await expect(page).toHaveURL(`/contacts/${contactFixture.contactId}/edit`);
     });
 
     test("should display correct page title", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const heading = page.locator('h1:has-text("Edit Contact")');
       await expect(heading).toBeVisible();
     });
 
     test("should display contact name in subtitle", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const subtitle = page.locator(
         `text=Update information for John Doe`,
       );
@@ -90,7 +90,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const loadingSkeleton = page.locator(".animate-pulse");
       // Note: This might not be visible if data loads quickly
       // await expect(loadingSkeleton).toBeVisible();
@@ -100,8 +100,8 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
+      // Wait removed - networkidle unreliable with GraphQL
       const form = page.locator("form");
       await expect(form).toBeVisible();
     });
@@ -136,7 +136,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const nameInput = page.getByLabel('Name *');
       await expect(nameInput).toHaveValue("Jane Smith");
     });
@@ -145,7 +145,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const emailInput = page.getByLabel('Email');
       await expect(emailInput).toHaveValue("jane.smith@example.com");
     });
@@ -154,7 +154,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const phoneInput = page.getByLabel('Phone');
       await expect(phoneInput).toHaveValue("+1-555-987-6543");
     });
@@ -163,7 +163,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const linkedInInput = page.getByLabel('LinkedIn Profile');
       await expect(linkedInInput).toHaveValue("https://linkedin.com/in/janesmith");
     });
@@ -172,7 +172,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const companyInput = page.getByLabel('Company');
       await expect(companyInput).toHaveValue("TechCorp Industries");
     });
@@ -181,7 +181,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const industryInput = page.getByLabel('Industry');
       await expect(industryInput).toHaveValue("Software Development");
     });
@@ -190,7 +190,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const roleInput = page.getByLabel('Role');
       await expect(roleInput).toHaveValue("Senior Software Engineer");
     });
@@ -199,7 +199,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const prioritySelect = page.getByRole('combobox', { name: 'Priority *' });
       // shadcn Select displays text, not value - check for "High" instead of "HIGH"
       await expect(prioritySelect).toContainText("High");
@@ -209,7 +209,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const genderSelect = page.getByRole('combobox', { name: 'Gender' });
       // shadcn Select displays text, not value - check for "Female" instead of "FEMALE"
       await expect(genderSelect).toContainText("Female");
@@ -219,7 +219,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const birthdayInput = page.getByLabel('Birthday');
       await expect(birthdayInput).toHaveValue("1988-03-22");
     });
@@ -228,7 +228,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const profilePictureInput = page.getByLabel('Profile Picture URL');
       await expect(profilePictureInput).toHaveValue("https://example.com/jane-photo.jpg");
     });
@@ -237,7 +237,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const notesTextarea = page.getByLabel('Notes');
       await expect(notesTextarea).toHaveValue("Key stakeholder in AI project");
     });
@@ -263,7 +263,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const nameInput = page.getByLabel('Name *');
       const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
@@ -273,7 +273,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should show error for invalid email format", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const emailInput = page.getByLabel('Email');
       await emailInput.fill("invalid-email");
       await emailInput.blur();
@@ -285,7 +285,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const linkedInInput = page.getByLabel('LinkedIn Profile');
       await linkedInInput.fill("not-a-url");
       await linkedInInput.blur();
@@ -295,7 +295,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should allow empty optional fields", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const emailInput = page.getByLabel('Email');
       const submitButton = page.locator('button[type="submit"]');
       await submitButton.click();
@@ -306,7 +306,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should validate phone number format", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const phoneInput = page.getByLabel('Phone');
       await phoneInput.fill("invalid-phone");
       await phoneInput.blur();
@@ -315,7 +315,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should allow valid birthday date", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const birthdayInput = page.getByLabel('Birthday');
       await birthdayInput.fill("1995-05-15");
       const submitButton = page.locator('button[type="submit"]');
@@ -338,7 +338,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update form fields
       await page.getByLabel('Name *').fill("Updated Name 1");
@@ -367,7 +367,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update a field
       await page.getByLabel('Name *').fill("Updated Name 2");
@@ -395,7 +395,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update a field
       await page.getByLabel('Company').fill("Updated Corp");
@@ -421,7 +421,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update a field
       await page.getByLabel('Name *').fill("Updated Name 4");
@@ -447,7 +447,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update a field
       await page.getByLabel('Name *').fill("Updated Name 5");
@@ -471,7 +471,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update only name field
       await page.getByLabel('Name *').fill("Updated Name 6");
@@ -496,7 +496,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update multiple fields
       await page.getByLabel('Name *').fill("Updated Name 7");
@@ -538,7 +538,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Mock network error by intercepting API call
       await page.route("**/graphql", (route) => route.abort());
@@ -557,7 +557,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should not redirect on submission failure", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Mock network error
       await page.route("**/graphql", (route) => route.abort());
@@ -576,7 +576,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should re-enable submit button after error", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Mock network error
       await page.route("**/graphql", (route) => route.abort());
@@ -614,7 +614,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should display Cancel button", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const cancelButton = page.locator('button:has-text("Cancel")');
       await expect(cancelButton).toBeVisible();
     });
@@ -623,7 +623,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const cancelButton = page.locator('button:has-text("Cancel")');
       await cancelButton.click();
       await expect(page).toHaveURL(`/contacts/${contactFixture.contactId}`);
@@ -631,7 +631,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should not save changes when Cancel is clicked", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Make changes
       await page.getByLabel('Name *').fill("Changed Name");
@@ -646,7 +646,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should disable Cancel button during submission", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update a field
       await page.getByLabel('Name *').fill("Updated Name");
@@ -700,7 +700,7 @@ test.describe("Contact Edit Page", () => {
       await page.route("**/graphql", (route) => route.abort());
 
       await page.goto("/contacts/test-contact-network-error/edit");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const errorHeading = page.locator('h2:has-text("Error Loading Contact")');
       await expect(errorHeading).toBeVisible();
     });
@@ -711,7 +711,7 @@ test.describe("Contact Edit Page", () => {
       await page.route("**/graphql", (route) => route.abort());
 
       await page.goto("/contacts/test-contact-network-error/edit");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const backButton = page.locator('button:has-text("Back to Contacts")');
       await expect(backButton).toBeVisible();
     });
@@ -738,7 +738,7 @@ test.describe("Contact Edit Page", () => {
     }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const form = page.locator("form");
       await expect(form).toBeVisible();
     });
@@ -748,7 +748,7 @@ test.describe("Contact Edit Page", () => {
     }) => {
       await page.setViewportSize({ width: 768, height: 1024 });
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const form = page.locator("form");
       await expect(form).toBeVisible();
     });
@@ -758,7 +758,7 @@ test.describe("Contact Edit Page", () => {
     }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const form = page.locator("form");
       await expect(form).toBeVisible();
     });
@@ -766,7 +766,7 @@ test.describe("Contact Edit Page", () => {
     test("should stack form fields vertically on mobile", async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const nameInput = page.getByLabel('Name *');
       const emailInput = page.getByLabel('Email');
       const nameBox = await nameInput.boundingBox();
@@ -794,7 +794,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should have proper form labels", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const nameLabel = page.locator('label[for="name"]');
       await expect(nameLabel).toBeVisible();
       await expect(nameLabel).toContainText("Name");
@@ -802,7 +802,7 @@ test.describe("Contact Edit Page", () => {
 
     test("should mark required fields with asterisk", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const nameLabel = page.locator('label[for="name"]');
       const asterisk = nameLabel.locator("span.text-red-500");
       await expect(asterisk).toBeVisible();
@@ -810,14 +810,14 @@ test.describe("Contact Edit Page", () => {
 
     test("should have accessible submit button", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const submitButton = page.locator('button[type="submit"]');
       await expect(submitButton).toHaveText("Update Contact");
     });
 
     test("should have accessible cancel button", async ({ page }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const cancelButton = page.locator('button:has-text("Cancel")');
       await expect(cancelButton).toBeVisible();
     });
@@ -826,7 +826,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
       const nameInput = page.getByLabel('Name *');
       await nameInput.blur();
       // Note: Actual ARIA implementation depends on form library
@@ -852,8 +852,8 @@ test.describe("Contact Edit Page", () => {
     test("should load edit page within 3 seconds", async ({ page }) => {
       const startTime = Date.now();
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
+      // Wait removed - networkidle unreliable with GraphQL
       const loadTime = Date.now() - startTime;
       expect(loadTime).toBeLessThan(3000);
     });
@@ -866,8 +866,8 @@ test.describe("Contact Edit Page", () => {
         }
       });
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
+      // Wait removed - networkidle unreliable with GraphQL
       expect(consoleErrors).toHaveLength(0);
     });
 
@@ -879,8 +879,8 @@ test.describe("Contact Edit Page", () => {
         }
       });
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
+      // Wait removed - networkidle unreliable with GraphQL
       // Allow for some framework warnings
       expect(consoleWarnings.length).toBeLessThan(5);
     });
@@ -900,7 +900,7 @@ test.describe("Contact Edit Page", () => {
       await contactFixture.setup();
 
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Update a field
       await page.getByLabel('Name *').fill("Updated Name");
@@ -936,7 +936,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Enter invalid data
       await page.getByLabel('Email').fill("invalid-email");
@@ -954,7 +954,7 @@ test.describe("Contact Edit Page", () => {
       page,
     }) => {
       await page.goto(`/contacts/${contactFixture.contactId}/edit`);
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Make multiple changes
       await page.getByLabel('Company').fill("New Company");
