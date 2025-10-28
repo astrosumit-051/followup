@@ -429,70 +429,7 @@ Use sequential thinking for problems that require:
 
 ---
 
-### 7. **PostgreSQL** (`postgres`)
-**Purpose:** Direct read-only database query execution for debugging, analysis, and schema verification
-
-**Tools Available:**
-- `mcp__postgres__query`: Execute read-only SQL queries on the PostgreSQL database
-
-**Key Features:**
-- **Read-Only Safety**: Cannot execute INSERT, UPDATE, DELETE, or DROP operations
-- **Direct Database Access**: Query production or development databases without ORM layer
-- **Schema Inspection**: Analyze table structures, indexes, and constraints
-- **Performance Analysis**: Run EXPLAIN queries to diagnose slow queries
-- **Data Validation**: Verify data integrity and relationships
-
-**Use Cases:**
-- Debugging database schema issues
-- Verifying Prisma migrations applied correctly
-- Analyzing query performance with EXPLAIN
-- Checking data integrity and foreign key relationships
-- Testing complex JOIN queries before implementing in code
-- Monitoring table sizes and index usage
-- Validating database constraints
-
-**When to Trigger:**
-- After running Prisma migrations (verify schema changes)
-- When debugging data-related issues
-- Need to analyze query performance
-- Validating relationships between tables
-- Checking for orphaned records or data inconsistencies
-- Before implementing complex database queries
-
-**Security & Safety:**
-```
-CRITICAL RULES:
-- This tool is READ-ONLY - use Prisma for data modifications
-- Never run destructive queries (DROP, TRUNCATE, DELETE)
-- Always use LIMIT for potentially large result sets
-- Test queries on development database first
-- No write operations - Prisma handles all data changes
-```
-
-**Best Practice:**
-```
-1. Use for inspection and analysis only
-2. Always include LIMIT clause for data queries
-3. Use EXPLAIN ANALYZE for performance debugging
-4. Verify schema after migrations
-5. Check indexes on frequently queried columns
-6. Use for debugging, not for application logic
-```
-
-**Example Prompts:**
-```
-"Check the contacts table schema in PostgreSQL"
-"Verify email conversation history is storing correctly"
-"Analyze performance of slow contact search query with EXPLAIN"
-"Count total contacts by priority level"
-"Check for orphaned records in emails table"
-"Verify indexes exist on user_id columns"
-"Show table sizes in the database"
-```
-
----
-
-### 8. **shadcn** (`shadcn`)
+### 7. **shadcn** (`shadcn`)
 **Purpose:** UI component registry for browsing, searching, and installing shadcn/ui components and blocks
 
 **Tools Available:**
@@ -566,7 +503,6 @@ Don't wait for explicit permission to use MCP tools. If the task clearly benefit
 - Semgrep: For all security-sensitive code
 - GitHub: For repository operations and issue tracking
 - Sequential Thinking: For complex planning
-- PostgreSQL: For database debugging and verification
 - shadcn: For UI component discovery and installation
 
 **CRITICAL: When Stuck or Encountering Problems**
@@ -577,7 +513,7 @@ If you encounter ANY of the following situations, you MUST use the appropriate M
 2. **Unsure about API usage** → Use **Ref** to look up exact documentation
 3. **Debugging errors** → Use **Ref** for error messages + **Sequential Thinking** for root cause analysis
 4. **Need UI component** → Use **shadcn** to find existing components
-5. **Database issues** → Use **PostgreSQL** to inspect actual schema/data
+5. **Database issues** → Use **Prisma CLI** to inspect schema (prisma db pull, prisma studio)
 6. **Security concerns** → Use **Semgrep** to scan for vulnerabilities
 7. **Performance problems** → Use **Chrome DevTools** to profile
 8. **Code examples needed** → Use **Ref** → **GitHub** search
@@ -630,8 +566,8 @@ ALWAYS run Semgrep on:
 - File upload/download functionality
 - Any code dealing with secrets or credentials
 
-ALWAYS verify with PostgreSQL after:
-- Running database migrations
+ALWAYS verify schema with Prisma CLI after:
+- Running database migrations (use: prisma db pull, prisma studio)
 - Schema changes
 - Adding indexes or constraints
 
@@ -652,9 +588,9 @@ When Figma MCP is available:
 ### 7. **Database Operations**
 ```
 For database work:
-1. Use Prisma for schema definitions and migrations
-2. Use PostgreSQL MCP for verification and debugging
-3. Never use PostgreSQL MCP for writes - use Prisma only
+1. Use Prisma for all schema definitions, migrations, and data operations
+2. Use Prisma CLI for verification and debugging (prisma db pull, prisma studio, prisma db push)
+3. Use Prisma Client for all database queries in application code
 ```
 
 ---
@@ -669,27 +605,25 @@ For database work:
 4. shadcn: Find UI components for the feature
 5. GitHub: Check for similar features in current codebase
 6. [Generate Implementation]
-7. PostgreSQL: Verify database schema if DB changes
-8. Semgrep: Security scan
-9. Playwright: E2E tests (broad validation)
-10. Chrome DevTools: Performance profiling (deep analysis)
-11. GitHub Issues: Update issue status and document decisions
-12. GitHub: Create PR and link to issue
+7. Semgrep: Security scan
+8. Playwright: E2E tests (broad validation)
+9. Chrome DevTools: Performance profiling (deep analysis)
+10. GitHub Issues: Update issue status and document decisions
+11. GitHub: Create PR and link to issue
 ```
 
 ### Pattern 2: Bug Investigation & Performance Debugging
 ```
 1. GitHub Issues: Search for existing bug reports or related issues
 2. Chrome DevTools: Profile page performance and inspect network
-3. PostgreSQL: Check database state if data-related
-4. Ref: Search official docs for expected behavior
-5. GitHub: Analyze recent commits and related code
-6. Sequential Thinking: Reason through root cause
-7. [Implement Fix]
-8. Playwright: Add regression test
-9. Chrome DevTools: Verify performance improvements
-10. GitHub Issues: Update bug issue with root cause and fix details
-11. GitHub: Create PR with fix and link to issue
+3. Ref: Search official docs for expected behavior
+4. GitHub: Analyze recent commits and related code
+5. Sequential Thinking: Reason through root cause
+6. [Implement Fix]
+7. Playwright: Add regression test
+8. Chrome DevTools: Verify performance improvements
+9. GitHub Issues: Update bug issue with root cause and fix details
+10. GitHub: Create PR with fix and link to issue
 ```
 
 ### Pattern 3: UI Component Implementation
@@ -733,11 +667,10 @@ For database work:
 2. Sequential Thinking: Plan migration strategy
 3. Ref: Look up Prisma migration documentation
 4. [Generate Migration]
-5. PostgreSQL: Verify schema changes in development
+5. Prisma CLI: Verify schema changes (prisma db pull, prisma studio)
 6. Semgrep: Scan migration code for security issues
 7. Playwright: Test affected features after migration
-8. PostgreSQL: Verify production schema after deployment
-9. GitHub Issues: Update migration issue with completion details
+8. GitHub Issues: Update migration issue with completion details
 ```
 
 ---
@@ -779,10 +712,6 @@ Ensure these MCP servers are configured in `.claude.json`:
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
-    },
     "shadcn": {
       "command": "npx",
       "args": ["-y", "shadcn@latest", "mcp"]
@@ -795,7 +724,6 @@ Ensure these MCP servers are configured in `.claude.json`:
 - Ref: Sign up at https://ref.tools
 - Semgrep: https://semgrep.dev/
 - GitHub: https://github.com/settings/tokens
-- PostgreSQL: Use connection string from your database provider
 - shadcn: No API key needed (uses project's components.json)
 
 ---
@@ -824,9 +752,9 @@ Ensure these MCP servers are configured in `.claude.json`:
 | Generate tests | Playwright | mcp__playwright__browser_snapshot |
 | Analyze vulnerabilities | Semgrep | mcp__semgrep__semgrep_scan |
 | Check library syntax | **Ref** | mcp__Ref__ref_search_documentation |
-| Query database | PostgreSQL | mcp__postgres__query |
 | Browse components | shadcn | mcp__shadcn__list_items_in_registries |
 | View component details | shadcn | mcp__shadcn__view_items_in_registries |
+| Inspect database schema | Prisma CLI | prisma db pull, prisma studio |
 
 ---
 

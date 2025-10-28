@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { AIService } from './ai.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { MetricsService } from '../metrics/metrics.service';
 import { NotFoundException } from '@nestjs/common';
 
 // Mock LangChain modules with simpler implementations
@@ -31,6 +32,16 @@ describe('AIService', () => {
       };
       return config[key];
     }),
+  };
+
+  const mockMetricsService = {
+    recordAIRequest: jest.fn(),
+    recordAILatency: jest.fn(),
+    recordAITokens: jest.fn(),
+    recordAIError: jest.fn(),
+    recordAIEmailGenerationError: jest.fn(),
+    recordCacheHit: jest.fn(),
+    recordCacheMiss: jest.fn(),
   };
 
   const mockContact = {
@@ -77,6 +88,10 @@ describe('AIService', () => {
         {
           provide: ConfigService,
           useValue: mockConfigService,
+        },
+        {
+          provide: MetricsService,
+          useValue: mockMetricsService,
         },
       ],
     }).compile();

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ContactSidebar } from "./ContactSidebar";
 import { EmailComposer } from "./EmailComposer";
 
-interface ComposePageProps {}
+type ComposePageProps = Record<string, never>;
 
 /**
  * Email Composition Page Component

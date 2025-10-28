@@ -144,6 +144,20 @@ input CreateContactDto {
 }
 
 """
+Input for Creating a Conversation History Entry
+
+Used to track conversation history between user and contact.
+Automatically created when emails are sent.
+"""
+input CreateConversationEntryInput {
+  contactId: String!
+  content: String!
+  direction: Direction!
+  emailId: String
+  metadata: JSONObject
+}
+
+"""
 Input for Creating Email Draft
 
 Used to create a new email draft for a specific contact.
@@ -529,6 +543,7 @@ scalar JSONObject
 type Mutation {
   autoSaveDraft(input: CreateDraftInput!): EmailDraft!
   createContact(input: CreateContactDto!): Contact!
+  createConversationEntry(input: CreateConversationEntryInput!): ConversationHistory!
   createEmailTemplate(input: CreateEmailTemplateInput!): EmailTemplate!
   createSignature(input: CreateSignatureInput!): EmailSignature!
   deleteContact(id: ID!): Boolean!

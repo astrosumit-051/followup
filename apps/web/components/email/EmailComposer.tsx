@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Bold,
   Italic,
@@ -16,10 +16,12 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { PolishDraftModal } from "./PolishDraftModal";
 
 interface EmailComposerProps {
   selectedContactIds?: string[];
@@ -39,6 +41,7 @@ export function EmailComposer({
   initialSubject = "",
 }: EmailComposerProps) {
   const [subject, setSubject] = useState(initialSubject);
+  const [isPolishModalOpen, setIsPolishModalOpen] = useState(false);
 
   // Initialize TipTap editor with all required extensions
   // Note: StarterKit v3 includes Bold, Italic, Underline, Link, BulletList, OrderedList
@@ -75,6 +78,16 @@ export function EmailComposer({
     }
   };
 
+  // Handle polished version selection
+  const handlePolishedVersionSelect = (polishedContent: string) => {
+    if (editor) {
+      editor.commands.setContent(polishedContent);
+      if (onContentChange) {
+        onContentChange(polishedContent);
+      }
+    }
+  };
+
   // Toolbar button component
   const ToolbarButton = ({
     onClick,
@@ -84,7 +97,7 @@ export function EmailComposer({
   }: {
     onClick: () => void;
     isActive: boolean;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     label: string;
   }) => (
     <Button
@@ -248,6 +261,21 @@ export function EmailComposer({
             icon={LinkIcon}
             label="Insert Link"
           />
+
+          <div className="w-px h-6 bg-border mx-1" />
+
+          {/* Polish Draft Button */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPolishModalOpen(true)}
+            className="h-8 px-3 text-purple-600 border-purple-300 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-700 dark:hover:bg-purple-950"
+            disabled={!editor.getText().trim()}
+          >
+            <Sparkles className="h-4 w-4 mr-1.5" />
+            Polish Draft
+          </Button>
         </div>
 
         {/* Editor Content */}
@@ -255,6 +283,15 @@ export function EmailComposer({
           <EditorContent editor={editor} />
         </div>
       </div>
+
+      {/* Polish Draft Modal */}
+      <PolishDraftModal
+        isOpen={isPolishModalOpen}
+        roughDraft={editor?.getText() || ""}
+        contextType={emailType === "followup" ? "FOLLOW_UP" : emailType === "cold" ? "COLD_EMAIL" : undefined}
+        onClose={() => setIsPolishModalOpen(false)}
+        onSelectVersion={handlePolishedVersionSelect}
+      />
     </div>
   );
 }

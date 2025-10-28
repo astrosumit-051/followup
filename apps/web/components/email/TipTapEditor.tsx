@@ -37,8 +37,8 @@ import { useEffect } from "react";
  */
 
 interface TipTapEditorProps {
-  content?: Record<string, any>;
-  onChange: (json: Record<string, any>, html: string) => void;
+  content?: Record<string, unknown>;
+  onChange: (json: Record<string, unknown>, html: string) => void;
   placeholder?: string;
 }
 

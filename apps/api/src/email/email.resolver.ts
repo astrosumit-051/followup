@@ -16,7 +16,7 @@ import { GmailOAuthService } from '../gmail/gmail-oauth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Email, EmailTemplate, ConversationHistory, EmailConnection, GeneratedEmailTemplate, EmailDraft, EmailSignature } from './entities';
 import { GmailConnection } from '../gmail/entities/gmail-connection.entity';
-import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput, CreateEmailTemplateInput, UpdateEmailTemplateInput, CreateDraftInput, UpdateDraftInput, CreateSignatureInput, UpdateSignatureInput, PaginationInput, EmailDraftConnection, SendEmailInput, SendBulkCampaignInput, PolishDraftInput } from './dto';
+import { FindEmailsInput, GenerateEmailInput, SaveEmailInput, UpdateEmailInput, CreateEmailTemplateInput, UpdateEmailTemplateInput, CreateDraftInput, UpdateDraftInput, CreateSignatureInput, UpdateSignatureInput, PaginationInput, EmailDraftConnection, SendEmailInput, SendBulkCampaignInput, PolishDraftInput, CreateConversationEntryInput } from './dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/authenticated-user.interface';
@@ -127,7 +127,82 @@ export class EmailResolver {
     @Args('contactId', { type: () => ID }) contactId: string,
     @Args('limit', { type: () => Number, nullable: true, defaultValue: 5 }) limit: number,
   ): Promise<ConversationHistory[]> {
-    return this.emailService.getConversationHistory(user.id, contactId, limit) as Promise<ConversationHistory[]>;
+    console.log('[conversationHistory] Query received:', { userId: user.id, contactId, limit });
+    const result = await this.emailService.getConversationHistory(user.id, contactId, limit);
+    console.log('[conversationHistory] Returning', result.length, 'entries');
+    return result as ConversationHistory[];
+  }
+
+  /**
+   * Create a conversation history entry
+   *
+   * This mutation creates a conversation history entry for testing purposes
+   * or manual conversation logging. It allows E2E tests to seed conversation
+   * data to test features that depend on conversation history.
+   *
+   * The contact must belong to the authenticated user.
+   *
+   * @param user - Current user from JWT (injected by @CurrentUser decorator)
+   * @param input - Conversation entry data (contactId, content, direction, emailId, metadata)
+   * @returns Created conversation history entry
+   * @throws NotFoundException if contact doesn't exist
+   * @throws ForbiddenException if contact doesn't belong to user
+   *
+   * @example
+   * ```graphql
+   * mutation {
+   *   createConversationEntry(input: {
+   *     contactId: "contact-123"
+   *     content: "Thanks for connecting! Looking forward to our collaboration."
+   *     direction: SENT
+   *   }) {
+   *     id
+   *     contactId
+   *     content
+   *     direction
+   *     timestamp
+   *   }
+   * }
+   * ```
+   */
+  @Mutation(() => ConversationHistory)
+  @Throttle({ default: { limit: 60, ttl: 60000 } }) // 60 requests per minute
+  async createConversationEntry(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('input', { type: () => CreateConversationEntryInput }) input: CreateConversationEntryInput,
+  ): Promise<ConversationHistory> {
+    this.logger.log(`Creating conversation entry for user ${user.id}, contact ${input.contactId}`);
+
+    // Verify contact exists and belongs to user
+    const contact = await this.prisma.contact.findUnique({
+      where: { id: input.contactId },
+    });
+
+    if (!contact) {
+      throw new NotFoundException(`Contact with ID ${input.contactId} not found`);
+    }
+
+    if (contact.userId !== user.id) {
+      throw new ForbiddenException('You do not have permission to create conversation entries for this contact');
+    }
+
+    try {
+      // Create conversation entry
+      const entry = await this.emailService.createConversationEntry({
+        userId: user.id,
+        contactId: input.contactId,
+        emailId: input.emailId,
+        content: input.content,
+        direction: input.direction,
+        metadata: input.metadata,
+      });
+
+      this.logger.log(`Conversation entry created successfully: ${entry.id}`);
+      return entry as ConversationHistory;
+    } catch (error) {
+      this.logger.error(`Failed to create conversation entry for user ${user.id}`, error);
+      throw error;
+    }
   }
 
   /**

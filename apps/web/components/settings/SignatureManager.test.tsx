@@ -40,7 +40,7 @@ describe("SignatureManager", () => {
   const mockOnCreate = jest.fn<
     (data: {
       name: string;
-      contentJson: Record<string, any>;
+      contentJson: Record<string, unknown>;
       contentHtml: string;
       isDefaultForFormal: boolean;
       isDefaultForCasual: boolean;
@@ -53,7 +53,7 @@ describe("SignatureManager", () => {
       id: string,
       data: {
         name?: string;
-        contentJson?: Record<string, any>;
+        contentJson?: Record<string, unknown>;
         contentHtml?: string;
         isDefaultForFormal?: boolean;
         isDefaultForCasual?: boolean;

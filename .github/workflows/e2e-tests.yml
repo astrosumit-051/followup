@@ -1,0 +1,240 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [main, staging]
+  push:
+    branches: [main, staging]
+
+jobs:
+  e2e:
+    name: Run E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: relationhub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
+      - name: Setup database schema
+        run: pnpm --filter database prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/relationhub_test?schema=public
+
+      - name: Setup environment variables
+        run: |
+          # Create .env files for both frontend and backend
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > apps/web/.env.local
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> apps/web/.env.local
+
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > apps/api/.env
+          echo "SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}" >> apps/api/.env
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> apps/api/.env
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/relationhub_test?schema=public" >> apps/api/.env
+          echo "REDIS_URL=redis://localhost:6379" >> apps/api/.env
+          echo "DISABLE_RATE_LIMIT=true" >> apps/api/.env
+          echo "NODE_ENV=test" >> apps/api/.env
+
+      - name: Run E2E tests (Chromium only)
+        run: pnpm --filter web test:e2e --project=chromium
+        env:
+          CI: true
+          DISABLE_RATE_LIMIT: true
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: apps/web/test-results/
+          retention-days: 7
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: apps/web/test-results/**/screenshots/
+          retention-days: 7
+
+      - name: Upload videos on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos
+          path: apps/web/test-results/**/videos/
+          retention-days: 7
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration:" >> $GITHUB_STEP_SUMMARY
+          echo "- Browser: Chromium" >> $GITHUB_STEP_SUMMARY
+          echo "- Workers: 1 (sequential execution)" >> $GITHUB_STEP_SUMMARY
+          echo "- Retries: 2 (on CI)" >> $GITHUB_STEP_SUMMARY
+          echo "- Timeout: 90 seconds per test" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Coverage:" >> $GITHUB_STEP_SUMMARY
+          echo "- Contact CRUD operations" >> $GITHUB_STEP_SUMMARY
+          echo "- Contact list and search functionality" >> $GITHUB_STEP_SUMMARY
+          echo "- Responsive design (mobile and desktop)" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance benchmarks" >> $GITHUB_STEP_SUMMARY
+          echo "- Visual regression tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 View detailed results in the Playwright report artifact" >> $GITHUB_STEP_SUMMARY
+
+  # Optional: Multi-browser testing job (runs in parallel, only on main/staging)
+  e2e-browsers:
+    name: Cross-Browser E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, webkit]
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: relationhub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter web exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Setup database schema
+        run: pnpm --filter database prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/relationhub_test?schema=public
+
+      - name: Setup environment variables
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > apps/web/.env.local
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> apps/web/.env.local
+
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > apps/api/.env
+          echo "SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }}" >> apps/api/.env
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> apps/api/.env
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/relationhub_test?schema=public" >> apps/api/.env
+          echo "REDIS_URL=redis://localhost:6379" >> apps/api/.env
+          echo "DISABLE_RATE_LIMIT=true" >> apps/api/.env
+          echo "NODE_ENV=test" >> apps/api/.env
+
+      - name: Run E2E tests (${{ matrix.browser }})
+        run: pnpm --filter web test:e2e --project=${{ matrix.browser }}
+        env:
+          CI: true
+          DISABLE_RATE_LIMIT: true
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Upload Playwright report (${{ matrix.browser }})
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: apps/web/playwright-report/
+          retention-days: 30
+
+      - name: Upload test results (${{ matrix.browser }})
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.browser }}
+          path: apps/web/test-results/
+          retention-days: 7

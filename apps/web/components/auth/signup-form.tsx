@@ -84,18 +84,14 @@ export function SignupForm() {
 
       if (signUpError) {
         setError(signUpError.message);
-        return;
-      }
-
-      if (data.user) {
+      } else if (data.user) {
         // Check if email confirmation is required
         if (data.user.identities?.length === 0) {
           setError("An account with this email already exists");
-          return;
+        } else {
+          // Redirect to confirmation page or dashboard
+          router.push("/auth/confirm-email");
         }
-
-        // Redirect to confirmation page or dashboard
-        router.push("/auth/confirm-email");
       }
     } catch (err) {
       console.error("Unexpected signup error:", err);
@@ -185,6 +181,7 @@ export function SignupForm() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -209,6 +206,7 @@ export function SignupForm() {
                   value={passwordStrength}
                   className="h-2"
                   indicatorClassName={getStrengthColor(passwordStrength)}
+                  aria-label={`Password strength: ${getStrengthText(passwordStrength)}`}
                 />
                 <p className="text-xs text-muted-foreground">
                   Use 8+ characters with a mix of letters, numbers & symbols
@@ -237,6 +235,11 @@ export function SignupForm() {
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 tabIndex={-1}
+                aria-label={
+                  showConfirmPassword
+                    ? "Hide confirm password"
+                    : "Show confirm password"
+                }
               >
                 {showConfirmPassword ? (
                   <EyeOff className="h-4 w-4" />

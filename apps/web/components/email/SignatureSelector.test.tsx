@@ -335,7 +335,7 @@ describe("SignatureSelector", () => {
       render(
         <SignatureSelector
           signatures={mockSignatures}
-          selectedSignatureId={undefined as any}
+          selectedSignatureId={undefined}
           onChange={mockOnChange}
         />
       );

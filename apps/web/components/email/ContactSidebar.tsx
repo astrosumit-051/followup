@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, X, Filter } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { useContacts } from "@/lib/hooks/useContacts";
 import {
   Select,
@@ -48,7 +48,7 @@ export function ContactSidebar({ onSelectionChange }: ContactSidebarProps) {
 
   // Build filter object for GraphQL query
   const filters = useMemo(() => {
-    const filter: any = {};
+    const filter: Record<string, string> = {};
 
     if (priorityFilter) {
       filter.priority = priorityFilter;

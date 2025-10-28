@@ -39,6 +39,7 @@ export default function CreateContactPage() {
       // Show success toast
       toast.success("Contact created successfully!", {
         description: `${data.name} has been added to your contacts.`,
+        duration: 5000, // 5 seconds for better UX and E2E test reliability
       });
 
       // Redirect to contact detail page
@@ -50,6 +51,7 @@ export default function CreateContactPage() {
           error instanceof Error
             ? error.message
             : "An unexpected error occurred",
+        duration: 5000, // 5 seconds for better UX and E2E test reliability
       });
     }
   };

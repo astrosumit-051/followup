@@ -33,7 +33,7 @@ import { Pen } from "lucide-react";
 export interface EmailSignature {
   id: string;
   name: string;
-  contentJson: Record<string, any>;
+  contentJson: Record<string, unknown>;
   contentHtml: string;
   isDefaultForFormal: boolean;
   isDefaultForCasual: boolean;

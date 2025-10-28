@@ -27,7 +27,6 @@ import type {
   ContactFilterInput,
   ContactSortField,
   SortOrder,
-  ContactConnection,
 } from "@/lib/graphql/contacts";
 
 /**

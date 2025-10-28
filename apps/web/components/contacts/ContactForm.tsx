@@ -112,7 +112,9 @@ export function ContactForm({
       role: defaultValues?.role ?? "",
       priority: defaultValues?.priority ?? "HIGH",
       gender: defaultValues?.gender ?? undefined,
-      birthday: defaultValues?.birthday ? new Date(defaultValues.birthday) : undefined,
+      birthday: defaultValues?.birthday
+        ? new Date(defaultValues.birthday)
+        : undefined,
       profilePicture: defaultValues?.profilePicture ?? "",
       notes: defaultValues?.notes ?? "",
       lastContactedAt: defaultValues?.lastContactedAt ?? "",
@@ -422,7 +424,9 @@ export function ContactForm({
                   onChange={(e) => {
                     const dateStr = e.target.value;
                     // Convert datetime-local format to ISO 8601
-                    field.onChange(dateStr ? new Date(dateStr).toISOString() : "");
+                    field.onChange(
+                      dateStr ? new Date(dateStr).toISOString() : "",
+                    );
                   }}
                 />
               </FormControl>

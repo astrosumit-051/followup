@@ -54,7 +54,7 @@ import {
 export interface EmailSignature {
   id: string;
   name: string;
-  contentJson: Record<string, any>;
+  contentJson: Record<string, unknown>;
   contentHtml: string;
   isDefaultForFormal: boolean;
   isDefaultForCasual: boolean;
@@ -63,7 +63,7 @@ export interface EmailSignature {
 
 interface SignatureFormData {
   name: string;
-  contentJson: Record<string, any>;
+  contentJson: Record<string, unknown>;
   contentHtml: string;
   isDefaultForFormal: boolean;
   isDefaultForCasual: boolean;
@@ -524,7 +524,7 @@ export function SignatureManager({
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
-              signature "{deletingSignature?.name}".
+              signature &quot;{deletingSignature?.name}&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -45,6 +45,7 @@ export default function EditContactPage() {
       // Show success toast
       toast.success("Contact updated successfully!", {
         description: `${data.name || contact?.name} has been updated.`,
+        duration: 5000, // 5 seconds for better UX and E2E test reliability
       });
 
       // Redirect to contact detail page
@@ -56,6 +57,7 @@ export default function EditContactPage() {
           error instanceof Error
             ? error.message
             : "An unexpected error occurred",
+        duration: 5000, // 5 seconds for better UX and E2E test reliability
       });
     }
   };

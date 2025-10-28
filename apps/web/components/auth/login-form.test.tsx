@@ -6,16 +6,6 @@ import { LoginForm } from "./login-form";
 
 expect.extend(toHaveNoViolations);
 
-// Mock Next.js router
-const mockPush = jest.fn();
-const mockRefresh = jest.fn();
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: mockPush,
-    refresh: mockRefresh,
-  }),
-}));
-
 // Mock Next.js Link
 jest.mock("next/link", () => {
   const MockLink = ({
@@ -31,21 +21,13 @@ jest.mock("next/link", () => {
   return MockLink;
 });
 
-// Mock Supabase client
-const mockSignInWithPassword = jest.fn();
-const mockSignInWithOAuth = jest.fn();
-jest.mock("@/lib/supabase/client", () => ({
-  createBrowserClient: () => ({
-    auth: {
-      signInWithPassword: mockSignInWithPassword,
-      signInWithOAuth: mockSignInWithOAuth,
-    },
-  }),
-}));
-
 describe("LoginForm", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Clear all global mocks before each test
+    global.mockPush.mockClear();
+    global.mockRefresh.mockClear();
+    global.mockSignInWithPassword.mockClear();
+    global.mockSignInWithOAuth.mockClear();
   });
 
   describe("Render", () => {
@@ -88,7 +70,7 @@ describe("LoginForm", () => {
 
   describe("Form Submission", () => {
     it("handles successful email/password login", async () => {
-      mockSignInWithPassword.mockResolvedValueOnce({
+      global.mockSignInWithPassword.mockResolvedValueOnce({
         data: {
           session: { access_token: "mock-token" },
           user: { email: "test@example.com" },
@@ -107,17 +89,17 @@ describe("LoginForm", () => {
       await user.click(screen.getByRole("button", { name: /sign in$/i }));
 
       await waitFor(() => {
-        expect(mockSignInWithPassword).toHaveBeenCalledWith({
+        expect(global.mockSignInWithPassword).toHaveBeenCalledWith({
           email: "test@example.com",
           password: "password123",
         });
-        expect(mockPush).toHaveBeenCalledWith("/dashboard");
-        expect(mockRefresh).toHaveBeenCalled();
+        expect(global.mockPush).toHaveBeenCalledWith("/dashboard");
+        expect(global.mockRefresh).toHaveBeenCalled();
       });
     });
 
     it("displays error message on failed login", async () => {
-      mockSignInWithPassword.mockResolvedValueOnce({
+      global.mockSignInWithPassword.mockResolvedValueOnce({
         data: { session: null, user: null },
         error: { message: "Invalid email or password" },
       });
@@ -140,7 +122,7 @@ describe("LoginForm", () => {
     });
 
     it("trims email input before submission", async () => {
-      mockSignInWithPassword.mockResolvedValueOnce({
+      global.mockSignInWithPassword.mockResolvedValueOnce({
         data: {
           session: { access_token: "mock-token" },
           user: { email: "test@example.com" },
@@ -159,7 +141,7 @@ describe("LoginForm", () => {
       await user.click(screen.getByRole("button", { name: /sign in$/i }));
 
       await waitFor(() => {
-        expect(mockSignInWithPassword).toHaveBeenCalledWith({
+        expect(global.mockSignInWithPassword).toHaveBeenCalledWith({
           email: "test@example.com",
           password: "password123",
         });
@@ -169,7 +151,7 @@ describe("LoginForm", () => {
 
   describe("Google OAuth", () => {
     it("handles Google sign-in", async () => {
-      mockSignInWithOAuth.mockResolvedValueOnce({
+      global.mockSignInWithOAuth.mockResolvedValueOnce({
         data: {},
         error: null,
       });
@@ -182,7 +164,7 @@ describe("LoginForm", () => {
       );
 
       await waitFor(() => {
-        expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+        expect(global.mockSignInWithOAuth).toHaveBeenCalledWith({
           provider: "google",
           options: {
             redirectTo: expect.stringContaining("/auth/callback"),
@@ -192,7 +174,7 @@ describe("LoginForm", () => {
     });
 
     it("displays error message on failed Google login", async () => {
-      mockSignInWithOAuth.mockResolvedValueOnce({
+      global.mockSignInWithOAuth.mockResolvedValueOnce({
         data: {},
         error: { message: "Google authentication failed" },
       });
@@ -214,7 +196,7 @@ describe("LoginForm", () => {
 
   describe("Loading State", () => {
     it("disables inputs and buttons during submission", async () => {
-      mockSignInWithPassword.mockImplementationOnce(
+      global.mockSignInWithPassword.mockImplementationOnce(
         () =>
           new Promise((resolve) =>
             setTimeout(
@@ -250,12 +232,12 @@ describe("LoginForm", () => {
       ).toBeDisabled();
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith("/dashboard");
+        expect(global.mockPush).toHaveBeenCalledWith("/dashboard");
       });
     });
 
     it("shows loading spinner during submission", async () => {
-      mockSignInWithPassword.mockImplementationOnce(
+      global.mockSignInWithPassword.mockImplementationOnce(
         () =>
           new Promise((resolve) =>
             setTimeout(
@@ -287,7 +269,7 @@ describe("LoginForm", () => {
 
   describe("Keyboard Navigation", () => {
     it("allows form submission with Enter key", async () => {
-      mockSignInWithPassword.mockResolvedValueOnce({
+      global.mockSignInWithPassword.mockResolvedValueOnce({
         data: {
           session: { access_token: "mock-token" },
           user: { email: "test@example.com" },
@@ -306,7 +288,7 @@ describe("LoginForm", () => {
       await user.keyboard("{Enter}");
 
       await waitFor(() => {
-        expect(mockSignInWithPassword).toHaveBeenCalled();
+        expect(global.mockSignInWithPassword).toHaveBeenCalled();
       });
     });
 
@@ -315,15 +297,24 @@ describe("LoginForm", () => {
       render(<LoginForm />);
 
       const emailInput = screen.getByLabelText("Email address");
+      const forgotPasswordLink = screen.getByRole("link", {
+        name: /forgot password/i,
+      });
       const passwordInput = screen.getByLabelText("Password");
       const signInButton = screen.getByRole("button", { name: /sign in$/i });
 
       emailInput.focus();
       expect(emailInput).toHaveFocus();
 
+      // Tab to Forgot password link (comes before password input in DOM)
+      await user.tab();
+      expect(forgotPasswordLink).toHaveFocus();
+
+      // Tab to password input
       await user.tab();
       expect(passwordInput).toHaveFocus();
 
+      // Tab to sign in button (skipping eye icon button which has tabIndex=-1)
       await user.tab();
       expect(signInButton).toHaveFocus();
     });
@@ -347,7 +338,7 @@ describe("LoginForm", () => {
     });
 
     it("should have no accessibility violations with error state", async () => {
-      mockSignInWithPassword.mockResolvedValueOnce({
+      global.mockSignInWithPassword.mockResolvedValueOnce({
         data: { session: null, user: null },
         error: { message: "Invalid credentials" },
       });
@@ -373,7 +364,7 @@ describe("LoginForm", () => {
 
   describe("Error Handling", () => {
     it("clears previous error when starting new login attempt", async () => {
-      mockSignInWithPassword
+      global.mockSignInWithPassword
         .mockResolvedValueOnce({
           data: { session: null, user: null },
           error: { message: "First error" },

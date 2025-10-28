@@ -16,9 +16,9 @@ export interface EmailDraft {
   userId: string;
   contactId: string;
   subject?: string;
-  bodyJson?: Record<string, any>;
+  bodyJson?: Record<string, unknown>;
   bodyHtml?: string;
-  attachments?: Array<Record<string, any>>;
+  attachments?: Array<Record<string, unknown>>;
   signatureId?: string;
   version: number;
   createdAt: string;
@@ -29,9 +29,9 @@ export interface EmailDraft {
 export interface AutoSaveDraftInput {
   contactId: string;
   subject?: string;
-  bodyJson?: Record<string, any>;
+  bodyJson?: Record<string, unknown>;
   bodyHtml?: string;
-  attachments?: Array<Record<string, any>>;
+  attachments?: Array<Record<string, unknown>>;
   signatureId?: string;
   lastSyncedAt?: Date;
   version?: number;
