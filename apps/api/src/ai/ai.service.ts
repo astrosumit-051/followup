@@ -103,11 +103,12 @@ export class AIService {
     // Initialize OpenRouter (primary provider - unified access to multiple LLMs)
     if (openrouterKey) {
       this.openrouterClient = new ChatOpenAI({
-        modelName: 'openai/gpt-5-nano', // Nano model for cost-effective, fast responses
-        // Alternative models: 'anthropic/claude-3.5-sonnet', 'openai/gpt-4-turbo', 'google/gemini-2.0-flash-exp'
+        modelName: 'google/gemini-2.5-flash-lite', // Fast, cost-effective model without reasoning overhead
+        // Previous model 'openai/gpt-5-nano' consumed 2900+ tokens on reasoning alone, leaving no space for JSON output
+        // Alternative models: 'anthropic/claude-3.5-sonnet', 'openai/gpt-4-turbo', 'openai/gpt-5-nano'
         temperature: 0.7,
-        maxTokens: 500,
-        timeout: 30000,
+        maxTokens: 10000, // Increased to accommodate reasoning tokens + response
+        timeout: 30000, // 30 seconds - standard for LLM API calls (was 3000ms causing 91% timeouts)
         openAIApiKey: openrouterKey,
         configuration: {
           baseURL: 'https://openrouter.ai/api/v1',
@@ -118,16 +119,17 @@ export class AIService {
         },
       });
       availableProviders.push('OpenRouter');
-      this.logger.log('✅ OpenRouter client initialized successfully with gpt-5-nano');
+      this.logger.log('✅ OpenRouter client initialized successfully with gemini-2.5-flash-lite');
     }
 
     // Initialize Google Gemini 2.0 Flash (fallback provider)
     if (geminiKey) {
       try {
         this.geminiClient = new ChatGoogleGenerativeAI({
-          model: 'gemini-2.0-flash-exp',
+          model: 'google/gemini-2.5-flash-lite', // Fast, cost-effective model without reasoning overhead
+          // Alternative models: 'google/gemini-2.0-flash', 'google/gemini-1.5-pro', 'google/gemini-1.0'
           temperature: 0.7,
-          maxOutputTokens: 500,
+          maxOutputTokens: 5000,
           apiKey: geminiKey,
         });
         availableProviders.push('Gemini');
@@ -142,8 +144,8 @@ export class AIService {
       this.openaiClient = new ChatOpenAI({
         modelName: 'gpt-4-turbo-preview',
         temperature: 0.7,
-        maxTokens: 500,
-        timeout: 30000,
+        maxTokens: 10000, // Increased to accommodate reasoning tokens + response
+        timeout: 30000, // 30 seconds - standard for LLM API calls
         openAIApiKey: openaiKey,
       });
       availableProviders.push('OpenAI');
@@ -154,7 +156,7 @@ export class AIService {
       this.anthropicClient = new ChatAnthropic({
         model: 'claude-3-5-sonnet-20241022',
         temperature: 0.7,
-        maxTokens: 500,
+        maxTokens: 10000, // Increased to accommodate reasoning tokens + response
         anthropicApiKey: anthropicKey,
       });
       availableProviders.push('Anthropic');
@@ -467,6 +469,12 @@ Respond in JSON format:
   private parseResponse(response: any): Omit<EmailTemplateResult, 'style' | 'providerId'> {
     let parsedContent: any;
 
+    // Debug logging to inspect actual response structure
+    this.logger.debug(`Raw response type: ${typeof response}`);
+    this.logger.debug(`Raw response keys: ${Object.keys(response || {}).join(', ')}`);
+    this.logger.debug(`Response.content type: ${typeof response?.content}`);
+    this.logger.debug(`Response.content preview: ${JSON.stringify(response?.content?.substring(0, 200))}`);
+
     // Handle different response formats
     if (typeof response === 'string') {
       try {
@@ -476,9 +484,18 @@ Respond in JSON format:
         throw new Error('Invalid LLM response format: expected JSON');
       }
     } else if (response.content) {
+      // Extract JSON from markdown code blocks if present
+      let content = response.content;
+      const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      if (jsonMatch) {
+        content = jsonMatch[1];
+        this.logger.debug('Extracted JSON from markdown code block');
+      }
+
       try {
-        parsedContent = JSON.parse(response.content);
+        parsedContent = JSON.parse(content);
       } catch (error) {
+        this.logger.error(`Failed to parse content as JSON: ${content.substring(0, 200)}`);
         throw new Error('Invalid LLM response format: expected JSON in content');
       }
     } else {
@@ -487,6 +504,7 @@ Respond in JSON format:
 
     // Validate response structure
     if (!parsedContent.subject || !parsedContent.body) {
+      this.logger.error(`Parsed content missing subject/body: ${JSON.stringify(parsedContent)}`);
       throw new Error('Invalid LLM response: missing subject or body');
     }
 
@@ -511,7 +529,7 @@ Respond in JSON format:
    */
   private getSystemPrompt(): string {
     return `
-You are an expert professional networking assistant. Your role is to help users craft personalized, 
+You are an expert professional networking assistant. Your role is to help users craft personalized,
 effective follow-up emails to their professional contacts.
 
 Guidelines:
@@ -520,21 +538,22 @@ Guidelines:
 - Reference previous conversations when relevant
 - Keep emails concise but warm
 - Match the requested style (formal or casual)
-- Always respond in valid JSON format
+- CRITICAL: Always respond with a valid JSON object containing EXACTLY two fields: "subject" and "body"
 
-Few-shot Examples:
+Response Format:
+Your response must be a JSON object with this exact structure:
+- "subject": string containing the email subject line
+- "body": string containing the complete email body text
 
-Example 1 (Formal):
-{
-  "subject": "Following up on our AI discussion at AWS Summit",
-  "body": "Dear John,\\n\\nI hope this email finds you well. I wanted to follow up on our conversation at AWS Summit regarding AI solutions for enterprise workflows.\\n\\nGiven your role as CTO at TechCorp, I believe there could be valuable synergies between our approaches. Would you be available for a brief call next week to explore potential collaboration opportunities?\\n\\nBest regards"
-}
+Example Formal Style:
+Subject: "Following up on our AI discussion at AWS Summit"
+Body: "Dear John, I hope this email finds you well. I wanted to follow up on our conversation at AWS Summit regarding AI solutions for enterprise workflows. Given your role as CTO at TechCorp, I believe there could be valuable synergies between our approaches. Would you be available for a brief call next week to explore potential collaboration opportunities? Best regards"
 
-Example 2 (Casual):
-{
-  "subject": "Hey John! Quick follow-up from AWS Summit",
-  "body": "Hey John,\\n\\nGreat meeting you at AWS Summit! I've been thinking about our conversation on AI solutions and how they could fit with what you're building at TechCorp.\\n\\nWould love to chat more when you have a chance. Any time next week work for a quick call?\\n\\nCheers"
-}
+Example Casual Style:
+Subject: "Hey John! Quick follow-up from AWS Summit"
+Body: "Hey John, Great meeting you at AWS Summit! I've been thinking about our conversation on AI solutions and how they could fit with what you're building at TechCorp. Would love to chat more when you have a chance. Any time next week work for a quick call? Cheers"
+
+Remember: Respond ONLY with valid JSON. No markdown, no code blocks, no extra text.
     `.trim();
   }
 

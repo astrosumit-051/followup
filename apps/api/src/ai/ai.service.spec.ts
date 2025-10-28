@@ -282,7 +282,7 @@ describe('AIService', () => {
       // Verify system prompt defines the role
       expect(systemPrompt).toContain('expert professional networking assistant');
       expect(systemPrompt).toContain('follow-up emails');
-      expect(systemPrompt).toContain('valid JSON format');
+      expect(systemPrompt).toContain('valid JSON object');
     });
 
     it('should include few-shot examples in system prompt', () => {
@@ -290,8 +290,8 @@ describe('AIService', () => {
       const systemPrompt = getSystemPromptMethod();
 
       // Verify few-shot examples exist
-      expect(systemPrompt).toContain('Example 1 (Formal)');
-      expect(systemPrompt).toContain('Example 2 (Casual)');
+      expect(systemPrompt).toContain('Example Formal Style');
+      expect(systemPrompt).toContain('Example Casual Style');
       expect(systemPrompt).toContain('Following up on our AI discussion at AWS Summit');
       expect(systemPrompt).toContain('Hey John! Quick follow-up from AWS Summit');
     });
