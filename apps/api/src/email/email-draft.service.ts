@@ -127,7 +127,7 @@ export class EmailDraftService {
       }) as unknown as EmailDraft;
     } catch (error) {
       // Check if error is due to concurrent modification
-      if (error.code === 'P2034') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2034') {
         throw new ConflictException(
           'Draft has been modified by another client. Please refresh and try again.',
         );

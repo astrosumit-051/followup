@@ -112,7 +112,9 @@ export function ContactForm({
       role: defaultValues?.role ?? "",
       priority: defaultValues?.priority ?? "HIGH",
       gender: defaultValues?.gender ?? undefined,
-      birthday: defaultValues?.birthday ? new Date(defaultValues.birthday) : undefined,
+      birthday: defaultValues?.birthday
+        ? new Date(defaultValues.birthday)
+        : undefined,
       profilePicture: defaultValues?.profilePicture ?? "",
       notes: defaultValues?.notes ?? "",
       lastContactedAt: defaultValues?.lastContactedAt ?? "",
@@ -137,6 +139,7 @@ export function ContactForm({
                   placeholder="John Doe"
                   disabled={isSubmitting}
                   value={field.value || ""}
+                  data-testid="contact-form-name"
                 />
               </FormControl>
               <FormMessage />
@@ -158,6 +161,7 @@ export function ContactForm({
                   placeholder="john@example.com"
                   disabled={isSubmitting}
                   value={field.value || ""}
+                  data-testid="contact-form-email"
                 />
               </FormControl>
               <FormMessage />
@@ -179,6 +183,7 @@ export function ContactForm({
                   placeholder="+1-234-567-8900"
                   disabled={isSubmitting}
                   value={field.value || ""}
+                  data-testid="contact-form-phone"
                 />
               </FormControl>
               <FormMessage />
@@ -282,7 +287,7 @@ export function ContactForm({
                 disabled={isSubmitting}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger data-testid="contact-form-priority">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                 </FormControl>
@@ -391,6 +396,7 @@ export function ContactForm({
                   placeholder="Add any notes about this contact..."
                   disabled={isSubmitting}
                   value={field.value || ""}
+                  data-testid="contact-form-notes"
                 />
               </FormControl>
               <FormMessage />
@@ -418,7 +424,9 @@ export function ContactForm({
                   onChange={(e) => {
                     const dateStr = e.target.value;
                     // Convert datetime-local format to ISO 8601
-                    field.onChange(dateStr ? new Date(dateStr).toISOString() : "");
+                    field.onChange(
+                      dateStr ? new Date(dateStr).toISOString() : "",
+                    );
                   }}
                 />
               </FormControl>
@@ -447,6 +455,7 @@ export function ContactForm({
             type="submit"
             disabled={isSubmitting}
             className="w-full sm:w-auto"
+            data-testid="contact-form-submit"
           >
             {isSubmitting
               ? "Saving..."

@@ -71,7 +71,7 @@ Guide: `~/.agent-os/instructions/execute-tasks.md`
 
 All MCP server details including full tool lists, usage patterns, and workflows are documented in the comprehensive guide. Below is a quick reference of available servers:
 
-### Quick Reference - 8 MCP Servers Available
+### Quick Reference - 7 MCP Servers Available
 
 | # | Server | Primary Purpose | Key Tools |
 |---|--------|-----------------|-----------|
@@ -81,8 +81,7 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 | 4 | **Semgrep** | Security scanning & static analysis | 7 tools for vulnerability detection |
 | 5 | **GitHub** | Repository management & PR automation | 30+ tools for code, issues, PRs, workflows |
 | 6 | **Sequential Thinking** | Complex multi-step problem solving | `sequentialthinking` |
-| 7 | **PostgreSQL** | Read-only database queries for debugging | `query` |
-| 8 | **shadcn** | UI component registry & installation | Browse/search/install components, examples |
+| 7 | **shadcn** | UI component registry & installation | Browse/search/install components, examples |
 
 ### Priority Rules
 
@@ -93,11 +92,10 @@ All MCP server details including full tool lists, usage patterns, and workflows 
 2. 🎨 **UI Components**: shadcn for pre-built components
 3. 🛠️ **Implement**: Follow tech-stack.md with continuous Ref lookups
 4. 🔒 **Security**: Semgrep scan on auth/database/API code
-5. 🗄️ **Database**: PostgreSQL to verify schema after migrations
-6. 🧪 **Testing**: Playwright E2E tests (broad validation)
-7. ⚡ **Performance**: Chrome DevTools profiling (deep analysis)
-8. 📋 **Track**: GitHub Issues to update status and document decisions
-9. 🚀 **Deploy**: GitHub PR creation linked to issue
+5. 🧪 **Testing**: Playwright E2E tests (broad validation)
+6. ⚡ **Performance**: Chrome DevTools profiling (deep analysis)
+7. 📋 **Track**: GitHub Issues to update status and document decisions
+8. 🚀 **Deploy**: GitHub PR creation linked to issue
 
 **📚 See `/context/mcp-instructions.md` for:**
 - Complete tool lists for each server
@@ -131,9 +129,6 @@ The following MCP tools can be used without requiring user approval for automate
 - `mcp__chrome-devtools__performance_start_trace` - Start performance trace
 - `mcp__chrome-devtools__performance_stop_trace` - Stop performance trace
 - `mcp__chrome-devtools__performance_analyze_insight` - Analyze performance
-
-**PostgreSQL MCP:**
-- `mcp__postgres__query` - Read-only database queries for debugging
 
 **Ref MCP:**
 - `mcp__Ref__ref_search_documentation` - Search documentation
@@ -208,15 +203,14 @@ The following MCP tools can be used without requiring user approval for automate
 ```
 GitHub (check issues) → Ref (Prisma) → Sequential Thinking →
 shadcn (forms/tables) → Ref (Next.js) → Implement →
-Semgrep → PostgreSQL → Playwright → Chrome DevTools →
-GitHub (update issue)
+Semgrep → Playwright → Chrome DevTools → GitHub (update issue)
 ```
 
 #### AI Email Generation Features
 ```
 GitHub (check issues) → Sequential Thinking → Ref (LangChain + OpenAI) →
 shadcn (email editor components) → Implement →
-Semgrep (prompt injection) → PostgreSQL → Playwright →
+Semgrep (prompt injection) → Playwright →
 Chrome DevTools (performance testing) → GitHub (update issue)
 ```
 
@@ -230,7 +224,7 @@ Playwright → Chrome DevTools → GitHub (update issue)
 #### Dashboard & Analytics Features
 ```
 GitHub (check issues) → Ref (Recharts + TanStack Query) →
-shadcn (charts/cards) → Implement → PostgreSQL (query testing) →
+shadcn (charts/cards) → Implement →
 Playwright → Chrome DevTools (Core Web Vitals) → GitHub (update issue)
 ```
 
@@ -392,7 +386,6 @@ When conflicts arise, follow this priority hierarchy:
 - Use **Sequential Thinking** for complex feature planning
 - Use **shadcn** to find UI components before building from scratch
 - Verify with **Ref** before implementing any API/library
-- Check **PostgreSQL** schema before and after migrations
 - Track work with **GitHub Issues** and link to PRs
 - Use **Playwright + Chrome DevTools** together for comprehensive testing
 
@@ -403,7 +396,6 @@ When conflicts arise, follow this priority hierarchy:
 - Build custom UI components before checking shadcn registry
 - Skip performance profiling for user-facing features
 - Make assumptions about library usage without checking Ref
-- Run destructive queries with PostgreSQL MCP (READ-ONLY - use Prisma for writes)
 - Forget to link GitHub Issues to PRs
 
 **🚨 CRITICAL: When Stuck or Encountering Problems**
@@ -414,7 +406,7 @@ When conflicts arise, follow this priority hierarchy:
 2. **Unsure about API usage** → **Ref** (look up exact documentation)
 3. **Debugging errors** → **Ref** (error messages) + **Sequential Thinking** (root cause)
 4. **Need UI component** → **shadcn** (find existing components)
-5. **Database issues** → **PostgreSQL** (inspect actual schema/data)
+5. **Database issues** → **Prisma CLI** (inspect schema with `prisma db pull`, `prisma studio`)
 6. **Security concerns** → **Semgrep** (scan for vulnerabilities)
 7. **Performance problems** → **Chrome DevTools** (profile performance)
 8. **Code examples needed** → **Ref** → **GitHub** (search code)
@@ -479,10 +471,9 @@ When conflicts arise, follow this priority hierarchy:
 4. Find UI components with shadcn
 5. Implement with continuous Ref lookups (never hallucinate)
 6. Scan with Semgrep (security-critical code)
-7. Verify with PostgreSQL (schema changes)
-8. Test with Playwright (E2E user flows - broad validation)
-9. Profile with Chrome DevTools (performance - deep analysis)
-10. Update GitHub Issue with status and decisions
+7. Test with Playwright (E2E user flows - broad validation)
+8. Profile with Chrome DevTools (performance - deep analysis)
+9. Update GitHub Issue with status and decisions
 ```
 
 ### Visual Changes
@@ -611,7 +602,7 @@ pnpm dev  # Starts both frontend (3000) and backend (4000)
 **📖 PRIMARY REFERENCE:** `/context/mcp-instructions.md`
 
 This comprehensive guide contains:
-- **Complete tool lists** for all 8 MCP servers (80+ tools total)
+- **Complete tool lists** for all 7 MCP servers (75+ tools total)
 - **Detailed usage patterns** and when to trigger each server
 - **Tool chaining workflows** for common development patterns
 - **Security scanning requirements** and best practices
@@ -632,6 +623,15 @@ This comprehensive guide contains:
 ### Design
 - Principles: `/context/design-principles.md`
 - Style Guide: `/context/style-guide.md`
+
+### Testing
+- **E2E Testing Guide**: `/context/e2e-testing-guide.md`
+  - shadcn/ui component testing best practices
+  - Common test failure patterns and solutions
+  - Selector strategies for accessible components
+  - Data loading and async handling
+  - Debugging failing tests
+  - Prevention strategies for UI refactors
 
 ### Troubleshooting
 - **Error Knowledge Base**: `/context/errors-solved.md`

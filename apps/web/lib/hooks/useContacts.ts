@@ -23,6 +23,7 @@ import {
   type ContactSortField,
   type SortOrder,
 } from "@/lib/graphql/contacts";
+import { transformEmptyToUndefined } from "@/lib/validations/contact";
 
 /**
  * TanStack Query Hooks for Contact CRUD Operations
@@ -251,11 +252,19 @@ export function useCreateContact(
         birthday: input.birthday instanceof Date
           ? input.birthday.toISOString()
           : input.birthday,
+        // Transform empty strings to undefined for optional fields
+        email: transformEmptyToUndefined(input.email),
+        phone: transformEmptyToUndefined(input.phone),
+        linkedInUrl: transformEmptyToUndefined(input.linkedInUrl),
+        company: transformEmptyToUndefined(input.company),
+        industry: transformEmptyToUndefined(input.industry),
+        role: transformEmptyToUndefined(input.role),
+        notes: transformEmptyToUndefined(input.notes),
       };
 
       // Remove fields not supported by backend CreateContactDto
       // profilePicture and lastContactedAt are not in the backend schema yet
-      const { profilePicture, lastContactedAt, ...backendInput } = transformedInput;
+      const { profilePicture: _profilePicture, lastContactedAt: _lastContactedAt, ...backendInput } = transformedInput;
 
       return createContact(backendInput as CreateContactInput);
     },
@@ -319,7 +328,25 @@ export function useUpdateContact(
 
   return useMutation<Contact, Error, { id: string; input: UpdateContactInput }, { previousContact?: Contact }>(
     {
-      mutationFn: ({ id, input }) => updateContact(id, input),
+      mutationFn: ({ id, input }) => {
+        // Transform empty strings to undefined for optional fields
+        const transformedInput = {
+          ...input,
+          email: transformEmptyToUndefined(input.email),
+          phone: transformEmptyToUndefined(input.phone),
+          linkedInUrl: transformEmptyToUndefined(input.linkedInUrl),
+          company: transformEmptyToUndefined(input.company),
+          industry: transformEmptyToUndefined(input.industry),
+          role: transformEmptyToUndefined(input.role),
+          notes: transformEmptyToUndefined(input.notes),
+        };
+
+        // Remove fields not supported by backend UpdateContactDto
+        // profilePicture and lastContactedAt are not in the backend schema yet
+        const { profilePicture: _profilePicture, lastContactedAt: _lastContactedAt, ...backendInput } = transformedInput;
+
+        return updateContact(id, backendInput as UpdateContactInput);
+      },
       onMutate: async ({ id, input }) => {
         // Cancel outgoing refetches to prevent overwriting optimistic update
         await queryClient.cancelQueries({ queryKey: contactKeys.detail(id) });

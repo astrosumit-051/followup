@@ -1,7 +1,19 @@
 import { test, expect } from "@playwright/test";
+import {
+  createMultipleContactsFixture,
+  Priority,
+  Gender,
+} from "../helpers/test-isolation";
 
 /**
  * Responsive Design E2E Tests
+ *
+ * ✅ Fully migrated to use test isolation (no shared test data)
+ *
+ * Migration Strategy:
+ * - Uses createMultipleContactsFixture with 5 contacts for grid layout testing
+ * - Replaces placeholder "/contacts/[id]" with actual fixture contact IDs
+ * - All contacts have unique UUID-based IDs (no race conditions)
  *
  * Tests contact CRUD pages across mobile, tablet, and desktop viewports.
  * Verifies:
@@ -17,8 +29,6 @@ import { test, expect } from "@playwright/test";
  * - Desktop: 1440x900 (standard laptop)
  */
 
-// Test data
-
 // Helper function to check if element meets touch target size
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function checkTouchTargetSize(element: any, minSize = 44) {
@@ -30,6 +40,50 @@ async function checkTouchTargetSize(element: any, minSize = 44) {
 }
 
 test.describe("Contact List Page - Responsive Design", () => {
+  // Create 5 contacts for grid layout testing
+  const contactsFixture = createMultipleContactsFixture([
+    {
+      name: "Alice Anderson",
+      email: "alice@example.com",
+      priority: Priority.HIGH,
+      gender: Gender.FEMALE,
+    },
+    {
+      name: "Bob Brown",
+      email: "bob@example.com",
+      priority: Priority.MEDIUM,
+      gender: Gender.MALE,
+    },
+    {
+      name: "Charlie Chen",
+      email: "charlie@example.com",
+      priority: Priority.LOW,
+      gender: Gender.MALE,
+    },
+    {
+      name: "Diana Davis",
+      email: "diana@example.com",
+      priority: Priority.HIGH,
+      gender: Gender.FEMALE,
+    },
+    {
+      name: "Edward Evans",
+      email: "edward@example.com",
+      priority: Priority.MEDIUM,
+      gender: Gender.MALE,
+    },
+  ]);
+
+  test.beforeEach(async () => {
+    // Setup: Create 5 contacts for grid layout tests
+    await contactsFixture.setup();
+  });
+
+  test.afterEach(async () => {
+    // Cleanup: Delete all 5 test contacts
+    await contactsFixture.teardown();
+  });
+
   test.describe("Mobile Viewport (375px)", () => {
     test.use({ viewport: { width: 375, height: 667 } });
 
@@ -49,18 +103,19 @@ test.describe("Contact List Page - Responsive Design", () => {
       await expect(grid).toBeVisible();
       await expect(grid).toHaveClass(/grid-cols-1/);
 
-      // Verify cards stack vertically
+      // Verify cards stack vertically (we have 5 contacts)
       const cards = page.locator('[data-testid="contact-card"]');
       const count = await cards.count();
-      if (count > 1) {
-        const firstBox = await cards.nth(0).boundingBox();
-        const secondBox = await cards.nth(1).boundingBox();
-        expect(firstBox).not.toBeNull();
-        expect(secondBox).not.toBeNull();
-        if (firstBox && secondBox) {
-          // Second card should be below first card
-          expect(secondBox.y).toBeGreaterThan(firstBox.y + firstBox.height);
-        }
+      expect(count).toBeGreaterThanOrEqual(5); // Should show our 5 test contacts
+
+      // Verify first 2 cards stack vertically
+      const firstBox = await cards.nth(0).boundingBox();
+      const secondBox = await cards.nth(1).boundingBox();
+      expect(firstBox).not.toBeNull();
+      expect(secondBox).not.toBeNull();
+      if (firstBox && secondBox) {
+        // Second card should be below first card
+        expect(secondBox.y).toBeGreaterThan(firstBox.y + firstBox.height);
       }
     });
 
@@ -139,21 +194,21 @@ test.describe("Contact List Page - Responsive Design", () => {
         state: "visible",
       });
 
-      // Should use sm:grid-cols-2 at tablet size
+      // Should use sm:grid-cols-2 at tablet size (we have 5 contacts)
       const cards = page.locator('[data-testid="contact-card"]');
       const count = await cards.count();
+      expect(count).toBeGreaterThanOrEqual(5); // Should show our 5 test contacts
 
-      if (count >= 2) {
-        const firstBox = await cards.nth(0).boundingBox();
-        const secondBox = await cards.nth(1).boundingBox();
+      // Verify first 2 cards are side by side
+      const firstBox = await cards.nth(0).boundingBox();
+      const secondBox = await cards.nth(1).boundingBox();
 
-        expect(firstBox).not.toBeNull();
-        expect(secondBox).not.toBeNull();
+      expect(firstBox).not.toBeNull();
+      expect(secondBox).not.toBeNull();
 
-        if (firstBox && secondBox) {
-          // Cards should be side by side at same Y position
-          expect(Math.abs(firstBox.y - secondBox.y)).toBeLessThan(10); // Allow small diff
-        }
+      if (firstBox && secondBox) {
+        // Cards should be side by side at same Y position
+        expect(Math.abs(firstBox.y - secondBox.y)).toBeLessThan(10); // Allow small diff
       }
     });
 
@@ -190,23 +245,23 @@ test.describe("Contact List Page - Responsive Design", () => {
         state: "visible",
       });
 
-      // Should use xl:grid-cols-4 at desktop size
+      // Should use xl:grid-cols-4 at desktop size (we have 5 contacts, so first 4 should be in one row)
       const cards = page.locator('[data-testid="contact-card"]');
       const count = await cards.count();
+      expect(count).toBeGreaterThanOrEqual(5); // Should show our 5 test contacts
 
-      if (count >= 4) {
-        const boxes = await Promise.all([
-          cards.nth(0).boundingBox(),
-          cards.nth(1).boundingBox(),
-          cards.nth(2).boundingBox(),
-          cards.nth(3).boundingBox(),
-        ]);
+      // Verify first 4 cards are on same row
+      const boxes = await Promise.all([
+        cards.nth(0).boundingBox(),
+        cards.nth(1).boundingBox(),
+        cards.nth(2).boundingBox(),
+        cards.nth(3).boundingBox(),
+      ]);
 
-        // All 4 cards should be on same row (similar Y position)
-        const yPositions = boxes.filter((b) => b !== null).map((b) => b!.y);
-        const maxYDiff = Math.max(...yPositions) - Math.min(...yPositions);
-        expect(maxYDiff).toBeLessThan(20); // Allow small differences
-      }
+      // All 4 cards should be on same row (similar Y position)
+      const yPositions = boxes.filter((b) => b !== null).map((b) => b!.y);
+      const maxYDiff = Math.max(...yPositions) - Math.min(...yPositions);
+      expect(maxYDiff).toBeLessThan(20); // Allow small differences
     });
 
     test("should display full-width page with proper max-width", async ({
@@ -232,7 +287,7 @@ test.describe("Contact Form - Responsive Design", () => {
 
     test("should stack form buttons vertically on mobile", async ({ page }) => {
       await page.goto("/contacts/new");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Submit button should be full width on mobile
       const submitButton = page.getByRole("button", {
@@ -258,7 +313,7 @@ test.describe("Contact Form - Responsive Design", () => {
       page,
     }) => {
       await page.goto("/contacts/new");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       const submitButton = page.getByRole("button", {
         name: /create contact/i,
@@ -289,7 +344,7 @@ test.describe("Contact Form - Responsive Design", () => {
 
     test("should display buttons horizontally", async ({ page }) => {
       await page.goto("/contacts/new");
-      await page.waitForLoadState("networkidle");
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Buttons should be in horizontal row on larger screens
       const buttonContainer = page.locator(".sm\\:flex-row").last();
@@ -320,11 +375,37 @@ test.describe("Contact Form - Responsive Design", () => {
 });
 
 test.describe("Contact Detail Page - Responsive Design", () => {
+  // Create a single contact for detail page testing
+  const contactFixture = createMultipleContactsFixture([
+    {
+      name: "Test User",
+      email: "test@example.com",
+      phone: "+1-555-100-0001",
+      company: "Test Company",
+      industry: "Technology",
+      role: "Engineer",
+      priority: Priority.HIGH,
+      gender: Gender.MALE,
+      notes: "Responsive design test contact",
+    },
+  ]);
+
+  test.beforeEach(async () => {
+    // Setup: Create 1 contact for detail page tests
+    await contactFixture.setup();
+  });
+
+  test.afterEach(async () => {
+    // Cleanup: Delete test contact
+    await contactFixture.teardown();
+  });
+
   test.describe("Mobile Viewport (375px)", () => {
     test.use({ viewport: { width: 375, height: 667 } });
 
     test("should stack header vertically on mobile", async ({ page }) => {
-      await page.goto("/contacts/[id]"); // Replace with actual ID in real test
+      await page.goto(`/contacts/${contactFixture.contactIds[0]}`);
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Header should stack on mobile
       const header = page.locator(".flex.flex-col").first();
@@ -334,10 +415,14 @@ test.describe("Contact Detail Page - Responsive Design", () => {
     test("should have adequate touch targets for Edit and Delete buttons", async ({
       page,
     }) => {
-      await page.goto("/contacts/[id]"); // Replace with actual ID
+      await page.goto(`/contacts/${contactFixture.contactIds[0]}`);
+      // Wait removed - networkidle unreliable with GraphQL
 
-      const editButton = page.getByRole("button", { name: /edit/i });
+      const editButton = page.getByRole("link", { name: /edit/i });
       const deleteButton = page.getByRole("button", { name: /delete/i });
+
+      await expect(editButton).toBeVisible();
+      await expect(deleteButton).toBeVisible();
 
       await checkTouchTargetSize(editButton);
       await checkTouchTargetSize(deleteButton);
@@ -346,10 +431,14 @@ test.describe("Contact Detail Page - Responsive Design", () => {
     test("should display buttons with equal width on mobile", async ({
       page,
     }) => {
-      await page.goto("/contacts/[id]"); // Replace with actual ID
+      await page.goto(`/contacts/${contactFixture.contactIds[0]}`);
+      // Wait removed - networkidle unreliable with GraphQL
 
-      const editButton = page.getByRole("button", { name: /edit/i });
+      const editButton = page.getByRole("link", { name: /edit/i });
       const deleteButton = page.getByRole("button", { name: /delete/i });
+
+      await expect(editButton).toBeVisible();
+      await expect(deleteButton).toBeVisible();
 
       const editBox = await editButton.boundingBox();
       const deleteBox = await deleteButton.boundingBox();
@@ -368,7 +457,8 @@ test.describe("Contact Detail Page - Responsive Design", () => {
     test.use({ viewport: { width: 1440, height: 900 } });
 
     test("should display header horizontally", async ({ page }) => {
-      await page.goto("/contacts/[id]"); // Replace with actual ID
+      await page.goto(`/contacts/${contactFixture.contactIds[0]}`);
+      // Wait removed - networkidle unreliable with GraphQL
 
       // Header should be horizontal row on desktop
       const header = page.locator(".sm\\:flex-row").first();
@@ -379,6 +469,32 @@ test.describe("Contact Detail Page - Responsive Design", () => {
 
 test.describe("Touch Interactions", () => {
   test.use({ viewport: { width: 375, height: 667 }, hasTouch: true });
+
+  // Create 2 contacts for touch interaction testing
+  const touchContactsFixture = createMultipleContactsFixture([
+    {
+      name: "Touch Test 1",
+      email: "touch1@example.com",
+      priority: Priority.HIGH,
+      gender: Gender.FEMALE,
+    },
+    {
+      name: "Touch Test 2",
+      email: "touch2@example.com",
+      priority: Priority.MEDIUM,
+      gender: Gender.MALE,
+    },
+  ]);
+
+  test.beforeEach(async () => {
+    // Setup: Create 2 contacts for touch tests
+    await touchContactsFixture.setup();
+  });
+
+  test.afterEach(async () => {
+    // Cleanup: Delete test contacts
+    await touchContactsFixture.teardown();
+  });
 
   test("should handle tap on contact card", async ({ page }) => {
     await page.goto("/contacts");
@@ -391,9 +507,9 @@ test.describe("Touch Interactions", () => {
     // Simulate touch tap
     await firstCard.tap();
 
-    // Should navigate to detail page
-    await page.waitForURL(/\/contacts\/[^\/]+$/);
-    expect(page.url()).toMatch(/\/contacts\/[^\/]+$/);
+    // Should navigate to detail page (one of our 2 test contacts)
+    await page.waitForURL(/\/contacts\/test-contact-[a-f0-9-]+$/);
+    expect(page.url()).toMatch(/\/contacts\/test-contact-[a-f0-9-]+$/);
   });
 
   test("should handle tap on buttons", async ({ page }) => {

@@ -54,7 +54,10 @@ export function ContactListEmpty({
   onAction,
 }: ContactListEmptyProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+    <div
+      className="flex flex-col items-center justify-center py-12 px-4 text-center"
+      data-testid="contacts-empty"
+    >
       {/* Empty State Icon */}
       <div className="mb-4">
         <svg

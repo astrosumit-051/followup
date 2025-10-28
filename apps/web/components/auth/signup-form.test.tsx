@@ -1,18 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe, toHaveNoViolations } from "jest-axe";
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 import { SignupForm } from "./signup-form";
 
 expect.extend(toHaveNoViolations);
-
-// Mock Next.js router
-const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: mockPush,
-  }),
-}));
 
 // Mock Next.js Link
 jest.mock("next/link", () => {
@@ -29,21 +21,12 @@ jest.mock("next/link", () => {
   return MockLink;
 });
 
-// Mock Supabase client
-const mockSignUp = jest.fn();
-const mockSignInWithOAuth = jest.fn();
-jest.mock("@/lib/supabase/client", () => ({
-  createBrowserClient: () => ({
-    auth: {
-      signUp: mockSignUp,
-      signInWithOAuth: mockSignInWithOAuth,
-    },
-  }),
-}));
-
 describe("SignupForm", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Clear all global mocks before each test
+    global.mockPush.mockClear();
+    global.mockSignUp.mockClear();
+    global.mockSignInWithOAuth.mockClear();
   });
 
   describe("Render", () => {
@@ -185,7 +168,7 @@ describe("SignupForm", () => {
     });
 
     it("handles successful signup", async () => {
-      mockSignUp.mockResolvedValueOnce({
+      global.mockSignUp.mockResolvedValueOnce({
         data: {
           user: {
             id: "123",
@@ -212,19 +195,19 @@ describe("SignupForm", () => {
       await user.click(screen.getByRole("button", { name: /create account/i }));
 
       await waitFor(() => {
-        expect(mockSignUp).toHaveBeenCalledWith({
+        expect(global.mockSignUp).toHaveBeenCalledWith({
           email: "test@example.com",
           password: "StrongP@ssw0rd!",
           options: {
             emailRedirectTo: expect.stringContaining("/auth/callback"),
           },
         });
-        expect(mockPush).toHaveBeenCalledWith("/auth/confirm-email");
+        expect(global.mockPush).toHaveBeenCalledWith("/auth/confirm-email");
       });
     });
 
     it("displays error when email already exists", async () => {
-      mockSignUp.mockResolvedValueOnce({
+      global.mockSignUp.mockResolvedValueOnce({
         data: {
           user: { id: "123", email: "test@example.com", identities: [] },
           session: null,
@@ -254,7 +237,7 @@ describe("SignupForm", () => {
     });
 
     it("displays error message on failed signup", async () => {
-      mockSignUp.mockResolvedValueOnce({
+      global.mockSignUp.mockResolvedValueOnce({
         data: { user: null, session: null },
         error: { message: "Invalid email format" },
       });
@@ -262,12 +245,13 @@ describe("SignupForm", () => {
       const user = userEvent.setup();
       render(<SignupForm />);
 
-      await user.type(screen.getByLabelText("Email address"), "invalid-email");
-      await user.type(screen.getByLabelText(/^Password$/), "Password123!");
+      await user.type(screen.getByLabelText("Email address"), "test@example.com");
+      await user.type(screen.getByLabelText(/^Password$/), "StrongP@ssw0rd!");
       await user.type(
         screen.getByLabelText("Confirm Password"),
-        "Password123!",
+        "StrongP@ssw0rd!",
       );
+
       await user.click(screen.getByRole("button", { name: /create account/i }));
 
       await waitFor(() => {
@@ -278,7 +262,7 @@ describe("SignupForm", () => {
 
   describe("Google OAuth", () => {
     it("handles Google sign-up", async () => {
-      mockSignInWithOAuth.mockResolvedValueOnce({
+      global.mockSignInWithOAuth.mockResolvedValueOnce({
         data: {},
         error: null,
       });
@@ -291,7 +275,7 @@ describe("SignupForm", () => {
       );
 
       await waitFor(() => {
-        expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+        expect(global.mockSignInWithOAuth).toHaveBeenCalledWith({
           provider: "google",
           options: {
             redirectTo: expect.stringContaining("/auth/callback"),
@@ -301,7 +285,7 @@ describe("SignupForm", () => {
     });
 
     it("displays error message on failed Google signup", async () => {
-      mockSignInWithOAuth.mockResolvedValueOnce({
+      global.mockSignInWithOAuth.mockResolvedValueOnce({
         data: {},
         error: { message: "Google authentication failed" },
       });
@@ -323,7 +307,7 @@ describe("SignupForm", () => {
 
   describe("Loading State", () => {
     it("disables inputs and buttons during submission", async () => {
-      mockSignUp.mockImplementationOnce(
+      global.mockSignUp.mockImplementationOnce(
         () =>
           new Promise((resolve) =>
             setTimeout(
@@ -347,15 +331,16 @@ describe("SignupForm", () => {
         screen.getByLabelText("Email address"),
         "test@example.com",
       );
-      await user.type(screen.getByLabelText(/^Password$/), "Password123!");
+      await user.type(screen.getByLabelText(/^Password$/), "StrongP@ssw0rd!");
       await user.type(
         screen.getByLabelText("Confirm Password"),
-        "Password123!",
+        "StrongP@ssw0rd!",
       );
 
       const submitButton = screen.getByRole("button", {
         name: /create account/i,
       });
+
       await user.click(submitButton);
 
       // Check loading state
@@ -369,12 +354,12 @@ describe("SignupForm", () => {
       ).toBeDisabled();
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith("/auth/confirm-email");
+        expect(global.mockPush).toHaveBeenCalledWith("/auth/confirm-email");
       });
     });
 
     it("shows loading spinner during submission", async () => {
-      mockSignUp.mockImplementationOnce(
+      global.mockSignUp.mockImplementationOnce(
         () =>
           new Promise((resolve) =>
             setTimeout(
@@ -398,12 +383,17 @@ describe("SignupForm", () => {
         screen.getByLabelText("Email address"),
         "test@example.com",
       );
-      await user.type(screen.getByLabelText(/^Password$/), "Password123!");
+      await user.type(screen.getByLabelText(/^Password$/), "StrongP@ssw0rd!");
       await user.type(
         screen.getByLabelText("Confirm Password"),
-        "Password123!",
+        "StrongP@ssw0rd!",
       );
-      await user.click(screen.getByRole("button", { name: /create account/i }));
+
+      await act(async () => {
+        await user.click(
+          screen.getByRole("button", { name: /create account/i }),
+        );
+      });
 
       // Check for Loader2 icon (animated spinner)
       const submitButton = screen.getByRole("button", {
@@ -415,7 +405,7 @@ describe("SignupForm", () => {
 
   describe("Keyboard Navigation", () => {
     it("allows form submission with Enter key", async () => {
-      mockSignUp.mockResolvedValueOnce({
+      global.mockSignUp.mockResolvedValueOnce({
         data: {
           user: {
             id: "123",
@@ -434,15 +424,16 @@ describe("SignupForm", () => {
         screen.getByLabelText("Email address"),
         "test@example.com",
       );
-      await user.type(screen.getByLabelText(/^Password$/), "Password123!");
+      await user.type(screen.getByLabelText(/^Password$/), "StrongP@ssw0rd!");
       await user.type(
         screen.getByLabelText("Confirm Password"),
-        "Password123!",
+        "StrongP@ssw0rd!",
       );
+
       await user.keyboard("{Enter}");
 
       await waitFor(() => {
-        expect(mockSignUp).toHaveBeenCalled();
+        expect(global.mockSignUp).toHaveBeenCalled();
       });
     });
 
@@ -491,7 +482,7 @@ describe("SignupForm", () => {
     });
 
     it("should have no accessibility violations with error state", async () => {
-      mockSignUp.mockResolvedValueOnce({
+      global.mockSignUp.mockResolvedValueOnce({
         data: { user: null, session: null },
         error: { message: "Invalid credentials" },
       });
@@ -503,11 +494,12 @@ describe("SignupForm", () => {
         screen.getByLabelText("Email address"),
         "test@example.com",
       );
-      await user.type(screen.getByLabelText(/^Password$/), "Password123!");
+      await user.type(screen.getByLabelText(/^Password$/), "StrongP@ssw0rd!");
       await user.type(
         screen.getByLabelText("Confirm Password"),
-        "Password123!",
+        "StrongP@ssw0rd!",
       );
+
       await user.click(screen.getByRole("button", { name: /create account/i }));
 
       await waitFor(() => {

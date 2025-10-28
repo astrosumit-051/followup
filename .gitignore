@@ -54,3 +54,8 @@ prisma/migrations/
 # Build outputs
 *.tsbuildinfo
 .playwright-mcp/
+
+# E2E Test Artifacts
+apps/web/e2e/visual-regression.spec.ts-snapshots/
+apps/web/test-results/
+apps/web/playwright-report/

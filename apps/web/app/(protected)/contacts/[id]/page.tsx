@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import { toast } from "sonner";
 import { useContact, useDeleteContact } from "@/lib/hooks/useContacts";
+import { useConversationCount } from "@/lib/hooks/useConversationCount";
 import { ContactDeleteDialog } from "@/components/contacts/ContactDeleteDialog";
 import { ContactLoadingSkeleton } from "@/components/contacts/ContactLoadingSkeleton";
 import { ContactErrorState } from "@/components/contacts/ContactErrorState";
@@ -40,6 +42,7 @@ export default function ContactDetailPage() {
 
   const { data: contact, isLoading, error } = useContact(id);
   const deleteContactMutation = useDeleteContact();
+  const { data: conversationCount, isLoading: isLoadingConversationCount, error: conversationCountError } = useConversationCount(id);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -50,6 +53,17 @@ export default function ContactDetailPage() {
     }
   }, [contact]);
 
+  // Debug: Log conversation count status
+  useEffect(() => {
+    console.log('[CTA Debug] Conversation count status:', {
+      contactId: id,
+      conversationCount,
+      isLoadingConversationCount,
+      error: conversationCountError ? (conversationCountError as Error).message : null,
+      shouldRenderCTA: !isLoadingConversationCount && conversationCount !== undefined,
+    });
+  }, [id, conversationCount, isLoadingConversationCount, conversationCountError]);
+
   const handleDelete = async () => {
     try {
       await deleteContactMutation.mutateAsync(id);
@@ -57,6 +71,7 @@ export default function ContactDetailPage() {
       // Show success toast
       toast.success("Contact deleted successfully!", {
         description: `${contact?.name || "Contact"} has been removed from your contacts.`,
+        duration: 5000, // 5 seconds for better UX and E2E test reliability
       });
 
       // Redirect to contacts list
@@ -68,6 +83,7 @@ export default function ContactDetailPage() {
           error instanceof Error
             ? error.message
             : "An unexpected error occurred",
+        duration: 5000, // 5 seconds for better UX and E2E test reliability
       });
 
       // Close dialog even on error
@@ -140,7 +156,40 @@ export default function ContactDetailPage() {
             <p className="mt-1 text-sm text-gray-500">Contact Details</p>
           </div>
 
-          <div className="flex space-x-3">
+          <div className="flex flex-wrap gap-3">
+            {/* Dynamic CTA: Compose Email Button (Task 18) */}
+            {!isLoadingConversationCount && conversationCount !== undefined && (
+              <>
+                {conversationCount > 0 ? (
+                  /* Follow Up Button - Blue (has conversation history) */
+                  <button
+                    onClick={() => router.push(`/compose?contactId=${id}&type=followup`)}
+                    aria-label={`Send follow-up email to ${contact.name}`}
+                    data-testid="follow-up-button"
+                    className="flex-1 px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium
+                               text-white bg-blue-600 hover:bg-blue-700 focus:outline-none
+                               focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                               sm:flex-none sm:py-2"
+                  >
+                    Follow Up
+                  </button>
+                ) : (
+                  /* Cold Email Button - Orange (no conversation history) */
+                  <button
+                    onClick={() => router.push(`/compose?contactId=${id}&type=cold`)}
+                    aria-label={`Send cold email to ${contact.name}`}
+                    data-testid="cold-email-button"
+                    className="flex-1 px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium
+                               text-white bg-orange-500 hover:bg-orange-600 focus:outline-none
+                               focus:ring-2 focus:ring-offset-2 focus:ring-orange-500
+                               sm:flex-none sm:py-2"
+                  >
+                    Cold Email
+                  </button>
+                )}
+              </>
+            )}
+
             {/* Edit Button */}
             <button
               onClick={() => router.push(`/contacts/${id}/edit`)}
@@ -149,6 +198,7 @@ export default function ContactDetailPage() {
                          text-gray-700 bg-white hover:bg-gray-50 focus:outline-none
                          focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
                          sm:flex-none sm:py-2"
+              data-testid="contact-detail-edit-button"
             >
               Edit
             </button>
@@ -338,10 +388,12 @@ export default function ContactDetailPage() {
                   Profile Picture
                 </dt>
                 <dd className="mt-1">
-                  <img
+                  <Image
                     src={contact.profilePicture}
                     alt={`${contact.name}&apos;s profile`}
-                    className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
+                    width={128}
+                    height={128}
+                    className="rounded-full object-cover border-2 border-gray-200"
                   />
                 </dd>
               </div>

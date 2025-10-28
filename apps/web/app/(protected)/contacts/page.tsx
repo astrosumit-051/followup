@@ -27,7 +27,6 @@ import type {
   ContactFilterInput,
   ContactSortField,
   SortOrder,
-  ContactConnection,
 } from "@/lib/graphql/contacts";
 
 /**
@@ -307,6 +306,7 @@ function ContactsPageContent() {
                   variant="outline"
                   onClick={() => fetchNextPage()}
                   disabled={isFetchingNextPage}
+                  data-testid="contacts-load-more"
                 >
                   {isFetchingNextPage ? (
                     <>

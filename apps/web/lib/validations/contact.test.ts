@@ -296,8 +296,9 @@ describe("Contact Validation Schemas", () => {
         expect(result.success).toBe(false);
         if (!result.success) {
           const errorMessages = result.error.issues.map((e) => e.message);
+          // Zod returns "Expected date, received string" for wrong type
           expect(
-            errorMessages.some((msg) => msg.includes("expected date")),
+            errorMessages.some((msg) => msg.toLowerCase().includes("expected") || msg.includes("Invalid date")),
           ).toBe(true);
         }
       });

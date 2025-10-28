@@ -32,7 +32,7 @@ const emailTemplateSchema = z.object({
  * AI Service
  *
  * Provides AI-powered email template generation using LangChain with multiple LLM providers.
- * Implements provider fallback chain: OpenRouter → OpenAI GPT-4 Turbo → Anthropic Claude Sonnet 3.5 → Gemini 2.0 Flash
+ * Implements provider fallback chain: OpenRouter (gpt-5-nano) → OpenAI GPT-4 Turbo → Anthropic Claude Sonnet 3.5 → Gemini 2.0 Flash
  *
  * Features:
  * - Email template generation with formal and casual style variants
@@ -43,7 +43,7 @@ const emailTemplateSchema = z.object({
  * - Automatic error handling and retry logic
  *
  * Configuration:
- * - OPENROUTER_API_KEY: Primary provider (unified access to multiple LLMs)
+ * - OPENROUTER_API_KEY: Primary provider (unified access to multiple LLMs via gpt-5-nano)
  * - OPENAI_API_KEY: Optional fallback provider
  * - ANTHROPIC_API_KEY: Optional fallback provider
  * - GEMINI_API_KEY: Optional fallback provider
@@ -55,14 +55,14 @@ const emailTemplateSchema = z.object({
  *
  * Rate Limits & Production Considerations:
  * - OpenRouter provides unified access to multiple LLM providers with higher rate limits
- * - Gemini Free Tier: 10 requests/minute (sufficient for testing, upgrade to paid tier for production)
+ * - gpt-5-nano offers cost-effective, fast responses with better JSON formatting than free tier models
  * - For production deployments handling >100 concurrent requests, configure multiple provider API keys
  * - Monitor Prometheus metrics (aiEmailGenerationDuration, aiProviderUsage) for performance insights
  *
  * Technical Implementation Notes:
  * - OpenRouter uses OpenAI-compatible API with custom base URL
- * - Gemini uses direct model.invoke() instead of ChatPromptTemplate to avoid template variable conflicts
- * - OpenAI and Anthropic use ChatPromptTemplate.fromMessages() for consistency with LangChain patterns
+ * - All providers use direct model.invoke() to avoid ChatPromptTemplate template variable parsing issues
+ * - Gemini and OpenRouter use consistent direct invoke pattern for reliability
  * - All user input is sanitized with XML-style delimiters to prevent prompt injection attacks
  * - JSON response validation ensures consistent output structure across all providers
  */
@@ -103,7 +103,7 @@ export class AIService {
     // Initialize OpenRouter (primary provider - unified access to multiple LLMs)
     if (openrouterKey) {
       this.openrouterClient = new ChatOpenAI({
-        modelName: 'openai/gpt-oss-20b:free', // Free tier OpenRouter model
+        modelName: 'openai/gpt-5-nano', // Nano model for cost-effective, fast responses
         // Alternative models: 'anthropic/claude-3.5-sonnet', 'openai/gpt-4-turbo', 'google/gemini-2.0-flash-exp'
         temperature: 0.7,
         maxTokens: 500,
@@ -118,7 +118,7 @@ export class AIService {
         },
       });
       availableProviders.push('OpenRouter');
-      this.logger.log('✅ OpenRouter client initialized successfully');
+      this.logger.log('✅ OpenRouter client initialized successfully with gpt-5-nano');
     }
 
     // Initialize Google Gemini 2.0 Flash (fallback provider)
@@ -345,13 +345,12 @@ export class AIService {
    * Generate email template using OpenRouter
    */
   private async generateWithOpenRouter(prompt: string): Promise<Omit<EmailTemplateResult, 'style' | 'providerId'>> {
-    const chatPrompt = ChatPromptTemplate.fromMessages([
-      ['system', this.getSystemPrompt()],
-      ['human', prompt],
+    // Use direct invoke() to avoid ChatPromptTemplate template variable parsing issues
+    // (system prompt contains JSON examples with curly braces that would be misinterpreted)
+    const response = await this.openrouterClient.invoke([
+      { role: 'system', content: this.getSystemPrompt() },
+      { role: 'user', content: prompt }
     ]);
-
-    const chain = chatPrompt.pipe(this.openrouterClient);
-    const response = await chain.invoke({});
 
     return this.parseResponse(response);
   }
@@ -373,13 +372,11 @@ export class AIService {
    * Generate email template using OpenAI GPT-4 Turbo
    */
   private async generateWithOpenAI(prompt: string): Promise<Omit<EmailTemplateResult, 'style' | 'providerId'>> {
-    const chatPrompt = ChatPromptTemplate.fromMessages([
-      ['system', this.getSystemPrompt()],
-      ['human', prompt],
+    // Use direct invoke() to avoid ChatPromptTemplate template variable parsing issues
+    const response = await this.openaiClient.invoke([
+      { role: 'system', content: this.getSystemPrompt() },
+      { role: 'user', content: prompt }
     ]);
-
-    const chain = chatPrompt.pipe(this.openaiClient);
-    const response = await chain.invoke({});
 
     return this.parseResponse(response);
   }
@@ -388,13 +385,11 @@ export class AIService {
    * Generate email template using Anthropic Claude
    */
   private async generateWithAnthropic(prompt: string): Promise<Omit<EmailTemplateResult, 'style' | 'providerId'>> {
-    const chatPrompt = ChatPromptTemplate.fromMessages([
-      ['system', this.getSystemPrompt()],
-      ['human', prompt],
+    // Use direct invoke() to avoid ChatPromptTemplate template variable parsing issues
+    const response = await this.anthropicClient.invoke([
+      { role: 'system', content: this.getSystemPrompt() },
+      { role: 'user', content: prompt }
     ]);
-
-    const chain = chatPrompt.pipe(this.anthropicClient);
-    const response = await chain.invoke({});
 
     return this.parseResponse(response);
   }
@@ -435,8 +430,8 @@ ${contact.linkedinUrl ? `- LinkedIn: ${contact.linkedinUrl}` : ''}
 
     const historyContext = conversationHistory.length > 0
       ? `\n\nPrevious Conversation History (most recent first):\n${conversationHistory.map((entry, idx) => {
-          const bodyPreview = entry.content.substring(0, 200);
-          const subject = entry.metadata?.subject || 'No subject';
+          const bodyPreview = (entry.body || '').substring(0, 200);
+          const subject = entry.subject || entry.metadata?.subject || 'No subject';
           return `${idx + 1}. [${entry.direction}] Subject: ${this.sanitizeInput(subject, 'email-subject')}\n   Body: ${this.sanitizeInput(bodyPreview, 'email-body')}...`;
         }).join('\n')}`
       : '\n\nNo previous conversation history.';
