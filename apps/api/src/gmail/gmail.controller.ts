@@ -49,7 +49,10 @@ export class GmailController {
    * @param code - Authorization code from Google OAuth (required)
    *
    * @returns Success response with connected email address
-   * @throws BadRequestException if state is invalid or code exchange fails
+   * @throws BadRequestException if state is invalid, code is missing, or code exchange fails
+   * @throws UnauthorizedException if OAuth tokens are invalid or expired during exchange
+   * @throws InternalServerErrorException if token encryption or database storage fails
+   * @throws ServiceUnavailableException if Google OAuth API is temporarily unavailable
    */
   @Get('callback')
   async handleCallback(

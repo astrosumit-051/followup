@@ -125,7 +125,16 @@ export function PolishDraftModal({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to polish draft");
+        const statusCode = response.status;
+        if (statusCode >= 500) {
+          throw new Error(`Server error (${statusCode}). Please try again later.`);
+        } else if (statusCode === 429) {
+          throw new Error("Too many requests. Please wait a moment and try again.");
+        } else if (statusCode === 401 || statusCode === 403) {
+          throw new Error("Authentication error. Please log in again.");
+        } else {
+          throw new Error(`Request failed (${statusCode}). Please try again.`);
+        }
       }
 
       const data = await response.json();
@@ -136,11 +145,14 @@ export function PolishDraftModal({
 
       setPolishedVersions(data.data.polishDraft);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to polish draft. Please try again."
-      );
+      // Distinguish between network errors and API errors
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError("Network error. Please check your connection and try again.");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -197,6 +209,7 @@ export function PolishDraftModal({
           <Button
             onClick={() => handleSelectVersion(version.content)}
             className="w-full"
+            aria-label={`Use ${config.label} version`}
           >
             Use This Version
           </Button>
