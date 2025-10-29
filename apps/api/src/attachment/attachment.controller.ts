@@ -85,7 +85,7 @@ export class AttachmentController {
    * @throws ForbiddenException if user tries to delete another user's attachment
    * @throws BadRequestException if S3 key format is invalid
    */
-  @Delete(':key(*)')
+  @Delete('*key')
   @UseGuards(AuthGuard)
   @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   async deleteAttachment(
