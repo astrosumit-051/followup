@@ -1,0 +1,78 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+.nyc_output
+*.lcov
+apps/web/e2e-results/
+apps/web/playwright-report/
+apps/web/test-results/
+apps/web/e2e-full-results.log
+
+# Build outputs (exclude non-web apps)
+apps/api/dist
+apps/api/.next
+apps/api/out
+packages/*/dist
+
+# Cache
+.turbo
+.next/cache
+.vercel
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files
+.env
+.env*.local
+.env.test.local
+
+# Logs
+logs
+*.log
+
+# Documentation and development files
+docs/
+.agent-os/
+.github/
+scripts/verify-rename.sh
+.claude/
+
+# Backend code (we're only deploying frontend)
+apps/api/
+
+# Database files
+packages/database/prisma/dev.db
+packages/database/prisma/dev.db-journal
+*.db
+*.db-journal
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.yml
+Dockerfile*
+.dockerignore
+
+# CI/CD
+.github/workflows/
