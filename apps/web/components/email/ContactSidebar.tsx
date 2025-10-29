@@ -93,7 +93,7 @@ export function ContactSidebar({ onSelectionChange }: ContactSidebarProps) {
     return contacts.filter(
       (contact) =>
         contact.name.toLowerCase().includes(query) ||
-        contact.email.toLowerCase().includes(query) ||
+        contact.email?.toLowerCase().includes(query) ||
         contact.company?.toLowerCase().includes(query)
     );
   }, [contacts, debouncedSearch]);

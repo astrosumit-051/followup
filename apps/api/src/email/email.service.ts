@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Email, ConversationHistory, EmailStatus, TemplateType, Direction } from '@relationhub/database';
+import { Email, ConversationHistory, EmailStatus, TemplateType, Direction } from '@cordiq/database';
 
 export interface CreateEmailDto {
   userId: string;

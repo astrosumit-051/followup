@@ -1,4 +1,4 @@
-# RelationHub
+# Cordiq
 
 AI-Powered Professional Relationship Management Platform
 
@@ -46,13 +46,13 @@ brew services stop postgresql@17
 lsof -i :5432  # Should only show Docker, not postgres
 
 # Generate Prisma Client
-pnpm --filter @relationhub/database prisma generate
+pnpm --filter @cordiq/database prisma generate
 
 # Run migrations
-pnpm --filter @relationhub/database prisma migrate dev --name init
+pnpm --filter @cordiq/database prisma migrate dev --name init
 
 # Seed database with test data
-pnpm --filter @relationhub/database db:seed
+pnpm --filter @cordiq/database db:seed
 ```
 
 ### 4. Start Development Servers
@@ -66,10 +66,10 @@ Or run them individually:
 
 ```bash
 # Terminal 1: Next.js (Frontend)
-pnpm --filter @relationhub/web dev
+pnpm --filter @cordiq/web dev
 
 # Terminal 2: NestJS (Backend)
-pnpm --filter @relationhub/api dev
+pnpm --filter @cordiq/api dev
 ```
 
 ### 5. Access Applications
@@ -77,12 +77,12 @@ pnpm --filter @relationhub/api dev
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:3001
 - **API Health Check**: http://localhost:3001/health
-- **Prisma Studio**: `pnpm --filter @relationhub/database db:studio` (http://localhost:5555)
+- **Prisma Studio**: `pnpm --filter @cordiq/database db:studio` (http://localhost:5555)
 
 ## Project Structure
 
 ```
-relationhub/
+cordiq/
 ├── apps/
 │   ├── web/              # Next.js frontend
 │   └── api/              # NestJS backend
@@ -100,25 +100,25 @@ relationhub/
 ### Run Migrations
 
 ```bash
-pnpm --filter @relationhub/database prisma migrate dev
+pnpm --filter @cordiq/database prisma migrate dev
 ```
 
 ### Seed Database
 
 ```bash
-pnpm --filter @relationhub/database db:seed
+pnpm --filter @cordiq/database db:seed
 ```
 
 ### Open Prisma Studio
 
 ```bash
-pnpm --filter @relationhub/database db:studio
+pnpm --filter @cordiq/database db:studio
 ```
 
 ### Reset Database
 
 ```bash
-pnpm --filter @relationhub/database prisma migrate reset
+pnpm --filter @cordiq/database prisma migrate reset
 ```
 
 ## Environment Variables
@@ -132,7 +132,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ### NestJS (apps/api/.env)
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/relationhub_dev?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cordiq_dev?schema=public"
 PORT=3001
 ```
 
@@ -147,30 +147,30 @@ PORT=3001
 
 ### Next.js (apps/web)
 
-- `pnpm --filter @relationhub/web dev` - Start Next.js dev server
-- `pnpm --filter @relationhub/web build` - Build for production
-- `pnpm --filter @relationhub/web start` - Start production server
+- `pnpm --filter @cordiq/web dev` - Start Next.js dev server
+- `pnpm --filter @cordiq/web build` - Build for production
+- `pnpm --filter @cordiq/web start` - Start production server
 
 ### NestJS (apps/api)
 
-- `pnpm --filter @relationhub/api dev` - Start NestJS dev server
-- `pnpm --filter @relationhub/api build` - Build for production
-- `pnpm --filter @relationhub/api start:prod` - Start production server
+- `pnpm --filter @cordiq/api dev` - Start NestJS dev server
+- `pnpm --filter @cordiq/api build` - Build for production
+- `pnpm --filter @cordiq/api start:prod` - Start production server
 
 ### Database (packages/database)
 
-- `pnpm --filter @relationhub/database db:generate` - Generate Prisma Client
-- `pnpm --filter @relationhub/database db:migrate` - Run migrations
-- `pnpm --filter @relationhub/database db:seed` - Seed database
-- `pnpm --filter @relationhub/database db:studio` - Open Prisma Studio
+- `pnpm --filter @cordiq/database db:generate` - Generate Prisma Client
+- `pnpm --filter @cordiq/database db:migrate` - Run migrations
+- `pnpm --filter @cordiq/database db:seed` - Seed database
+- `pnpm --filter @cordiq/database db:studio` - Open Prisma Studio
 
 ## Development Workflow
 
 1. **Start services**: `docker compose up -d postgres redis`
 2. **Install dependencies**: `pnpm install`
-3. **Generate Prisma Client**: `pnpm --filter @relationhub/database prisma generate`
-4. **Run migrations**: `pnpm --filter @relationhub/database prisma migrate dev`
-5. **Seed database**: `pnpm --filter @relationhub/database db:seed`
+3. **Generate Prisma Client**: `pnpm --filter @cordiq/database prisma generate`
+4. **Run migrations**: `pnpm --filter @cordiq/database prisma migrate dev`
+5. **Seed database**: `pnpm --filter @cordiq/database db:seed`
 6. **Start development**: `pnpm dev`
 
 ## Troubleshooting
@@ -193,7 +193,7 @@ docker compose up -d
 ### Prisma Client not found
 
 ```bash
-pnpm --filter @relationhub/database prisma generate
+pnpm --filter @cordiq/database prisma generate
 ```
 
 ### Port already in use

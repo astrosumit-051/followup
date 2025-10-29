@@ -144,7 +144,7 @@ User → Frontend (Next.js) → Supabase Auth → OAuth Provider (Google/LinkedI
   - Enable Email provider with email confirmation
   - Configure Google OAuth (Client ID, Client Secret)
   - Configure LinkedIn OIDC OAuth (Client ID, Client Secret)
-  - Add redirect URLs to allow list: `http://localhost:3000/auth/callback` (dev), `https://relationhub.com/auth/callback` (prod)
+  - Add redirect URLs to allow list: `http://localhost:3000/auth/callback` (dev), `https://cordiq.com/auth/callback` (prod)
 
 - **Environment Variables:**
   ```

@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GmailOAuthService } from './gmail-oauth.service';
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-import { Email, ConversationHistory } from '@relationhub/database';
+import { Email, ConversationHistory } from '@cordiq/database';
 
 interface EmailData {
   to: string;

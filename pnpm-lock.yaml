@@ -39,6 +39,9 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.911.0
         version: 3.911.0
+      '@cordiq/database':
+        specifier: workspace:^
+        version: link:../../packages/database
       '@langchain/anthropic':
         specifier: ^0.3.31
         version: 0.3.31(@langchain/core@0.3.78)(zod@4.1.12)
@@ -72,9 +75,6 @@ importers:
       '@nestjs/throttler':
         specifier: ^6.4.0
         version: 6.4.0(@nestjs/common@11.1.6)(@nestjs/core@11.1.6)(reflect-metadata@0.2.2)
-      '@relationhub/database':
-        specifier: workspace:^
-        version: link:../../packages/database
       '@supabase/supabase-js':
         specifier: ^2.58.0
         version: 2.58.0

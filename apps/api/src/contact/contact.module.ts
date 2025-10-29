@@ -1,5 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
-import { PrismaClient } from '@relationhub/database';
+import { PrismaClient } from '@cordiq/database';
 import { ContactService } from './contact.service';
 import { ContactResolver } from './contact.resolver';
 import { AuthModule } from '../auth/auth.module';

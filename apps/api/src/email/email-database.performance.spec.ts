@@ -13,7 +13,7 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaClient } from '@relationhub/database';
+import { PrismaClient } from '@cordiq/database';
 import { EmailService } from './email.service';
 import { PrismaService } from '../prisma/prisma.service';
 

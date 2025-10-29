@@ -1,7 +1,7 @@
 import { ObjectType, Field, ID, registerEnumType, HideField } from '@nestjs/graphql';
-import { Priority as PrismaEnumPriority } from '@relationhub/database';
+import { Priority as PrismaEnumPriority } from '@cordiq/database';
 import { Priority } from '../enums/priority.enum';
-import { Gender as PrismaEnumGender } from '@relationhub/database';
+import { Gender as PrismaEnumGender } from '@cordiq/database';
 import { Gender } from '../enums/gender.enum';
 
 /**

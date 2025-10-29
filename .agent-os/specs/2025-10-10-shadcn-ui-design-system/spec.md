@@ -6,13 +6,13 @@
 
 ## Overview
 
-Establish a comprehensive design system for RelationHub using shadcn/ui component library to ensure consistent, accessible, and maintainable UI across the entire platform. This implementation will provide a solid foundation of reusable components before proceeding with Phase 2 AI features, reducing code duplication and ensuring WCAG 2.1 AA compliance throughout the application.
+Establish a comprehensive design system for Cordiq using shadcn/ui component library to ensure consistent, accessible, and maintainable UI across the entire platform. This implementation will provide a solid foundation of reusable components before proceeding with Phase 2 AI features, reducing code duplication and ensuring WCAG 2.1 AA compliance throughout the application.
 
 ## User Stories
 
 ### Story 1: Developer Consistency and Productivity
 
-As a frontend developer building new features for RelationHub, I want access to a comprehensive library of pre-built, accessible UI components, so that I can rapidly develop consistent interfaces without writing custom CSS or reinventing common patterns for every form, dialog, or card.
+As a frontend developer building new features for Cordiq, I want access to a comprehensive library of pre-built, accessible UI components, so that I can rapidly develop consistent interfaces without writing custom CSS or reinventing common patterns for every form, dialog, or card.
 
 **Workflow:**
 1. Developer starts implementing a new feature (e.g., AI email composer)
@@ -27,10 +27,10 @@ As a frontend developer building new features for RelationHub, I want access to 
 
 ### Story 2: Professional User Experience
 
-As a professional user managing my networking contacts, I expect a polished, accessible interface with consistent visual language, smooth interactions, and dark mode support, so that I can use RelationHub comfortably in any environment and trust the platform for managing important business relationships.
+As a professional user managing my networking contacts, I expect a polished, accessible interface with consistent visual language, smooth interactions, and dark mode support, so that I can use Cordiq comfortably in any environment and trust the platform for managing important business relationships.
 
 **Workflow:**
-1. User accesses RelationHub dashboard
+1. User accesses Cordiq dashboard
 2. Experiences consistent button styles, form inputs, and card layouts
 3. Switches to dark mode for evening work sessions
 4. All components seamlessly adapt to dark theme
@@ -42,7 +42,7 @@ As a professional user managing my networking contacts, I expect a polished, acc
 
 ### Story 3: Design System Scalability
 
-As a product team scaling RelationHub from MVP to enterprise features, I want a token-based design system with semantic color variables and standardized component patterns, so that we can maintain visual consistency as we add calendar integrations, analytics dashboards, and AI-powered features without accumulating design debt.
+As a product team scaling Cordiq from MVP to enterprise features, I want a token-based design system with semantic color variables and standardized component patterns, so that we can maintain visual consistency as we add calendar integrations, analytics dashboards, and AI-powered features without accumulating design debt.
 
 **Workflow:**
 1. Product designer defines new feature (e.g., analytics dashboard)

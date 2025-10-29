@@ -573,7 +573,7 @@ export function TemplateLibrary({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Template?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{selectedTemplate?.name}"? This action cannot be undone.
+              Are you sure you want to delete &ldquo;{selectedTemplate?.name}&rdquo;? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

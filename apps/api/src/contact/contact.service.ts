@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaClient, Prisma } from '@relationhub/database';
+import { PrismaClient, Prisma } from '@cordiq/database';
 import { ContactFilterInput } from './dto/contact-filter.input';
 import { ContactPaginationInput } from './dto/contact-pagination.input';
 import { CreateContactDto } from './dto/create-contact.dto';

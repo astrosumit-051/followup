@@ -1,9 +1,9 @@
-# RelationHub - Pending Issues & TODOs
+# Cordiq - Pending Issues & TODOs
 
 > **Generated:** 2025-10-23
 > **Last Updated:** 2025-10-29 (PR #47 Merged: Email Composition 86% Complete - Frontend + Backend)
 > **Last Spec Reviewed:** 2025-10-15-email-composition-gmail-integration
-> **Repository:** RelationHub (Next.js + NestJS AI-Powered CRM)
+> **Repository:** Cordiq (Next.js + NestJS AI-Powered CRM)
 
 ---
 
@@ -89,7 +89,7 @@
    - Enable Gmail API
 
 2. **Configure OAuth 2.0 Consent Screen**
-   - Set application name: "RelationHub"
+   - Set application name: "Cordiq"
    - Add authorized domains
    - Set scopes: `https://www.googleapis.com/auth/gmail.send`
 
@@ -118,7 +118,7 @@
 
 **Required Steps:**
 1. **Create S3 Bucket**
-   - Bucket name: `relationhub-attachments-{env}`
+   - Bucket name: `cordiq-attachments-{env}`
    - Region: `us-east-1` (or preferred region)
    - Block all public access: ✅ Enabled
 
@@ -135,14 +135,14 @@
    ```
 
 3. **Create IAM User with S3 Access**
-   - Create IAM user: `relationhub-s3-uploader`
+   - Create IAM user: `cordiq-s3-uploader`
    - Attach policy: `AmazonS3FullAccess` (or custom policy)
    - Generate access key and secret
 
 4. **Configure Environment Variables**
    ```bash
    # Add to apps/api/.env
-   S3_BUCKET=relationhub-attachments-staging
+   S3_BUCKET=cordiq-attachments-staging
    S3_REGION=us-east-1
    AWS_ACCESS_KEY_ID=your_access_key_here
    AWS_SECRET_ACCESS_KEY=your_secret_access_key_here
@@ -912,7 +912,7 @@ All 16 major task groups and 211 subtasks have been completed successfully:
 | # | File | Line | Description | Priority | Related Task |
 |---|------|------|-------------|----------|--------------|
 | 1 | `apps/web/components/email/ComposePage.tsx` | 31 | Fetch contact name if contactId is provided | MEDIUM | Email Composition Spec |
-| 2 | `apps/web/e2e/contacts/performance.spec.ts` | 46 | Implement authentication for performance.test@relationhub.com user | HIGH | Contact CRUD - Task 15.6-15.9 |
+| 2 | `apps/web/e2e/contacts/performance.spec.ts` | 46 | Implement authentication for performance.test@cordiq.com user | HIGH | Contact CRUD - Task 15.6-15.9 |
 | 3 | `apps/web/e2e/auth/signup.spec.ts` | 68 | Enable after Task 10 (User Profile Sync) is complete | MEDIUM | User Auth - Task 10.5 |
 | 4 | `apps/web/e2e/auth/login.spec.ts` | 88 | Enable after Task 10 (User Profile Sync) is complete | MEDIUM | User Auth - Task 10.5 |
 
@@ -941,7 +941,7 @@ useEffect(() => {
 #### TODO #2: Performance Tests - Authentication Setup
 ```typescript
 test.beforeEach(async ({ page }) => {
-  // TODO: Implement authentication for performance.test@relationhub.com user
+  // TODO: Implement authentication for performance.test@cordiq.com user
   // This will be implemented once Supabase test environment is set up
   // For now, tests will be skipped with annotation
   test.skip(true, "Skipping until backend with test data is available");
@@ -952,7 +952,7 @@ test.beforeEach(async ({ page }) => {
 
 **Action:**
 1. Set up Supabase test instance
-2. Create `performance.test@relationhub.com` user
+2. Create `performance.test@cordiq.com` user
 3. Seed 1000+ contacts for this user
 4. Remove `test.skip()` annotation
 
@@ -1072,7 +1072,7 @@ These tests are skipped because they require a fully configured Supabase test en
 
 **Required:**
 - Run performance seed script: `pnpm --filter api db:seed:performance`
-- Supabase test user: `performance.test@relationhub.com`
+- Supabase test user: `performance.test@cordiq.com`
 - 1000+ seeded contacts
 
 ---
@@ -1409,7 +1409,7 @@ pnpm test:e2e e2e/contacts/
 cd apps/api
 pnpm db:seed:performance
 
-# Expected: 1000+ contacts created for performance.test@relationhub.com
+# Expected: 1000+ contacts created for performance.test@cordiq.com
 
 # 4. OPTIONAL: Run performance tests
 cd apps/web

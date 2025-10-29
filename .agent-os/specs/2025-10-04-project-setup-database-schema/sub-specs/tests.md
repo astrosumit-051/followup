@@ -115,7 +115,7 @@ Create reusable test fixtures in `packages/database/tests/fixtures/`:
 
 Use a separate PostgreSQL database for testing:
 ```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/relationhub_test?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cordiq_test?schema=public"
 ```
 
 ### Cleanup Strategy

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, User } from '@relationhub/database';
+import { PrismaClient, User } from '@cordiq/database';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 interface SupabaseUser {

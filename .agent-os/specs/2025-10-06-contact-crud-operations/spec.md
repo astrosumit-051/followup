@@ -6,13 +6,13 @@
 
 ## Overview
 
-Implement complete contact management functionality allowing authenticated users to create, read, update, and delete professional contacts with rich contextual data. This is the foundational feature that enables users to build and organize their professional network within RelationHub.
+Implement complete contact management functionality allowing authenticated users to create, read, update, and delete professional contacts with rich contextual data. This is the foundational feature that enables users to build and organize their professional network within Cordiq.
 
 ## User Stories
 
 ### Primary Contact Management
 
-As a RelationHub user, I want to add new professional contacts with comprehensive information (name, email, phone, LinkedIn, company, role, notes), so that I can build a detailed database of my professional network.
+As a Cordiq user, I want to add new professional contacts with comprehensive information (name, email, phone, LinkedIn, company, role, notes), so that I can build a detailed database of my professional network.
 
 **Workflow:**
 1. User navigates to contacts section or clicks "Quick Add" from dashboard

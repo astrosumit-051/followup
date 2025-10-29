@@ -12,7 +12,7 @@
  *   PERFORMANCE_TEST_USER_EMAIL=custom@example.com pnpm db:seed:performance
  */
 
-import { PrismaClient, Priority, Gender } from '@relationhub/database';
+import { PrismaClient, Priority, Gender } from '@cordiq/database';
 
 // Type-safe enum arrays
 const priorities: Priority[] = ['HIGH', 'MEDIUM', 'LOW'];
