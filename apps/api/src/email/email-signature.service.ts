@@ -8,7 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateSignatureInput } from './dto/create-signature.input';
 import { UpdateSignatureInput } from './dto/update-signature.input';
 import { EmailSignature } from './entities/email-signature.entity';
-import sanitizeHtml from 'sanitize-html';
+import * as sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class EmailSignatureService {

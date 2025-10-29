@@ -17,11 +17,15 @@ import {
   AlignRight,
   AlignJustify,
   Sparkles,
+  FileText,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { PolishDraftModal } from "./PolishDraftModal";
+import { TemplateLibrary } from "./TemplateLibrary";
+import type { EmailTemplate } from "@/lib/graphql/email-templates";
 
 interface EmailComposerProps {
   selectedContactIds?: string[];
@@ -42,6 +46,8 @@ export function EmailComposer({
 }: EmailComposerProps) {
   const [subject, setSubject] = useState(initialSubject);
   const [isPolishModalOpen, setIsPolishModalOpen] = useState(false);
+  const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
+  const [showSaveAsTemplate, setShowSaveAsTemplate] = useState(false);
 
   // Initialize TipTap editor with all required extensions
   // Note: StarterKit v3 includes Bold, Italic, Underline, Link, BulletList, OrderedList
@@ -86,6 +92,36 @@ export function EmailComposer({
         onContentChange(polishedContent);
       }
     }
+  };
+
+  // Handle template load
+  const handleLoadTemplate = (template: EmailTemplate) => {
+    if (editor) {
+      // Load subject
+      setSubject(template.subject);
+      if (onSubjectChange) {
+        onSubjectChange(template.subject);
+      }
+
+      // Load body content
+      const content = template.bodyHtml || template.body;
+      editor.commands.setContent(content);
+      if (onContentChange) {
+        onContentChange(content);
+      }
+    }
+  };
+
+  // Open template library for browsing
+  const openTemplateLibrary = () => {
+    setShowSaveAsTemplate(false);
+    setIsTemplateLibraryOpen(true);
+  };
+
+  // Open template library in "save as" mode
+  const openSaveAsTemplate = () => {
+    setShowSaveAsTemplate(true);
+    setIsTemplateLibraryOpen(true);
   };
 
   // Toolbar button component
@@ -264,6 +300,32 @@ export function EmailComposer({
 
           <div className="w-px h-6 bg-border mx-1" />
 
+          {/* Template Actions */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={openTemplateLibrary}
+            className="h-8 px-3 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-950"
+          >
+            <BookOpen className="h-4 w-4 mr-1.5" />
+            Browse Templates
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={openSaveAsTemplate}
+            className="h-8 px-3 text-green-600 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-950"
+            disabled={!editor.getText().trim() || !subject.trim()}
+          >
+            <FileText className="h-4 w-4 mr-1.5" />
+            Save as Template
+          </Button>
+
+          <div className="w-px h-6 bg-border mx-1" />
+
           {/* Polish Draft Button */}
           <Button
             type="button"
@@ -291,6 +353,19 @@ export function EmailComposer({
         contextType={emailType === "followup" ? "FOLLOW_UP" : emailType === "cold" ? "COLD_EMAIL" : undefined}
         onClose={() => setIsPolishModalOpen(false)}
         onSelectVersion={handlePolishedVersionSelect}
+      />
+
+      {/* Template Library Modal */}
+      <TemplateLibrary
+        isOpen={isTemplateLibraryOpen}
+        onClose={() => {
+          setIsTemplateLibraryOpen(false);
+          setShowSaveAsTemplate(false);
+        }}
+        onLoadTemplate={handleLoadTemplate}
+        showSaveAs={showSaveAsTemplate}
+        defaultSubject={subject}
+        defaultBody={editor?.getHTML() || ""}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Query, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Delete, Query, Res, UseGuards, BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
 import { GmailOAuthService } from './gmail-oauth.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -42,14 +42,17 @@ export class GmailController {
    *
    * Handles OAuth2 callback from Google after user grants/denies consent.
    * Exchanges authorization code for access and refresh tokens, encrypts them,
-   * and stores in database.
+   * and stores in database. Then redirects to frontend callback page.
    *
    * Query parameters:
    * @param state - OAuth state parameter for CSRF protection (required)
-   * @param code - Authorization code from Google OAuth (required)
+   * @param code - Authorization code from Google OAuth (present on success, absent on error)
+   * @param error - OAuth error code if user denied access (present only on error)
+   * @param error_description - Human-readable error description (present only on error)
+   * @param res - Express response object for redirect
    *
-   * @returns Success response with connected email address
-   * @throws BadRequestException if state is invalid, code is missing, or code exchange fails
+   * @returns 302 redirect to frontend callback page
+   * @throws BadRequestException if state is invalid, both code and error are missing, or code exchange fails
    * @throws UnauthorizedException if OAuth tokens are invalid or expired during exchange
    * @throws InternalServerErrorException if token encryption or database storage fails
    * @throws ServiceUnavailableException if Google OAuth API is temporarily unavailable
@@ -57,15 +60,35 @@ export class GmailController {
   @Get('callback')
   async handleCallback(
     @Query('state') state: string,
-    @Query('code') code: string,
-  ): Promise<{ success: boolean; message: string; emailAddress: string }> {
-    const gmailToken = await this.gmailOAuthService.handleCallback(state, code);
+    @Res() res: Response,
+    @Query('code') code?: string,
+    @Query('error') error?: string,
+    @Query('error_description') errorDescription?: string,
+  ): Promise<void> {
+    // Validate that either code or error is present
+    if (!code && !error) {
+      throw new BadRequestException('Missing required parameters: either code or error must be provided');
+    }
 
-    return {
-      success: true,
-      message: 'Gmail account connected successfully',
-      emailAddress: gmailToken.emailAddress,
-    };
+    // Handle OAuth error (user denied or error occurred)
+    if (error) {
+      const encodedError = encodeURIComponent(errorDescription || error);
+      res.redirect(`/settings/gmail-callback?error=${encodedError}`);
+      return;
+    }
+
+    try {
+      // Exchange code for tokens and store (non-null assertion safe due to validation above)
+      await this.gmailOAuthService.handleCallback(state, code!);
+
+      // Redirect to success callback page
+      res.redirect('/settings/gmail-callback?success=true');
+    } catch (err) {
+      // Redirect to error callback page
+      const errorMessage = err instanceof Error ? err.message : 'Failed to connect Gmail';
+      const encodedError = encodeURIComponent(errorMessage);
+      res.redirect(`/settings/gmail-callback?error=${encodedError}`);
+    }
   }
 
   /**
