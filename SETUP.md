@@ -1,6 +1,6 @@
-# RelationHub Local Development Setup Guide
+# Cordiq Local Development Setup Guide
 
-This guide will help you set up the RelationHub application for local development with Supabase authentication.
+This guide will help you set up the Cordiq application for local development with Supabase authentication.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This guide will help you set up the RelationHub application for local developmen
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd relationhub
+cd cordiq
 
 # Install dependencies
 pnpm install
@@ -26,7 +26,7 @@ pnpm install
 1. Go to [https://supabase.com/dashboard](https://supabase.com/dashboard)
 2. Click "New Project"
 3. Fill in:
-   - **Project name**: relationhub-dev (or your preferred name)
+   - **Project name**: cordiq-dev (or your preferred name)
    - **Database password**: Save this password securely
    - **Region**: Choose closest to your location
 4. Click "Create new project" and wait for provisioning (~2 minutes)
@@ -268,7 +268,7 @@ pnpm test
 ## Project Structure
 
 ```
-relationhub/
+cordiq/
 ├── apps/
 │   ├── api/              # NestJS backend (port 4000)
 │   │   ├── src/

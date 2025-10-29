@@ -143,8 +143,9 @@ export async function getEmailTemplates(
   supabase: SupabaseClient
 ): Promise<EmailTemplate[]> {
   const response = await graphqlRequest<{ emailTemplates: EmailTemplate[] }>(
-    supabase,
-    GET_EMAIL_TEMPLATES_QUERY
+    GET_EMAIL_TEMPLATES_QUERY,
+    undefined,
+    supabase
   );
 
   return response.emailTemplates;
@@ -177,9 +178,9 @@ export async function createEmailTemplate(
   input: CreateEmailTemplateInput
 ): Promise<EmailTemplate> {
   const response = await graphqlMutation<{ createEmailTemplate: EmailTemplate }>(
-    supabase,
     CREATE_EMAIL_TEMPLATE_MUTATION,
-    { input }
+    { input },
+    supabase
   );
 
   return response.createEmailTemplate;
@@ -208,9 +209,9 @@ export async function updateEmailTemplate(
   input: UpdateEmailTemplateInput
 ): Promise<EmailTemplate> {
   const response = await graphqlMutation<{ updateEmailTemplate: EmailTemplate }>(
-    supabase,
     UPDATE_EMAIL_TEMPLATE_MUTATION,
-    { id, input }
+    { id, input },
+    supabase
   );
 
   return response.updateEmailTemplate;
@@ -235,9 +236,9 @@ export async function deleteEmailTemplate(
   id: string
 ): Promise<boolean> {
   const response = await graphqlMutation<{ deleteEmailTemplate: boolean }>(
-    supabase,
     DELETE_EMAIL_TEMPLATE_MUTATION,
-    { id }
+    { id },
+    supabase
   );
 
   return response.deleteEmailTemplate;

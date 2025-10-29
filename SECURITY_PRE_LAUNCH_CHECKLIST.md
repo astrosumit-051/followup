@@ -199,7 +199,7 @@ AWS_SECRET_ACCESS_KEY=your-secret
 ```env
 # Production (no credentials needed!)
 AWS_REGION=us-east-1
-S3_BUCKET=relationhub-attachments-prod
+S3_BUCKET=cordiq-attachments-prod
 NODE_ENV=production
 # AWS SDK automatically uses instance metadata
 ```

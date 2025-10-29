@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmailService } from './email.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { EmailStatus, TemplateType, Direction } from '@relationhub/database';
+import { EmailStatus, TemplateType, Direction } from '@cordiq/database';
 
 // Mock PrismaService
 const mockPrismaService = {

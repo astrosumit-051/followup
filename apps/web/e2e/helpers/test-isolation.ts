@@ -57,7 +57,7 @@ export interface UniqueContactData {
 export async function createUniqueContact(
   data: UniqueContactData
 ): Promise<{ id: string; name: string; email: string }> {
-  const testEmail = process.env.TEST_USER_EMAIL || "test@relationhub.com";
+  const testEmail = process.env.TEST_USER_EMAIL || "test@cordiq.com";
 
   // Find test user
   const user = await prisma.user.findUnique({
@@ -255,7 +255,7 @@ export async function createConversationHistory(
   content: string,
   direction: Direction = Direction.SENT
 ): Promise<{ id: string; contactId: string; content: string }> {
-  const testEmail = process.env.TEST_USER_EMAIL || "test@relationhub.com";
+  const testEmail = process.env.TEST_USER_EMAIL || "test@cordiq.com";
 
   // Find test user
   const user = await prisma.user.findUnique({

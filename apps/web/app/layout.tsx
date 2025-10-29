@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "RelationHub",
+  title: "Cordiq",
   description: "AI-Powered Professional Relationship Management Platform",
 };
 

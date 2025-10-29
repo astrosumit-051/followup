@@ -222,13 +222,13 @@ pnpm --filter database prisma db seed
 
 **Development Connection String:**
 ```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/relationhub_dev?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cordiq_dev?schema=public"
 ```
 
 **Docker PostgreSQL Configuration:**
 - Host: localhost (mapped from container)
 - Port: 5432
-- Database: relationhub_dev
+- Database: cordiq_dev
 - Username: postgres
 - Password: postgres (development only)
 

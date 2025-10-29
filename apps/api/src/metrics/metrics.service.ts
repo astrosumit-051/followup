@@ -55,94 +55,94 @@ export class MetricsService {
   private initializeMetrics() {
     // AI Email Generation Metrics
     this.aiEmailGenerationDuration = new Histogram({
-      name: 'relationhub_ai_email_generation_duration_seconds',
+      name: 'cordiq_ai_email_generation_duration_seconds',
       help: 'Duration of AI email generation requests in seconds',
       labelNames: ['style', 'provider', 'status'],
       buckets: [0.1, 0.5, 1, 2, 5, 10, 30],
     });
 
     this.aiEmailGenerationTotal = new Counter({
-      name: 'relationhub_ai_email_generation_total',
+      name: 'cordiq_ai_email_generation_total',
       help: 'Total number of AI email generation requests',
       labelNames: ['style', 'provider', 'status'],
     });
 
     this.aiEmailGenerationErrors = new Counter({
-      name: 'relationhub_ai_email_generation_errors_total',
+      name: 'cordiq_ai_email_generation_errors_total',
       help: 'Total number of AI email generation errors',
       labelNames: ['error_type', 'provider'],
     });
 
     this.aiTokensUsed = new Counter({
-      name: 'relationhub_ai_tokens_used_total',
+      name: 'cordiq_ai_tokens_used_total',
       help: 'Total number of LLM tokens used',
       labelNames: ['provider', 'style'],
     });
 
     this.aiProviderUsage = new Counter({
-      name: 'relationhub_ai_provider_usage_total',
+      name: 'cordiq_ai_provider_usage_total',
       help: 'Total number of requests by AI provider',
       labelNames: ['provider'],
     });
 
     // Cache Metrics
     this.cacheHits = new Counter({
-      name: 'relationhub_cache_hits_total',
+      name: 'cordiq_cache_hits_total',
       help: 'Total number of cache hits',
       labelNames: ['operation'],
     });
 
     this.cacheMisses = new Counter({
-      name: 'relationhub_cache_misses_total',
+      name: 'cordiq_cache_misses_total',
       help: 'Total number of cache misses',
       labelNames: ['operation'],
     });
 
     this.cacheSize = new Gauge({
-      name: 'relationhub_cache_size_bytes',
+      name: 'cordiq_cache_size_bytes',
       help: 'Current size of cache in bytes',
       labelNames: ['cache_type'],
     });
 
     // Database Metrics
     this.dbQueryDuration = new Histogram({
-      name: 'relationhub_db_query_duration_seconds',
+      name: 'cordiq_db_query_duration_seconds',
       help: 'Duration of database queries in seconds',
       labelNames: ['operation', 'table', 'status'],
       buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1],
     });
 
     this.dbQueryTotal = new Counter({
-      name: 'relationhub_db_query_total',
+      name: 'cordiq_db_query_total',
       help: 'Total number of database queries',
       labelNames: ['operation', 'table', 'status'],
     });
 
     this.dbQueryErrors = new Counter({
-      name: 'relationhub_db_query_errors_total',
+      name: 'cordiq_db_query_errors_total',
       help: 'Total number of database query errors',
       labelNames: ['operation', 'table', 'error_type'],
     });
 
     // Business Metrics
     this.emailsGenerated = new Counter({
-      name: 'relationhub_emails_generated_total',
+      name: 'cordiq_emails_generated_total',
       help: 'Total number of emails generated',
       labelNames: ['style'],
     });
 
     this.contactsCreated = new Counter({
-      name: 'relationhub_contacts_created_total',
+      name: 'cordiq_contacts_created_total',
       help: 'Total number of contacts created',
     });
 
     this.contactsUpdated = new Counter({
-      name: 'relationhub_contacts_updated_total',
+      name: 'cordiq_contacts_updated_total',
       help: 'Total number of contacts updated',
     });
 
     this.contactsDeleted = new Counter({
-      name: 'relationhub_contacts_deleted_total',
+      name: 'cordiq_contacts_deleted_total',
       help: 'Total number of contacts deleted',
     });
 
@@ -231,10 +231,10 @@ export class MetricsService {
   async getCacheHitRate(): Promise<number> {
     const metrics = await register.metrics();
     const hitsMatch = metrics.match(
-      /relationhub_cache_hits_total{[^}]*} (\d+)/,
+      /cordiq_cache_hits_total{[^}]*} (\d+)/,
     );
     const missesMatch = metrics.match(
-      /relationhub_cache_misses_total{[^}]*} (\d+)/,
+      /cordiq_cache_misses_total{[^}]*} (\d+)/,
     );
 
     const hits = hitsMatch ? parseInt(hitsMatch[1]) : 0;

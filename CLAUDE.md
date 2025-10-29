@@ -1,8 +1,8 @@
-# RelationHub - AI-Powered Professional Relationship Management Platform
+# Cordiq - AI-Powered Professional Relationship Management Platform
 
 ## Project Overview
 
-RelationHub is an intelligent, agentic relationship management platform designed to revolutionize professional networking. This file serves as the central configuration and workflow guide for Claude Code development on this project.
+Cordiq is an intelligent, agentic relationship management platform designed to revolutionize professional networking. This file serves as the central configuration and workflow guide for Claude Code development on this project.
 
 ---
 
@@ -65,7 +65,7 @@ Guide: `~/.agent-os/instructions/execute-tasks.md`
 
 ---
 
-## MCP Servers for RelationHub
+## MCP Servers for Cordiq
 
 **📖 Complete Documentation:** `/context/mcp-instructions.md`
 
@@ -662,4 +662,4 @@ A feature is considered complete when:
 
 See @.agent-os/product/roadmap.md for complete phased development plan.
 
-*This claude.md file works in conjunction with /context/mcp-instructions.md to provide comprehensive development guidance for the RelationHub platform.*
+*This claude.md file works in conjunction with /context/mcp-instructions.md to provide comprehensive development guidance for the Cordiq platform.*

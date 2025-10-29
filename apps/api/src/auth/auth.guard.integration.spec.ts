@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthGuard } from './auth.guard';
 import { SupabaseService } from './supabase.service';
 import { UserService } from '../user/user.service';
-import { PrismaClient } from '@relationhub/database';
+import { PrismaClient } from '@cordiq/database';
 
 // Mock jose module to avoid ES module issues
 jest.mock('jose', () => ({

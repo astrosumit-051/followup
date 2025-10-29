@@ -613,4 +613,4 @@ import { Analytics } from '@vercel/analytics/react';
 ---
 
 **Last Updated:** October 12, 2025
-**Maintained by:** RelationHub Development Team
+**Maintained by:** Cordiq Development Team

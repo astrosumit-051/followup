@@ -4,7 +4,7 @@
  * This script creates 1000+ test contacts for performance testing.
  *
  * Environment Variables:
- * - PERFORMANCE_TEST_USER_EMAIL: Email of the test user (default: performance.test@relationhub.com)
+ * - PERFORMANCE_TEST_USER_EMAIL: Email of the test user (default: performance.test@cordiq.com)
  *
  * Usage:
  *   pnpm db:seed:performance
@@ -12,7 +12,7 @@
  *   PERFORMANCE_TEST_USER_EMAIL=custom@example.com pnpm db:seed:performance
  */
 
-import { PrismaClient, Priority, Gender } from '@relationhub/database';
+import { PrismaClient, Priority, Gender } from '@cordiq/database';
 
 // Type-safe enum arrays
 const priorities: Priority[] = ['HIGH', 'MEDIUM', 'LOW'];
@@ -78,7 +78,7 @@ async function main() {
   console.log('🌱 Starting performance test data seeding...');
 
   // Get test user email from environment or use default
-  const testUserEmail = process.env.PERFORMANCE_TEST_USER_EMAIL || 'performance.test@relationhub.com';
+  const testUserEmail = process.env.PERFORMANCE_TEST_USER_EMAIL || 'performance.test@cordiq.com';
   console.log(`📧 Using test user email: ${testUserEmail}`);
 
   // Try to find existing user in database

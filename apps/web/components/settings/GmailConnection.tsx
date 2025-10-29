@@ -35,7 +35,7 @@ export function GmailConnection() {
           <div>
             <CardTitle>Gmail Integration</CardTitle>
             <CardDescription>
-              Connect your Gmail account to send emails directly from RelationHub
+              Connect your Gmail account to send emails directly from Cordiq
             </CardDescription>
           </div>
         </div>

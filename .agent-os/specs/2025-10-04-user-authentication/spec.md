@@ -6,13 +6,13 @@
 
 ## Overview
 
-Implement a secure authentication and authorization system using Supabase Auth that enables users to register, log in, and manage their RelationHub account with support for email/password and social login providers (Google, LinkedIn).
+Implement a secure authentication and authorization system using Supabase Auth that enables users to register, log in, and manage their Cordiq account with support for email/password and social login providers (Google, LinkedIn).
 
 ## User Stories
 
 ### New User Registration
 
-As a new user, I want to register for RelationHub using my email or social accounts, so that I can start managing my professional relationships.
+As a new user, I want to register for Cordiq using my email or social accounts, so that I can start managing my professional relationships.
 
 **Workflow:**
 1. User visits landing page and clicks "Sign Up"

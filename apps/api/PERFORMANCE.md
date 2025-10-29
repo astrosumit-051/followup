@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-Performance testing infrastructure has been established for the RelationHub AI Email Generation system. Database query performance exceeds all targets by 82-244x. AI performance testing is ready but blocked on API key configuration.
+Performance testing infrastructure has been established for the Cordiq AI Email Generation system. Database query performance exceeds all targets by 82-244x. AI performance testing is ready but blocked on API key configuration.
 
 ## Test Infrastructure
 

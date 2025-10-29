@@ -1,4 +1,4 @@
-# Errors Solved - RelationHub Development Log
+# Errors Solved - Cordiq Development Log
 
 > **Purpose**: Document all errors encountered during development and their solutions for quick reference
 > **Last Updated**: 2025-10-06
@@ -19,7 +19,7 @@ lsof -i :5432
 # Should only show: com.docker process, NOT postgres process
 
 # Then run migrations
-pnpm --filter @relationhub/database prisma migrate dev
+pnpm --filter @cordiq/database prisma migrate dev
 ```
 
 **Why?** If both local and Docker PostgreSQL are running, Prisma connects to the wrong instance, causing P1010 errors. See [Error P1010](#error-p1010---user-denied-access-on-database) below for full details.
@@ -37,7 +37,7 @@ pnpm --filter @relationhub/database prisma migrate dev
 - Page snapshot shows only loading skeleton, no contact data
 
 **Failed Test Categories:**
-1. **Page title test (1)** - Expected "Contact Details" but got "RelationHub"
+1. **Page title test (1)** - Expected "Contact Details" but got "Cordiq"
 2. **Navigation test (1)** - Timeout navigating from contacts list
 3. **H1 class test (1)** - Expected `text-3xl font-bold` but got `text-2xl`
 4. **Birthday test (1)** - Expected "May 14, 1990" format
@@ -55,7 +55,7 @@ pnpm --filter @relationhub/database prisma migrate dev
    - **Result**: No improvement (still 43/62 passing)
 
 2. ✅ Added dynamic page title with useEffect
-   - **Fix**: `document.title = 'Contact Details - RelationHub'`
+   - **Fix**: `document.title = 'Contact Details - Cordiq'`
    - **Result**: Not verified - page still loading
 
 3. ✅ Fixed h1 CSS class
@@ -109,7 +109,7 @@ The root cause is deeper than initially suspected. Despite all fixes being in pl
 
 ```bash
 # 1. Check browser console during test execution
-export TEST_USER_EMAIL=test@relationhub.com && \
+export TEST_USER_EMAIL=test@cordiq.com && \
 export TEST_USER_PASSWORD=TestPassword123! && \
 pnpm playwright test e2e/contacts/contact-detail.spec.ts --headed --project=chromium
 
@@ -123,7 +123,7 @@ pnpm playwright test e2e/contacts/contact-detail.spec.ts --headed --project=chro
 
 # 4. Verify seed data user ID matches session user ID
 SELECT id, "userId" FROM contacts WHERE id = 'test-contact-123';
-SELECT id, email FROM users WHERE email = 'test@relationhub.com';
+SELECT id, email FROM users WHERE email = 'test@cordiq.com';
 
 # 5. Test GraphQL query manually with Postman/Insomnia
 # POST http://localhost:4000/graphql
@@ -167,7 +167,7 @@ The 19 failing tests all stem from the same root issue: contacts not loading in 
 
 **Full Error Message:**
 ```
-Error: P1010: User `postgres` was denied access on the database `relationhub_dev.public`
+Error: P1010: User `postgres` was denied access on the database `cordiq_dev.public`
 ```
 
 **Context:**
@@ -229,12 +229,12 @@ The `tsx` runtime used by the seed script doesn't automatically load `.env` file
 **Option 1 - Create local .env file:**
 ```bash
 # In packages/database/.env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/relationhub_dev"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cordiq_dev"
 ```
 
 **Option 2 - Inline environment variable:**
 ```bash
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/relationhub_dev" pnpm db:seed
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cordiq_dev" pnpm db:seed
 ```
 
 **Prevention:**
@@ -471,7 +471,7 @@ Prisma Migrate creates a temporary "shadow" database during `migrate dev` to:
 **Verification:**
 ```bash
 # Check user privileges in Docker container
-docker exec relationhub-postgres psql -U postgres -c "\du"
+docker exec cordiq-postgres psql -U postgres -c "\du"
 
 # Expected output:
 # postgres  | Superuser, Create role, Create DB, Replication, Bypass RLS
@@ -510,13 +510,13 @@ docker compose restart postgres
 ### Prisma Issues
 ```bash
 # Regenerate Prisma Client
-pnpm --filter @relationhub/database prisma generate
+pnpm --filter @cordiq/database prisma generate
 
 # Reset database (DESTRUCTIVE)
-pnpm --filter @relationhub/database prisma migrate reset
+pnpm --filter @cordiq/database prisma migrate reset
 
 # Push schema without migration
-DATABASE_URL="..." pnpm --filter @relationhub/database prisma db push
+DATABASE_URL="..." pnpm --filter @cordiq/database prisma db push
 ```
 
 ### Build Issues
@@ -537,7 +537,7 @@ pnpm clean && pnpm install && pnpm build
 echo $DATABASE_URL
 
 # Test database connection
-psql "postgresql://postgres:postgres@localhost:5432/relationhub_dev"
+psql "postgresql://postgres:postgres@localhost:5432/cordiq_dev"
 ```
 
 ---
@@ -1500,7 +1500,7 @@ Before starting development:
 - [ ] Verify `.env` file exists in `packages/database/`
 - [ ] Confirm Docker containers are healthy (`docker compose ps`)
 - [ ] Run `pnpm install` after pulling changes
-- [ ] Generate Prisma Client (`pnpm --filter @relationhub/database prisma generate`)
+- [ ] Generate Prisma Client (`pnpm --filter @cordiq/database prisma generate`)
 
 Before committing:
 - [ ] All builds pass (`pnpm build`)

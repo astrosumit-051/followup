@@ -86,11 +86,12 @@ export function useEmailTemplates(
     "queryKey" | "queryFn"
   >,
 ) {
-  const supabase = createBrowserClient();
-
   return useQuery<EmailTemplate[], Error>({
     queryKey: emailTemplateKeys.lists(),
-    queryFn: () => getEmailTemplates(supabase),
+    queryFn: () => {
+      const supabase = createBrowserClient();
+      return getEmailTemplates(supabase);
+    },
     ...options,
   });
 }
@@ -139,10 +140,10 @@ export function useCreateEmailTemplate(
   options?: UseMutationOptions<EmailTemplate, Error, CreateEmailTemplateInput>,
 ) {
   const queryClient = useQueryClient();
-  const supabase = createBrowserClient();
 
   return useMutation<EmailTemplate, Error, CreateEmailTemplateInput>({
     mutationFn: (input: CreateEmailTemplateInput) => {
+      const supabase = createBrowserClient();
       return createEmailTemplate(supabase, input);
     },
     onSuccess: (newTemplate) => {
@@ -206,7 +207,6 @@ export function useUpdateEmailTemplate(
   >,
 ) {
   const queryClient = useQueryClient();
-  const supabase = createBrowserClient();
 
   return useMutation<
     EmailTemplate,
@@ -215,6 +215,7 @@ export function useUpdateEmailTemplate(
     { previousTemplate?: EmailTemplate }
   >({
     mutationFn: ({ id, input }) => {
+      const supabase = createBrowserClient();
       return updateEmailTemplate(supabase, id, input);
     },
     onMutate: async ({ id, input }) => {
@@ -315,10 +316,12 @@ export function useDeleteEmailTemplate(
   options?: UseMutationOptions<boolean, Error, string>,
 ) {
   const queryClient = useQueryClient();
-  const supabase = createBrowserClient();
 
   return useMutation<boolean, Error, string>({
-    mutationFn: (id: string) => deleteEmailTemplate(supabase, id),
+    mutationFn: (id: string) => {
+      const supabase = createBrowserClient();
+      return deleteEmailTemplate(supabase, id);
+    },
     onSuccess: (_, deletedId) => {
       // Remove template from detail cache
       queryClient.removeQueries({

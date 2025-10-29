@@ -48,10 +48,12 @@ export function EmailComposer({
   const [isPolishModalOpen, setIsPolishModalOpen] = useState(false);
   const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
   const [showSaveAsTemplate, setShowSaveAsTemplate] = useState(false);
+  const [hasEditorContent, setHasEditorContent] = useState(!!initialContent);
 
   // Initialize TipTap editor with all required extensions
   // Note: StarterKit v3 includes Bold, Italic, Underline, Link, BulletList, OrderedList
   const editor = useEditor({
+    immediatelyRender: false, // Required for Next.js SSR compatibility
     extensions: [
       StarterKit,
       TextAlign.configure({
@@ -69,8 +71,13 @@ export function EmailComposer({
       },
     },
     onUpdate: ({ editor }) => {
+      const content = editor.getHTML();
+      const hasContent = editor.getText().trim().length > 0;
+
+      setHasEditorContent(hasContent);
+
       if (onContentChange) {
-        onContentChange(editor.getHTML());
+        onContentChange(content);
       }
     },
   });
@@ -88,6 +95,7 @@ export function EmailComposer({
   const handlePolishedVersionSelect = (polishedContent: string) => {
     if (editor) {
       editor.commands.setContent(polishedContent);
+      setHasEditorContent(editor.getText().trim().length > 0);
       if (onContentChange) {
         onContentChange(polishedContent);
       }
@@ -106,6 +114,7 @@ export function EmailComposer({
       // Load body content
       const content = template.bodyHtml || template.body;
       editor.commands.setContent(content);
+      setHasEditorContent(editor.getText().trim().length > 0);
       if (onContentChange) {
         onContentChange(content);
       }
@@ -318,7 +327,7 @@ export function EmailComposer({
             size="sm"
             onClick={openSaveAsTemplate}
             className="h-8 px-3 text-green-600 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-950"
-            disabled={!editor.getText().trim() || !subject.trim()}
+            disabled={!hasEditorContent || !subject.trim()}
           >
             <FileText className="h-4 w-4 mr-1.5" />
             Save as Template
@@ -333,7 +342,7 @@ export function EmailComposer({
             size="sm"
             onClick={() => setIsPolishModalOpen(true)}
             className="h-8 px-3 text-purple-600 border-purple-300 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-700 dark:hover:bg-purple-950"
-            disabled={!editor.getText().trim()}
+            disabled={!hasEditorContent}
           >
             <Sparkles className="h-4 w-4 mr-1.5" />
             Polish Draft

@@ -1,10 +1,10 @@
 # Prompt Engineering Guide
 
-> Documentation of prompt design decisions for AI email generation in RelationHub
+> Documentation of prompt design decisions for AI email generation in Cordiq
 
 ## Overview
 
-This document details the prompt engineering strategies used in RelationHub's AI email generation system. The prompts are designed to generate personalized, professional networking emails using Large Language Models (Gemini, OpenAI GPT-4, Anthropic Claude).
+This document details the prompt engineering strategies used in Cordiq's AI email generation system. The prompts are designed to generate personalized, professional networking emails using Large Language Models (Gemini, OpenAI GPT-4, Anthropic Claude).
 
 ## Architecture
 

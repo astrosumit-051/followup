@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PrismaClient } from '@relationhub/database';
+import { PrismaClient } from '@cordiq/database';
 import { AIService } from '../ai/ai.service';
 import { EmailService } from './email.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { EmailStatus, TemplateType, Direction } from '@relationhub/database';
+import { EmailStatus, TemplateType, Direction } from '@cordiq/database';
 
 // Mock LangChain to avoid actual API calls
 jest.mock('@langchain/openai');

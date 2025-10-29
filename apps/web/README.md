@@ -1,10 +1,10 @@
-# RelationHub Web App
+# Cordiq Web App
 
 > AI-powered professional relationship management frontend built with Next.js 14, React, and TanStack Query
 
 ## Overview
 
-The RelationHub web application provides an intelligent, user-friendly interface for managing professional relationships with AI-powered email composition features. Built with modern React patterns, server-side rendering, and real-time GraphQL subscriptions.
+The Cordiq web application provides an intelligent, user-friendly interface for managing professional relationships with AI-powered email composition features. Built with modern React patterns, server-side rendering, and real-time GraphQL subscriptions.
 
 ## Key Features
 

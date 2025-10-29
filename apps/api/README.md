@@ -1,10 +1,10 @@
-# RelationHub API
+# Cordiq API
 
 > AI-powered professional relationship management backend built with NestJS, GraphQL, and LangChain
 
 ## Overview
 
-The RelationHub API provides intelligent email generation capabilities powered by multiple Large Language Model (LLM) providers. The system uses LangChain for flexible LLM integration, Redis for caching, and PostgreSQL with Prisma ORM for data persistence.
+The Cordiq API provides intelligent email generation capabilities powered by multiple Large Language Model (LLM) providers. The system uses LangChain for flexible LLM integration, Redis for caching, and PostgreSQL with Prisma ORM for data persistence.
 
 ## Key Features
 
@@ -138,7 +138,7 @@ The API will be available at:
 
 ```bash
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/relationhub"
+DATABASE_URL="postgresql://user:password@localhost:5432/cordiq"
 
 # Supabase Authentication
 SUPABASE_URL="https://your-project.supabase.co"
@@ -481,7 +481,7 @@ semgrep --config=auto src/
 ### Environment Variables (Production)
 
 ```bash
-DATABASE_URL="postgresql://user:pass@prod-db.example.com:5432/relationhub"
+DATABASE_URL="postgresql://user:pass@prod-db.example.com:5432/cordiq"
 REDIS_HOST="prod-redis.example.com"
 REDIS_PORT=6379
 REDIS_PASSWORD="secure-password"

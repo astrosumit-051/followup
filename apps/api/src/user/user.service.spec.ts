@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
-import { PrismaClient } from '@relationhub/database';
+import { PrismaClient } from '@cordiq/database';
 
 describe('UserService', () => {
   let service: UserService;

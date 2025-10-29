@@ -1,15 +1,15 @@
-# RelationHub - Pending Issues & TODOs
+# Cordiq - Pending Issues & TODOs
 
 > **Generated:** 2025-10-23
-> **Last Updated:** 2025-10-29 (Email Composition: Task 24 Verification Complete - Backend 100%)
+> **Last Updated:** 2025-10-29 (PR #47 Merged: Email Composition 86% Complete - Frontend + Backend)
 > **Last Spec Reviewed:** 2025-10-15-email-composition-gmail-integration
-> **Repository:** RelationHub (Next.js + NestJS AI-Powered CRM)
+> **Repository:** Cordiq (Next.js + NestJS AI-Powered CRM)
 
 ---
 
 ## 📊 Executive Summary
 
-**Overall Status:** Phase 1 Complete (100%) | Phase 2 Backend Complete (100% - Task 24 Verification Done)
+**Overall Status:** Phase 1 Complete (100%) | Phase 2 Development Complete (86% - PR #47 Merged, Staging Testing Pending)
 
 ### Completion Overview
 
@@ -20,7 +20,7 @@
 | **Contact CRUD** | ✅ Complete | 100% | None (manual E2E testing complete) |
 | **shadcn UI Design** | ✅ Complete | 100% | None (production approved) |
 | **LangChain AI Email** | ✅ Complete | 100% | Production Ready with gpt-5-nano |
-| **Email Composition** | ✅ Backend Complete | 100% | Backend complete, Task 24 verification done (93% test pass rate) ✅ |
+| **Email Composition** | 🟡 Dev Complete | 86% (6/7 features) | Staging testing pending (no blocker, just validation needed) |
 
 ### Key Findings
 
@@ -37,13 +37,22 @@
 
 ### Recent Progress (Since 2025-10-23)
 
+- ✅ **PR #47 MERGED (2025-10-29):** Email Composition feature complete! Gmail OAuth + Template Library + Testing (commit 3635ac4)
+  - Tasks 19-21 complete: Gmail OAuth Frontend, Template Library UI, Integration Testing
+  - OAuth callback parameter handling fix (14/14 tests passing)
+  - 24 files changed: +7,658 insertions, -143 deletions
+  - Phase 2 now at 86% complete (6/7 Must-Have features)
 - ✅ **Task 24 Verification Complete (2025-10-29):** Backend 100% complete with 93% test pass rate (678/729), 0 critical Semgrep findings
 - ✅ **Contact CRUD Manual E2E Testing:** 100% complete (2025-10-28) - All workflows validated: List, Create, Detail, Edit, Delete
 - ✅ **shadcn UI Design Spec:** 100% complete, production approved (all 16 task groups finished)
 - ✅ **Auth Test Suite:** 100% passing (38/38 tests) - Fixed all password validation and email validation issues (2025-10-28)
 - ✅ **Task 15 completed:** Frontend Signature Components (SignatureSelector, SignatureManager)
 - ✅ **Task 16 completed:** A/B Template Modal (AITemplateModal component + 21 tests, fully implemented)
+- ✅ **Task 17 completed:** Polish Draft Modal (PolishDraftModal component + 17/17 tests passing)
 - ✅ **Task 18 completed (2025-10-28):** Dynamic CTA on Contact Detail Page (67/67 E2E tests passing across 5 browsers)
+- ✅ **Task 19 completed:** Gmail OAuth Frontend Integration (useGmailAuth hook + GmailConnection component)
+- ✅ **Task 20 completed:** Template Library UI (TemplateLibrary component + 29/29 tests passing)
+- ✅ **Task 21 completed:** Integration Testing (2 comprehensive E2E test suites created)
 - ✅ **Visual Regression Baselines:** 90+ baseline screenshots generated across 4 browsers (Chromium, Firefox, WebKit, Mobile Chrome)
 - 🧪 **E2E Infrastructure:** test-isolation helper, contact-detail-validation.spec.ts, timeout fixes
 - 📝 **Documentation:** Project docs and E2E test coverage updated (commit 355091c)
@@ -52,9 +61,362 @@
 
 ### Critical Path Forward
 
-1. 🎯 **Gmail OAuth Frontend Integration** (Task 19: OAuth flow and settings UI)
-2. 🎯 **Template Library UI** (Task 20: Save/load/manage email templates)
-3. 🎯 **Integration Testing** (Task 21: 21 E2E test scenarios)
+✅ **Tasks 19-21 COMPLETE** - PR #47 merged successfully (2025-10-29)
+
+**Phase 2 Status: 86% Complete (6/7 Must-Have Features)**
+
+**What's Pending:**
+1. 🏭 **Production Environment Setup** (Gmail OAuth credentials + AWS S3 bucket)
+2. 🧪 **Staging Testing** (8 manual test scenarios - see detailed section below)
+3. 📝 **Final Documentation** (Production deployment guides)
+
+---
+
+## 🏭 Phase 2 Staging Testing Requirements
+
+**Status:** ⏸️ **PAUSED** - No staging environment available currently
+
+**Note:** All backend and frontend development is complete (86%). The work below requires a staging environment with production-like credentials to validate actual email sending via Gmail API. This work will be completed when staging access is available.
+
+### Production Environment Setup Requirements
+
+#### 1. Gmail OAuth Credentials Setup
+
+**Required Steps:**
+1. **Create Google Cloud Project**
+   - Visit https://console.cloud.google.com/
+   - Create new project or use existing
+   - Enable Gmail API
+
+2. **Configure OAuth 2.0 Consent Screen**
+   - Set application name: "Cordiq"
+   - Add authorized domains
+   - Set scopes: `https://www.googleapis.com/auth/gmail.send`
+
+3. **Create OAuth 2.0 Credentials**
+   - Application type: Web application
+   - Authorized JavaScript origins: Your staging/production domain
+   - Authorized redirect URIs: `https://{domain}/api/auth/gmail/callback`
+   - Save Client ID and Client Secret
+
+4. **Configure Environment Variables**
+   ```bash
+   # Add to apps/api/.env
+   GOOGLE_CLIENT_ID=your_client_id_here
+   GOOGLE_CLIENT_SECRET=your_client_secret_here
+   GOOGLE_REDIRECT_URI=https://{domain}/api/auth/gmail/callback
+   ENCRYPTION_KEY=generate_32_byte_hex_string
+   ```
+
+5. **Generate Encryption Key**
+   ```bash
+   # Generate secure 32-byte hex string for token encryption
+   openssl rand -hex 32
+   ```
+
+#### 2. AWS S3 Bucket Configuration
+
+**Required Steps:**
+1. **Create S3 Bucket**
+   - Bucket name: `cordiq-attachments-{env}`
+   - Region: `us-east-1` (or preferred region)
+   - Block all public access: ✅ Enabled
+
+2. **Configure CORS Policy**
+   ```json
+   [
+     {
+       "AllowedHeaders": ["*"],
+       "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
+       "AllowedOrigins": ["https://{your-frontend-domain}"],
+       "ExposeHeaders": ["ETag"]
+     }
+   ]
+   ```
+
+3. **Create IAM User with S3 Access**
+   - Create IAM user: `cordiq-s3-uploader`
+   - Attach policy: `AmazonS3FullAccess` (or custom policy)
+   - Generate access key and secret
+
+4. **Configure Environment Variables**
+   ```bash
+   # Add to apps/api/.env
+   S3_BUCKET=cordiq-attachments-staging
+   S3_REGION=us-east-1
+   AWS_ACCESS_KEY_ID=your_access_key_here
+   AWS_SECRET_ACCESS_KEY=your_secret_access_key_here
+   ```
+
+5. **Set Lifecycle Policy (Optional)**
+   - Delete temporary attachments after 7 days
+   - Transition to cheaper storage class after 30 days
+
+### Manual Testing Scenarios (8 Test Cases)
+
+#### Test Case 1: Basic Email Composition Flow
+**Steps:**
+1. Navigate to `/compose`
+2. Select single contact from sidebar
+3. Compose email with subject and body
+4. Click "Send Email"
+5. Verify email sent successfully
+
+**Expected Result:**
+- Email appears in Gmail Sent folder
+- Success toast notification displayed
+- Draft cleared from database
+- Redirected to dashboard
+
+**Acceptance Criteria:**
+- ✅ Email received in recipient's inbox
+- ✅ Subject and body match composed content
+- ✅ Sender is user's connected Gmail account
+
+---
+
+#### Test Case 2: Draft Recovery Flow
+**Steps:**
+1. Start composing email
+2. Type subject and body
+3. Wait for auto-save (2s local, 10s DB)
+4. Close browser tab (simulate crash)
+5. Open new tab and navigate to `/compose`
+
+**Expected Result:**
+- Draft recovery banner appears
+- Click "Recover" restores subject and body
+- Click "Discard" clears draft
+
+**Acceptance Criteria:**
+- ✅ LocalStorage draft saves every 2 seconds
+- ✅ Database draft saves every 10 seconds
+- ✅ Recovery banner shows on page load
+- ✅ Recovered content matches original
+
+---
+
+#### Test Case 3: Attachment Upload Flow
+**Steps:**
+1. Navigate to `/compose`
+2. Click "Attach File" button
+3. Drag-drop or select file (max 10MB)
+4. Verify file upload progress
+5. Verify file preview displays
+6. Remove file and re-upload
+7. Send email with attachment
+
+**Expected Result:**
+- Upload progress bar displays
+- File preview shows filename and size
+- Presigned S3 URL generated (15-min expiry)
+- Attachment received in email
+
+**Acceptance Criteria:**
+- ✅ File size validation (max 10MB)
+- ✅ Allowed MIME types enforced
+- ✅ S3 presigned URL generated
+- ✅ Attachment included in sent email
+
+---
+
+#### Test Case 4: Polish Draft Flow (4 Styles)
+**Steps:**
+1. Compose email with rough draft
+2. Click "Polish Draft" button
+3. Verify 4 polished versions displayed:
+   - Formal (top-left)
+   - Casual (top-right)
+   - Elaborate (bottom-left)
+   - Concise (bottom-right)
+4. Select "Use Formal" and verify replacement
+5. Send polished email
+
+**Expected Result:**
+- 4 polished versions appear in 2x2 grid
+- Word count diff displayed for each
+- Selected version replaces draft content
+- Email sends with polished content
+
+**Acceptance Criteria:**
+- ✅ All 4 styles generated correctly
+- ✅ Word count diff accurate
+- ✅ Content replacement works
+- ✅ Regenerate button functional
+
+---
+
+#### Test Case 5: Template Library Flow
+**Steps:**
+1. Compose email with subject and body
+2. Click "Save Template"
+3. Enter template name and category
+4. Save template to library
+5. Clear composition form
+6. Click "Load Template"
+7. Select saved template
+8. Verify subject and body loaded
+9. Edit and delete template
+
+**Expected Result:**
+- Template saved with name and category
+- Template list grouped by category
+- Template loads correctly
+- Delete confirmation dialog works
+
+**Acceptance Criteria:**
+- ✅ Templates saved to database
+- ✅ Templates grouped by category
+- ✅ Load replaces current draft
+- ✅ Delete removes from list
+
+---
+
+#### Test Case 6: Bulk Campaign Flow (Up to 100 Contacts)
+**Steps:**
+1. Navigate to `/compose`
+2. Select 5 contacts from sidebar
+3. Compose email body
+4. Click "Send to All (5)"
+5. Verify confirmation dialog
+6. Confirm send
+7. Verify batch sending progress
+
+**Expected Result:**
+- All 5 contacts receive personalized email
+- Progress indicator shows: "Sending 3/5..."
+- Success message: "Sent to 5 contacts"
+- All emails appear in Gmail Sent folder
+
+**Acceptance Criteria:**
+- ✅ Max 100 contacts enforced
+- ✅ Personalization tokens work ({{name}}, {{company}})
+- ✅ Batch sending uses queue
+- ✅ Failed sends reported to user
+
+---
+
+#### Test Case 7: Gmail OAuth Flow
+**Steps:**
+1. Navigate to `/settings`
+2. Click "Connect Gmail Account"
+3. OAuth popup opens
+4. Grant Gmail send permission
+5. Popup closes with success
+6. Verify connection status shows "Connected"
+7. Verify email address displayed
+8. Test disconnect functionality
+
+**Expected Result:**
+- OAuth popup opens successfully
+- User grants permission
+- Callback handled correctly
+- Token encrypted and stored
+- Connection status updates
+
+**Acceptance Criteria:**
+- ✅ OAuth popup opens in new window
+- ✅ Callback redirects to success page
+- ✅ Token encrypted with AES-256-GCM
+- ✅ Automatic token refresh works
+- ✅ Disconnect revokes token
+
+---
+
+#### Test Case 8: Dynamic CTA Navigation
+**Steps:**
+1. Navigate to Contact Detail Page
+2. If contact has 0 emails → verify "Cold Email" button (orange)
+3. Click button → redirects to `/compose?contactId=X&type=cold`
+4. Verify contact pre-selected
+5. Send email
+6. Return to Contact Detail Page
+7. Verify button changed to "Follow Up" (blue)
+8. Click button → redirects to `/compose?contactId=X&type=followup`
+
+**Expected Result:**
+- CTA changes based on conversation history
+- Navigation passes correct query params
+- Contact pre-selected in compose sidebar
+- Email type affects AI template generation context
+
+**Acceptance Criteria:**
+- ✅ GraphQL conversation count query works
+- ✅ CTA renders conditionally
+- ✅ Navigation params passed correctly
+- ✅ AI generation uses email type
+
+---
+
+### Performance Benchmarks
+
+**Email Composition Interface:**
+- ✅ Page load time: <2 seconds
+- ✅ Auto-save latency: <200ms (local), <1s (DB)
+- ✅ AI template generation: <5 seconds (p95)
+- ✅ File upload speed: Based on connection (presigned URL)
+- ✅ Send email API: <3 seconds
+
+**Gmail OAuth:**
+- ✅ Authorization URL generation: <100ms
+- ✅ Token exchange: <2 seconds
+- ✅ Token refresh: <1 second
+
+**Template Library:**
+- ✅ Save template: <500ms
+- ✅ Load template: <300ms
+- ✅ List templates: <500ms (up to 100 templates)
+
+---
+
+### Security Validation Checklist
+
+**Gmail OAuth:**
+- [ ] Tokens encrypted at rest (AES-256-GCM)
+- [ ] State parameter validated (CSRF protection)
+- [ ] Token expiry enforced
+- [ ] Automatic token refresh working
+- [ ] Token revocation on disconnect
+
+**Attachment Uploads:**
+- [ ] File size limit enforced (max 10MB)
+- [ ] MIME type validation
+- [ ] S3 presigned URLs expire after 15 minutes
+- [ ] No public S3 bucket access
+- [ ] Virus scanning (if available)
+
+**AI Generation:**
+- [ ] Prompt injection protection
+- [ ] XSS prevention in generated content
+- [ ] Rate limiting enforced (10 req/min)
+- [ ] Token usage tracking
+
+**Data Privacy:**
+- [ ] Draft auto-delete after 30 days
+- [ ] Email content not logged
+- [ ] User data encrypted in transit (HTTPS)
+- [ ] Database row-level security (RLS)
+
+---
+
+### Timeline & Effort Estimate
+
+**Production Setup:** 2-3 days
+- Gmail OAuth credentials: 1 day
+- AWS S3 bucket configuration: 1 day
+- Environment variable setup: 0.5 day
+
+**Manual Testing:** 3-4 days
+- 8 test scenarios: 2-3 days
+- Bug fixes and polish: 1 day
+- Security validation: 0.5 day
+
+**Documentation:** 1 day
+- Gmail OAuth setup guide
+- S3 configuration guide
+- Troubleshooting guide
+
+**Total Estimated Time:** 1-2 weeks
 
 ---
 
@@ -550,7 +912,7 @@ All 16 major task groups and 211 subtasks have been completed successfully:
 | # | File | Line | Description | Priority | Related Task |
 |---|------|------|-------------|----------|--------------|
 | 1 | `apps/web/components/email/ComposePage.tsx` | 31 | Fetch contact name if contactId is provided | MEDIUM | Email Composition Spec |
-| 2 | `apps/web/e2e/contacts/performance.spec.ts` | 46 | Implement authentication for performance.test@relationhub.com user | HIGH | Contact CRUD - Task 15.6-15.9 |
+| 2 | `apps/web/e2e/contacts/performance.spec.ts` | 46 | Implement authentication for performance.test@cordiq.com user | HIGH | Contact CRUD - Task 15.6-15.9 |
 | 3 | `apps/web/e2e/auth/signup.spec.ts` | 68 | Enable after Task 10 (User Profile Sync) is complete | MEDIUM | User Auth - Task 10.5 |
 | 4 | `apps/web/e2e/auth/login.spec.ts` | 88 | Enable after Task 10 (User Profile Sync) is complete | MEDIUM | User Auth - Task 10.5 |
 
@@ -579,7 +941,7 @@ useEffect(() => {
 #### TODO #2: Performance Tests - Authentication Setup
 ```typescript
 test.beforeEach(async ({ page }) => {
-  // TODO: Implement authentication for performance.test@relationhub.com user
+  // TODO: Implement authentication for performance.test@cordiq.com user
   // This will be implemented once Supabase test environment is set up
   // For now, tests will be skipped with annotation
   test.skip(true, "Skipping until backend with test data is available");
@@ -590,7 +952,7 @@ test.beforeEach(async ({ page }) => {
 
 **Action:**
 1. Set up Supabase test instance
-2. Create `performance.test@relationhub.com` user
+2. Create `performance.test@cordiq.com` user
 3. Seed 1000+ contacts for this user
 4. Remove `test.skip()` annotation
 
@@ -710,7 +1072,7 @@ These tests are skipped because they require a fully configured Supabase test en
 
 **Required:**
 - Run performance seed script: `pnpm --filter api db:seed:performance`
-- Supabase test user: `performance.test@relationhub.com`
+- Supabase test user: `performance.test@cordiq.com`
 - 1000+ seeded contacts
 
 ---
@@ -1047,7 +1409,7 @@ pnpm test:e2e e2e/contacts/
 cd apps/api
 pnpm db:seed:performance
 
-# Expected: 1000+ contacts created for performance.test@relationhub.com
+# Expected: 1000+ contacts created for performance.test@cordiq.com
 
 # 4. OPTIONAL: Run performance tests
 cd apps/web

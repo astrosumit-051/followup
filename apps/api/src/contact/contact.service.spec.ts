@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContactService } from './contact.service';
-import { PrismaClient } from '@relationhub/database';
+import { PrismaClient } from '@cordiq/database';
 import { ContactFilterInput } from './dto/contact-filter.input';
 import { ContactPaginationInput } from './dto/contact-pagination.input';
 import { Priority } from './enums/priority.enum';

@@ -1,10 +1,10 @@
 # Gmail OAuth Setup Guide
 
-This guide walks you through setting up Gmail OAuth 2.0 authentication for RelationHub's email sending functionality.
+This guide walks you through setting up Gmail OAuth 2.0 authentication for Cordiq's email sending functionality.
 
 ## Overview
 
-RelationHub uses Gmail's OAuth 2.0 API to send emails on behalf of users. This requires:
+Cordiq uses Gmail's OAuth 2.0 API to send emails on behalf of users. This requires:
 1. A Google Cloud Project with Gmail API enabled
 2. OAuth 2.0 credentials (Client ID and Secret)
 3. Authorized redirect URIs configured
@@ -15,7 +15,7 @@ RelationHub uses Gmail's OAuth 2.0 API to send emails on behalf of users. This r
 ## Prerequisites
 
 - A Google account with access to Google Cloud Console
-- Admin access to your RelationHub deployment
+- Admin access to your Cordiq deployment
 - Backend API running (for testing OAuth callback)
 
 ---
@@ -31,7 +31,7 @@ RelationHub uses Gmail's OAuth 2.0 API to send emails on behalf of users. This r
 2. **Create a new project** (or select existing)
    - Click the project dropdown in the top navigation bar
    - Click **"New Project"**
-   - Enter project name: `RelationHub Email Service` (or your preference)
+   - Enter project name: `Cordiq Email Service` (or your preference)
    - Click **"Create"**
 
 3. **Wait for project creation**
@@ -74,7 +74,7 @@ RelationHub uses Gmail's OAuth 2.0 API to send emails on behalf of users. This r
 
    **App name:**
    ```
-   RelationHub
+   Cordiq
    ```
 
    **User support email:**
@@ -83,7 +83,7 @@ RelationHub uses Gmail's OAuth 2.0 API to send emails on behalf of users. This r
    ```
 
    **App logo:** (Optional)
-   - Upload your RelationHub logo (120x120 pixels recommended)
+   - Upload your Cordiq logo (120x120 pixels recommended)
 
    **Application home page:**
    ```
@@ -121,7 +121,7 @@ RelationHub uses Gmail's OAuth 2.0 API to send emails on behalf of users. This r
 
 2. **Select Gmail Scopes**
 
-   RelationHub requires these scopes:
+   Cordiq requires these scopes:
 
    - `https://www.googleapis.com/auth/gmail.send`
      - **Permission:** Send email on your behalf
@@ -190,11 +190,11 @@ For External apps in Testing mode:
 
    **Name:**
    ```
-   RelationHub Backend (Development)
+   Cordiq Backend (Development)
    ```
    OR
    ```
-   RelationHub Backend (Production)
+   Cordiq Backend (Production)
    ```
 
 4. **Add Authorized Redirect URIs**
@@ -387,7 +387,7 @@ After creating the OAuth client, you'll see a modal with your credentials:
 2. Click "Connect Gmail" again to re-authenticate
 3. If issue persists, revoke access manually:
    - Go to: https://myaccount.google.com/permissions
-   - Find "RelationHub" in the list
+   - Find "Cordiq" in the list
    - Click "Remove Access"
    - Try connecting again
 
@@ -476,7 +476,7 @@ GOOGLE_REDIRECT_URI=https://api.your-domain.com/api/auth/gmail/callback
 **Until verified:**
 - App shows "Unverified app" warning
 - Limited to 100 users
-- Users must click "Advanced" > "Go to RelationHub (unsafe)"
+- Users must click "Advanced" > "Go to Cordiq (unsafe)"
 
 ### 3. Secure Encryption Key
 
@@ -487,13 +487,13 @@ GOOGLE_REDIRECT_URI=https://api.your-domain.com/api/auth/gmail/callback
 1. **AWS Secrets Manager:**
    ```bash
    aws secretsmanager create-secret \
-     --name relationhub/gmail-encryption-key \
+     --name cordiq/gmail-encryption-key \
      --secret-string "your-64-char-hex-string"
    ```
 
 2. **HashiCorp Vault:**
    ```bash
-   vault kv put secret/relationhub/gmail encryption_key=your-key-here
+   vault kv put secret/cordiq/gmail encryption_key=your-key-here
    ```
 
 3. **Environment variable from CI/CD:**

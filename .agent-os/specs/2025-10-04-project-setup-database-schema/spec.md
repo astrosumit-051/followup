@@ -6,7 +6,7 @@
 
 ## Overview
 
-Establish the foundational Next.js + NestJS monorepo structure with PostgreSQL database, Prisma ORM integration, and complete database schema for the RelationHub platform. This is the critical first step in Phase 1 that enables all subsequent features.
+Establish the foundational Next.js + NestJS monorepo structure with PostgreSQL database, Prisma ORM integration, and complete database schema for the Cordiq platform. This is the critical first step in Phase 1 that enables all subsequent features.
 
 ## User Stories
 

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { ComposePage } from "@/components/email/ComposePage";
 
 export const metadata: Metadata = {
-  title: "Compose Email | RelationHub",
+  title: "Compose Email | Cordiq",
   description: "Compose professional emails with AI assistance",
 };
 

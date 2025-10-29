@@ -7,14 +7,14 @@
  * 3. Outputs the credentials to use in E2E tests
  *
  * Usage:
- * TEST_USER_EMAIL=test@relationhub.com TEST_USER_PASSWORD=TestPassword123! npx tsx scripts/create-test-user.ts
+ * TEST_USER_EMAIL=test@cordiq.com TEST_USER_PASSWORD=TestPassword123! npx tsx scripts/create-test-user.ts
  */
 
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const testEmail = process.env.TEST_USER_EMAIL || "test@relationhub.com";
+const testEmail = process.env.TEST_USER_EMAIL || "test@cordiq.com";
 const testPassword = process.env.TEST_USER_PASSWORD || "TestPassword123!";
 
 if (!supabaseUrl) {

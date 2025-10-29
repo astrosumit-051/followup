@@ -10,7 +10,7 @@ module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/src/'],
   moduleNameMapper: {
-    '^@relationhub/database$': '<rootDir>/../../packages/database/src',
+    '^@cordiq/database$': '<rootDir>/../../packages/database/src',
   },
   transformIgnorePatterns: [
     'node_modules/(?!jose)',

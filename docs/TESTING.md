@@ -5,7 +5,7 @@
 
 ## Overview
 
-This document describes the testing infrastructure for RelationHub, including configuration, best practices, and troubleshooting tips.
+This document describes the testing infrastructure for Cordiq, including configuration, best practices, and troubleshooting tips.
 
 ---
 

@@ -5,7 +5,7 @@
 
 ## Pitch
 
-RelationHub is an intelligent, agentic relationship management platform that helps busy professionals convert networking connections into meaningful collaborations by providing AI-powered follow-up automation, contextual communication tracking, and personalized engagement strategies.
+Cordiq is an intelligent, agentic relationship management platform that helps busy professionals convert networking connections into meaningful collaborations by providing AI-powered follow-up automation, contextual communication tracking, and personalized engagement strategies.
 
 ## Users
 
@@ -78,15 +78,15 @@ Tracking communication history, email engagement metrics (opens, reads, response
 
 ### AI-Powered Contextual Intelligence
 
-Unlike traditional CRMs that require extensive manual data entry, RelationHub leverages AI to automatically generate personalized email templates based on captured conversation context, relationship history, and engagement patterns. The AI continuously learns from user preferences and writing style, providing increasingly accurate suggestions over time. This results in 10x faster follow-up creation with significantly higher personalization quality.
+Unlike traditional CRMs that require extensive manual data entry, Cordiq leverages AI to automatically generate personalized email templates based on captured conversation context, relationship history, and engagement patterns. The AI continuously learns from user preferences and writing style, providing increasingly accurate suggestions over time. This results in 10x faster follow-up creation with significantly higher personalization quality.
 
 ### Relationship-Centric Priority System
 
-Unlike LinkedIn which treats all connections equally, RelationHub implements an intelligent priority ranking system (High, Medium, Low) that dynamically adjusts follow-up frequency and engagement strategies. This ensures high-value relationships receive appropriate attention without overwhelming users with low-priority maintenance tasks, resulting in 3x better relationship conversion rates.
+Unlike LinkedIn which treats all connections equally, Cordiq implements an intelligent priority ranking system (High, Medium, Low) that dynamically adjusts follow-up frequency and engagement strategies. This ensures high-value relationships receive appropriate attention without overwhelming users with low-priority maintenance tasks, resulting in 3x better relationship conversion rates.
 
 ### Seamless Email Provider Integration
 
-Unlike standalone email platforms, RelationHub integrates bidirectionally with existing email providers (Gmail, Outlook, Yahoo), allowing users to draft and manage emails within the platform while sending through their established email infrastructure. This maintains deliverability, preserves existing workflows, and provides comprehensive conversation history tracking across all channels.
+Unlike standalone email platforms, Cordiq integrates bidirectionally with existing email providers (Gmail, Outlook, Yahoo), allowing users to draft and manage emails within the platform while sending through their established email infrastructure. This maintains deliverability, preserves existing workflows, and provides comprehensive conversation history tracking across all channels.
 
 ## Key Features
 

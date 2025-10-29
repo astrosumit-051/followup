@@ -30,7 +30,7 @@ As a busy professional who just met someone at a networking event, I want the AI
 As a consultant maintaining relationships with 100+ clients, I want the AI to remember all previous email exchanges with each contact, so that follow-up emails naturally reference past conversations and avoid repeating information or asking redundant questions.
 
 **Workflow:**
-1. User sends email through RelationHub
+1. User sends email through Cordiq
 2. System stores email content in conversation history
 3. On next email generation, AI retrieves conversation context
 4. Generated emails reference previous discussions naturally

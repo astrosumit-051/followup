@@ -10,7 +10,7 @@
  * Prerequisites:
  * - Backend running with performance test data (1000+ contacts)
  * - Run seed script: cd apps/api && pnpm prisma db seed:performance
- * - Authenticated session with performance.test@relationhub.com user
+ * - Authenticated session with performance.test@cordiq.com user
  */
 
 import { test, expect, Page } from "@playwright/test";
@@ -43,7 +43,7 @@ async function measureInteraction(
 
 test.describe("Contact Performance Tests", () => {
   test.beforeEach(async ({ page }) => {
-    // TODO: Implement authentication for performance.test@relationhub.com user
+    // TODO: Implement authentication for performance.test@cordiq.com user
     // This will be implemented once Supabase test environment is set up
     // For now, tests will be skipped with annotation
     test.skip(true, "Skipping until backend with test data is available");

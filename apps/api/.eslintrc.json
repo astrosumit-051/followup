@@ -1,0 +1,16 @@
+{
+  "extends": ["../../.eslintrc.js"],
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Literal[value=/relationhub/i]",
+        "message": "❌ Detected 'relationhub' reference. Use 'cordiq' instead. The project has been rebranded."
+      },
+      {
+        "selector": "Literal[value=/RelationHub/]",
+        "message": "❌ Detected 'RelationHub' reference. Use 'Cordiq' instead. The project has been rebranded."
+      }
+    ]
+  }
+}

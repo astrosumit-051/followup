@@ -1,7 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserResolver } from './user.resolver';
-import { PrismaClient } from '@relationhub/database';
+import { PrismaClient } from '@cordiq/database';
 import { AuthModule } from '../auth/auth.module';
 
 /**

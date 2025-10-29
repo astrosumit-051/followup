@@ -49,7 +49,7 @@ export default function ContactDetailPage() {
   // Update document title when contact loads
   useEffect(() => {
     if (contact) {
-      document.title = "Contact Details - RelationHub";
+      document.title = "Contact Details - Cordiq";
     }
   }, [contact]);
 

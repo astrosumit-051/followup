@@ -17,7 +17,7 @@
 
 ### Decision
 
-Launch RelationHub as an intelligent, agentic relationship management platform targeting business professionals and students who attend networking events and struggle with systematic follow-up and relationship nurturing. The platform will focus on AI-powered email generation, automated follow-up reminders based on relationship priority, and comprehensive analytics to measure networking effectiveness.
+Launch Cordiq as an intelligent, agentic relationship management platform targeting business professionals and students who attend networking events and struggle with systematic follow-up and relationship nurturing. The platform will focus on AI-powered email generation, automated follow-up reminders based on relationship priority, and comprehensive analytics to measure networking effectiveness.
 
 ### Context
 
@@ -173,7 +173,7 @@ The application requires complex data fetching patterns (contact details + conve
 - Excellent TypeScript integration with code generation
 - Apollo Client provides sophisticated caching and state management
 
-**For RelationHub Specifically:**
+**For Cordiq Specifically:**
 - Dashboard requires data from multiple entities (contacts, emails, analytics, calendar events)
 - AI features need flexible queries as capabilities evolve
 - Real-time notifications are core feature (email opens, follow-up reminders)
@@ -223,7 +223,7 @@ Implement LLM Gateway pattern using LangChain as abstraction layer, supporting m
 
 ### Context
 
-AI email generation is the core differentiator of RelationHub. LLM technology is rapidly evolving with new providers, models, and pricing structures. Vendor lock-in to a single provider creates business risk. Users have different preferences for cost, privacy, and performance.
+AI email generation is the core differentiator of Cordiq. LLM technology is rapidly evolving with new providers, models, and pricing structures. Vendor lock-in to a single provider creates business risk. Users have different preferences for cost, privacy, and performance.
 
 ### Alternatives Considered
 
@@ -293,15 +293,15 @@ AI email generation is the core differentiator of RelationHub. LLM technology is
 
 ### Decision
 
-Use BullMQ + Redis for queue-based email processing with integration to user's existing email providers (Gmail, Outlook) via OAuth 2.0. Emails are drafted in RelationHub but sent through user's authenticated email account.
+Use BullMQ + Redis for queue-based email processing with integration to user's existing email providers (Gmail, Outlook) via OAuth 2.0. Emails are drafted in Cordiq but sent through user's authenticated email account.
 
 ### Context
 
-Email deliverability is critical for RelationHub's value proposition. Sending from RelationHub's domain would face deliverability challenges (SPF, DKIM, domain reputation). Users want emails to appear from their professional email addresses, not a third-party platform.
+Email deliverability is critical for Cordiq's value proposition. Sending from Cordiq's domain would face deliverability challenges (SPF, DKIM, domain reputation). Users want emails to appear from their professional email addresses, not a third-party platform.
 
 ### Alternatives Considered
 
-1. **RelationHub-Hosted Email Sending (Dedicated SMTP)**
+1. **Cordiq-Hosted Email Sending (Dedicated SMTP)**
    - Pros: Complete control over sending, simpler architecture
    - Cons: Deliverability challenges, domain reputation management, users don't want emails from third-party domain
 
@@ -439,7 +439,7 @@ The application requires ACID transactions for contact and email data, flexible 
 
 ## Summary
 
-These six foundational decisions establish RelationHub's technical architecture and product direction. All decisions prioritize:
+These six foundational decisions establish Cordiq's technical architecture and product direction. All decisions prioritize:
 
 1. **AI-First Development**: Flexible LLM integration, vector search, context management
 2. **Type Safety**: TypeScript across frontend/backend, GraphQL contracts, Prisma ORM

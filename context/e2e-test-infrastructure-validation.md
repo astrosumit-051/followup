@@ -47,7 +47,7 @@ The E2E test infrastructure for Contact CRUD operations has been successfully va
 
 **Root Cause:**
 - Playwright's `networkidle` state requires NO network activity for 500ms
-- RelationHub uses GraphQL subscriptions for real-time updates
+- Cordiq uses GraphQL subscriptions for real-time updates
 - Open WebSocket connections prevent the "networkidle" state from ever being reached
 
 **Solution:**

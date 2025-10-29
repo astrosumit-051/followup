@@ -19,12 +19,12 @@ import { MetricsController } from './metrics.controller';
       defaultMetrics: {
         enabled: true,
         config: {
-          prefix: 'relationhub_',
+          prefix: 'cordiq_',
         },
       },
       path: '/metrics',
       defaultLabels: {
-        app: 'relationhub-api',
+        app: 'cordiq-api',
         environment: process.env.NODE_ENV || 'development',
       },
     }),

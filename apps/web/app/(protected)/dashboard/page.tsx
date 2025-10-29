@@ -33,7 +33,7 @@ export default function DashboardPage() {
               Dashboard
             </h1>
             <p className="text-muted-foreground">
-              Welcome to your RelationHub dashboard!
+              Welcome to your Cordiq dashboard!
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                RelationHub helps you manage your professional network with
+                Cordiq helps you manage your professional network with
                 AI-powered features.
               </p>
 

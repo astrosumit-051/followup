@@ -5,7 +5,7 @@
 
 ## Overview
 
-RelationHub's Contact Management system provides a comprehensive CRUD interface for managing professional contacts with features including search, filtering, sorting, and pagination.
+Cordiq's Contact Management system provides a comprehensive CRUD interface for managing professional contacts with features including search, filtering, sorting, and pagination.
 
 ## Features Implemented
 
@@ -69,7 +69,7 @@ RelationHub's Contact Management system provides a comprehensive CRUD interface 
 
    **Backend** (`apps/api/.env`):
    ```env
-   DATABASE_URL=postgresql://user:password@localhost:5432/relationhub_dev
+   DATABASE_URL=postgresql://user:password@localhost:5432/cordiq_dev
    SUPABASE_URL=your_supabase_project_url
    SUPABASE_JWT_SECRET=your_supabase_jwt_secret
    SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
@@ -284,7 +284,7 @@ pnpm test:e2e:ui
 **Seed Performance Data:**
 ```bash
 cd apps/api
-PERFORMANCE_TEST_USER_EMAIL=test@relationhub.com pnpm db:seed:performance
+PERFORMANCE_TEST_USER_EMAIL=test@cordiq.com pnpm db:seed:performance
 ```
 
 This creates:
@@ -635,6 +635,6 @@ For development workflow and contribution guidelines, see:
 ## Support
 
 For issues or questions:
-- GitHub Issues: https://github.com/yourusername/relationhub/issues
+- GitHub Issues: https://github.com/yourusername/cordiq/issues
 - API Documentation: `/docs/API.md`
 - Development Guide: `CLAUDE.md`

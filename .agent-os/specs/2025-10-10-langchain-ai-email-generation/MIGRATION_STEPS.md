@@ -107,7 +107,7 @@ Tracks all email conversations for AI context
 
 ```bash
 # Check PostgreSQL is accessible
-psql -h localhost -p 5432 -U postgres -d relationhub_dev -c "SELECT 1"
+psql -h localhost -p 5432 -U postgres -d cordiq_dev -c "SELECT 1"
 
 # Or check Docker container
 docker ps | grep postgres
@@ -131,7 +131,7 @@ This will:
 
 ```bash
 # Check that new tables exist
-psql -h localhost -p 5432 -U postgres -d relationhub_dev -c "\dt"
+psql -h localhost -p 5432 -U postgres -d cordiq_dev -c "\dt"
 
 # Should show:
 # - emails (updated)
@@ -139,7 +139,7 @@ psql -h localhost -p 5432 -U postgres -d relationhub_dev -c "\dt"
 # - conversation_history (new)
 
 # Verify enums were created
-psql -h localhost -p 5432 -U postgres -d relationhub_dev -c "\dT"
+psql -h localhost -p 5432 -U postgres -d cordiq_dev -c "\dT"
 
 # Should show:
 # - EmailStatus
@@ -153,7 +153,7 @@ psql -h localhost -p 5432 -U postgres -d relationhub_dev -c "\dT"
 cd /Users/sumitkumarsah/Downloads/followup/packages/database
 
 # Run the seed script
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/relationhub_dev?schema=public" pnpm prisma db seed
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cordiq_dev?schema=public" pnpm prisma db seed
 ```
 
 This will populate:
@@ -197,7 +197,7 @@ cd /Users/sumitkumarsah/Downloads/followup/packages/database
 npx prisma migrate resolve --rolled-back <migration-name>
 
 # Or manually drop tables and enums
-psql -h localhost -p 5432 -U postgres -d relationhub_dev
+psql -h localhost -p 5432 -U postgres -d cordiq_dev
 ```
 
 ```sql
