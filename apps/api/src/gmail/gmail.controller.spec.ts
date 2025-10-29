@@ -91,7 +91,7 @@ describe('GmailController', () => {
     it('should handle successful OAuth callback', async () => {
       mockGmailOAuthService.handleCallback.mockResolvedValue(mockGmailToken);
 
-      await controller.handleCallback(mockState, mockAuthCode, '', '', mockResponse);
+      await controller.handleCallback(mockState, mockResponse, mockAuthCode, '', '');
 
       expect(mockGmailOAuthService.handleCallback).toHaveBeenCalledWith(mockState, mockAuthCode);
       expect(mockResponse.redirect).toHaveBeenCalledWith('/settings/gmail-callback?success=true');
@@ -101,7 +101,7 @@ describe('GmailController', () => {
       const error = new BadRequestException('Invalid or expired state parameter');
       mockGmailOAuthService.handleCallback.mockRejectedValue(error);
 
-      await controller.handleCallback('invalid-state', mockAuthCode, '', '', mockResponse);
+      await controller.handleCallback('invalid-state', mockResponse, mockAuthCode, '', '');
 
       expect(mockGmailOAuthService.handleCallback).toHaveBeenCalledWith('invalid-state', mockAuthCode);
       expect(mockResponse.redirect).toHaveBeenCalledWith(expect.stringContaining('/settings/gmail-callback?error='));
@@ -111,7 +111,7 @@ describe('GmailController', () => {
       const error = new BadRequestException('Invalid authorization code');
       mockGmailOAuthService.handleCallback.mockRejectedValue(error);
 
-      await controller.handleCallback(mockState, 'invalid-code', '', '', mockResponse);
+      await controller.handleCallback(mockState, mockResponse, 'invalid-code', '', '');
 
       expect(mockGmailOAuthService.handleCallback).toHaveBeenCalledWith(mockState, 'invalid-code');
       expect(mockResponse.redirect).toHaveBeenCalledWith(expect.stringContaining('/settings/gmail-callback?error='));
@@ -121,18 +121,27 @@ describe('GmailController', () => {
       const error = new BadRequestException('Missing state parameter');
       mockGmailOAuthService.handleCallback.mockRejectedValue(error);
 
-      await controller.handleCallback('', mockAuthCode, '', '', mockResponse);
+      await controller.handleCallback('', mockResponse, mockAuthCode, '', '');
 
       expect(mockResponse.redirect).toHaveBeenCalledWith(expect.stringContaining('/settings/gmail-callback?error='));
     });
 
-    it('should handle missing code parameter', async () => {
-      const error = new BadRequestException('Missing authorization code');
-      mockGmailOAuthService.handleCallback.mockRejectedValue(error);
+    it('should handle OAuth error response (user denied access)', async () => {
+      // Simulate OAuth error callback: no code, but error present
+      await controller.handleCallback(mockState, mockResponse, undefined, 'access_denied', 'User denied access');
 
-      await controller.handleCallback(mockState, '', '', '', mockResponse);
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/settings/gmail-callback?error=User%20denied%20access');
+      // Should not call the OAuth service when error is present
+      expect(mockGmailOAuthService.handleCallback).not.toHaveBeenCalled();
+    });
 
-      expect(mockResponse.redirect).toHaveBeenCalledWith(expect.stringContaining('/settings/gmail-callback?error='));
+    it('should throw BadRequestException when both code and error are missing', async () => {
+      await expect(
+        controller.handleCallback(mockState, mockResponse, undefined, undefined, undefined)
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        controller.handleCallback(mockState, mockResponse, undefined, undefined, undefined)
+      ).rejects.toThrow('Missing required parameters: either code or error must be provided');
     });
   });
 
