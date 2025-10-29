@@ -57,7 +57,7 @@ export default function AuthCodeErrorPage() {
               <p className="text-sm text-muted-foreground">
                 If this problem persists, please{" "}
                 <a
-                  href="mailto:support@relationhub.com"
+                  href="mailto:support@cordiq.com"
                   className="font-medium text-primary hover:underline"
                 >
                   contact support

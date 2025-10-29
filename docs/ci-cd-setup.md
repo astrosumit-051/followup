@@ -15,7 +15,7 @@
 
 ## Overview
 
-The RelationHub project uses GitHub Actions for continuous integration and continuous deployment. The CI/CD pipeline includes:
+The Cordiq project uses GitHub Actions for continuous integration and continuous deployment. The CI/CD pipeline includes:
 
 1. **Unit Tests** - Jest tests for backend API and database packages
 2. **E2E Tests** - Playwright browser automation tests for user workflows
@@ -132,7 +132,7 @@ services:
     env:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: relationhub_test
+      POSTGRES_DB: cordiq_test
     ports:
       - 5432:5432
     options: >-
@@ -152,7 +152,7 @@ The workflow automatically:
    pnpm --filter database prisma migrate deploy
    ```
 3. **Seeds test data** (if seed script exists)
-4. **Connects to database** at `postgresql://postgres:postgres@localhost:5432/relationhub_test`
+4. **Connects to database** at `postgresql://postgres:postgres@localhost:5432/cordiq_test`
 
 ### Redis Service Container
 
@@ -248,7 +248,7 @@ Error: P1001: Can't reach database server
 
 **Solution:**
 - Check PostgreSQL service is healthy (logs show "database system is ready")
-- Verify DATABASE_URL format: `postgresql://postgres:postgres@localhost:5432/relationhub_test`
+- Verify DATABASE_URL format: `postgresql://postgres:postgres@localhost:5432/cordiq_test`
 - Ensure migrations are up-to-date in repository
 
 ---
@@ -433,7 +433,7 @@ NODE_OPTIONS: --max-old-space-size=4096
 Add to README.md:
 
 ```markdown
-![E2E Tests](https://github.com/YOUR_ORG/relationhub/actions/workflows/e2e-tests.yml/badge.svg)
+![E2E Tests](https://github.com/YOUR_ORG/cordiq/actions/workflows/e2e-tests.yml/badge.svg)
 ```
 
 ### Email Notifications

@@ -1,4 +1,4 @@
-// Shared TypeScript types and interfaces for RelationHub
+// Shared TypeScript types and interfaces for Cordiq
 
 export enum Priority {
   HIGH = 'HIGH',

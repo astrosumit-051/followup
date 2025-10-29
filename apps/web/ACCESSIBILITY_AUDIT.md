@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive accessibility audit of all shadcn/ui refactored components in the RelationHub application. All components meet WCAG 2.1 AA standards for accessibility.
+This document provides a comprehensive accessibility audit of all shadcn/ui refactored components in the Cordiq application. All components meet WCAG 2.1 AA standards for accessibility.
 
 ### Audit Status: ✅ **PASSING**
 

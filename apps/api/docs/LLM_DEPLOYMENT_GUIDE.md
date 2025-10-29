@@ -1,10 +1,10 @@
 # LLM API Key Deployment Guide
 
-> Step-by-step guide for configuring LLM providers in RelationHub
+> Step-by-step guide for configuring LLM providers in Cordiq
 
 ## Overview
 
-RelationHub's AI email generation requires at least one LLM provider API key. This guide covers acquisition, configuration, security, and cost management for all supported providers.
+Cordiq's AI email generation requires at least one LLM provider API key. This guide covers acquisition, configuration, security, and cost management for all supported providers.
 
 ## Quick Start
 
@@ -60,7 +60,7 @@ kubectl create secret generic llm-api-keys \
 
 # AWS Parameter Store
 aws ssm put-parameter \
-  --name /relationhub/prod/gemini-api-key \
+  --name /cordiq/prod/gemini-api-key \
   --value "AIzaSy..." \
   --type SecureString
 ```
@@ -121,7 +121,7 @@ Total per email: ~$0.00018
 
 4. **Create API Key**
    - Click "Create new secret key"
-   - Name it: "RelationHub Production"
+   - Name it: "Cordiq Production"
    - Copy key immediately (won't be shown again)
 
 5. **Key Format**
@@ -144,7 +144,7 @@ kubectl create secret generic llm-api-keys \
 
 # AWS Secrets Manager
 aws secretsmanager create-secret \
-  --name /relationhub/prod/openai-api-key \
+  --name /cordiq/prod/openai-api-key \
   --secret-string "sk-proj-..."
 ```
 
@@ -216,7 +216,7 @@ Hard limit: $100/month (stops all requests)
 4. **Generate API Key**
    - Go to Settings → API Keys
    - Click "Create Key"
-   - Name: "RelationHub Production"
+   - Name: "Cordiq Production"
    - Copy immediately
 
 5. **Key Format**

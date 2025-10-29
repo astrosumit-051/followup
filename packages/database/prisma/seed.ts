@@ -7,10 +7,10 @@ async function main() {
 
   // Get or create a test user
   const testUser = await prisma.user.upsert({
-    where: { email: 'test@relationhub.com' },
+    where: { email: 'test@cordiq.com' },
     update: {},
     create: {
-      email: 'test@relationhub.com',
+      email: 'test@cordiq.com',
       supabaseId: 'test-supabase-id',
       name: 'Test User',
       provider: 'email',
@@ -71,12 +71,12 @@ async function main() {
           {
             type: 'paragraph',
             content: [
-              { type: 'text', text: 'test@relationhub.com' }
+              { type: 'text', text: 'test@cordiq.com' }
             ]
           }
         ]
       },
-      contentHtml: '<p>Best regards,</p><p>Test User</p><p>test@relationhub.com</p>',
+      contentHtml: '<p>Best regards,</p><p>Test User</p><p>test@cordiq.com</p>',
       isGlobalDefault: true,
       isDefaultForFormal: false,
       isDefaultForCasual: false,
@@ -104,14 +104,14 @@ async function main() {
               { type: 'hardBreak' },
               { type: 'text', text: 'Professional Title' },
               { type: 'hardBreak' },
-              { type: 'text', text: 'RelationHub' },
+              { type: 'text', text: 'Cordiq' },
               { type: 'hardBreak' },
-              { type: 'text', text: 'test@relationhub.com | +1-555-0100' }
+              { type: 'text', text: 'test@cordiq.com | +1-555-0100' }
             ]
           }
         ]
       },
-      contentHtml: '<p>Sincerely,</p><p>Test User<br>Professional Title<br>RelationHub<br>test@relationhub.com | +1-555-0100</p>',
+      contentHtml: '<p>Sincerely,</p><p>Test User<br>Professional Title<br>Cordiq<br>test@cordiq.com | +1-555-0100</p>',
       isGlobalDefault: false,
       isDefaultForFormal: true,
       isDefaultForCasual: false,

@@ -6,7 +6,7 @@
 
 ## Overview
 
-RelationHub API includes comprehensive Prometheus metrics for monitoring application performance, business metrics, and system health. This document describes the available metrics and how to use them.
+Cordiq API includes comprehensive Prometheus metrics for monitoring application performance, business metrics, and system health. This document describes the available metrics and how to use them.
 
 ## Metrics Endpoint
 
@@ -30,7 +30,7 @@ RelationHub API includes comprehensive Prometheus metrics for monitoring applica
 
 ### 1. AI Email Generation Metrics
 
-#### `relationhub_ai_email_generation_duration_seconds` (Histogram)
+#### `cordiq_ai_email_generation_duration_seconds` (Histogram)
 Duration of AI email generation requests in seconds.
 
 **Labels:**
@@ -50,15 +50,15 @@ Duration of AI email generation requests in seconds.
 ```promql
 # p95 latency for AI email generation
 histogram_quantile(0.95,
-  sum(rate(relationhub_ai_email_generation_duration_seconds_bucket[5m])) by (le, provider)
+  sum(rate(cordiq_ai_email_generation_duration_seconds_bucket[5m])) by (le, provider)
 )
 
 # Average latency by style
-rate(relationhub_ai_email_generation_duration_seconds_sum[5m]) /
-rate(relationhub_ai_email_generation_duration_seconds_count[5m])
+rate(cordiq_ai_email_generation_duration_seconds_sum[5m]) /
+rate(cordiq_ai_email_generation_duration_seconds_count[5m])
 ```
 
-#### `relationhub_ai_email_generation_total` (Counter)
+#### `cordiq_ai_email_generation_total` (Counter)
 Total number of AI email generation requests.
 
 **Labels**:
@@ -75,17 +75,17 @@ Total number of AI email generation requests.
 **Example PromQL Queries**:
 ```promql
 # Request rate per minute
-rate(relationhub_ai_email_generation_total[1m])
+rate(cordiq_ai_email_generation_total[1m])
 
 # Error rate percentage
 (
-  sum(rate(relationhub_ai_email_generation_total{status="error"}[5m]))
+  sum(rate(cordiq_ai_email_generation_total{status="error"}[5m]))
   /
-  sum(rate(relationhub_ai_email_generation_total[5m]))
+  sum(rate(cordiq_ai_email_generation_total[5m]))
 ) * 100
 ```
 
-#### `relationhub_ai_email_generation_errors_total` (Counter)
+#### `cordiq_ai_email_generation_errors_total` (Counter)
 Total number of AI email generation errors.
 
 **Labels**:
@@ -98,7 +98,7 @@ Total number of AI email generation errors.
 - Monitor fallback chain effectiveness
 - Identify common failure patterns
 
-#### `relationhub_ai_tokens_used_total` (Counter)
+#### `cordiq_ai_tokens_used_total` (Counter)
 Total number of LLM tokens used.
 
 **Labels**:
@@ -114,11 +114,11 @@ Total number of LLM tokens used.
 **Example PromQL Queries**:
 ```promql
 # Tokens per request average
-rate(relationhub_ai_tokens_used_total[5m]) /
-rate(relationhub_ai_email_generation_total{status="success"}[5m])
+rate(cordiq_ai_tokens_used_total[5m]) /
+rate(cordiq_ai_email_generation_total{status="success"}[5m])
 ```
 
-#### `relationhub_ai_provider_usage_total` (Counter)
+#### `cordiq_ai_provider_usage_total` (Counter)
 Total number of successful requests by AI provider.
 
 **Labels**:
@@ -134,7 +134,7 @@ Total number of successful requests by AI provider.
 
 ### 2. Cache Metrics
 
-#### `relationhub_cache_hits_total` (Counter)
+#### `cordiq_cache_hits_total` (Counter)
 Total number of cache hits.
 
 **Labels**:
@@ -150,13 +150,13 @@ Total number of cache hits.
 ```promql
 # Cache hit rate percentage
 (
-  sum(rate(relationhub_cache_hits_total[5m]))
+  sum(rate(cordiq_cache_hits_total[5m]))
   /
-  (sum(rate(relationhub_cache_hits_total[5m])) + sum(rate(relationhub_cache_misses_total[5m])))
+  (sum(rate(cordiq_cache_hits_total[5m])) + sum(rate(cordiq_cache_misses_total[5m])))
 ) * 100
 ```
 
-#### `relationhub_cache_misses_total` (Counter)
+#### `cordiq_cache_misses_total` (Counter)
 Total number of cache misses.
 
 **Labels**:
@@ -168,7 +168,7 @@ Total number of cache misses.
 - Optimize cache key generation
 - Monitor cache invalidation
 
-#### `relationhub_cache_size_bytes` (Gauge)
+#### `cordiq_cache_size_bytes` (Gauge)
 Current size of cache in bytes.
 
 **Labels**:
@@ -184,7 +184,7 @@ Current size of cache in bytes.
 
 ### 3. Database Query Metrics
 
-#### `relationhub_db_query_duration_seconds` (Histogram)
+#### `cordiq_db_query_duration_seconds` (Histogram)
 Duration of database queries in seconds.
 
 **Labels**:
@@ -204,14 +204,14 @@ Duration of database queries in seconds.
 ```promql
 # p95 query latency by table
 histogram_quantile(0.95,
-  sum(rate(relationhub_db_query_duration_seconds_bucket[5m])) by (le, table)
+  sum(rate(cordiq_db_query_duration_seconds_bucket[5m])) by (le, table)
 )
 
 # Slow queries (>100ms)
-sum(rate(relationhub_db_query_duration_seconds_bucket{le="0.1"}[5m])) by (table, operation)
+sum(rate(cordiq_db_query_duration_seconds_bucket{le="0.1"}[5m])) by (table, operation)
 ```
 
-#### `relationhub_db_query_total` (Counter)
+#### `cordiq_db_query_total` (Counter)
 Total number of database queries.
 
 **Labels**:
@@ -225,7 +225,7 @@ Total number of database queries.
 - Identify hotspots
 - Capacity planning
 
-#### `relationhub_db_query_errors_total` (Counter)
+#### `cordiq_db_query_errors_total` (Counter)
 Total number of database query errors.
 
 **Labels**:
@@ -243,7 +243,7 @@ Total number of database query errors.
 
 ### 4. Business Metrics
 
-#### `relationhub_emails_generated_total` (Counter)
+#### `cordiq_emails_generated_total` (Counter)
 Total number of emails generated (successful AI generations).
 
 **Labels**:
@@ -255,7 +255,7 @@ Total number of emails generated (successful AI generations).
 - Business analytics
 - Growth metrics
 
-#### `relationhub_contacts_created_total` (Counter)
+#### `cordiq_contacts_created_total` (Counter)
 Total number of contacts created.
 
 **Use Cases**:
@@ -264,7 +264,7 @@ Total number of contacts created.
 - Business metrics
 - Capacity planning
 
-#### `relationhub_contacts_updated_total` (Counter)
+#### `cordiq_contacts_updated_total` (Counter)
 Total number of contacts updated.
 
 **Use Cases**:
@@ -272,7 +272,7 @@ Total number of contacts updated.
 - Track engagement
 - Identify active users
 
-#### `relationhub_contacts_deleted_total` (Counter)
+#### `cordiq_contacts_deleted_total` (Counter)
 Total number of contacts deleted.
 
 **Use Cases**:
@@ -283,7 +283,7 @@ Total number of contacts deleted.
 
 ### 5. Default Node.js Metrics (Provided by Prometheus Client)
 
-All metrics are prefixed with `relationhub_` and include:
+All metrics are prefixed with `cordiq_` and include:
 
 #### Process Metrics
 - `nodejs_process_cpu_user_seconds_total`: User CPU time
@@ -315,7 +315,7 @@ Add to `prometheus.yml`:
 
 ```yaml
 scrape_configs:
-  - job_name: 'relationhub-api'
+  - job_name: 'cordiq-api'
     scrape_interval: 15s
     static_configs:
       - targets: ['localhost:4000']
@@ -328,13 +328,13 @@ Example alert rules (`alerts.yml`):
 
 ```yaml
 groups:
-  - name: relationhub_alerts
+  - name: cordiq_alerts
     rules:
       # AI Performance
       - alert: HighAILatency
         expr: |
           histogram_quantile(0.95,
-            sum(rate(relationhub_ai_email_generation_duration_seconds_bucket[5m])) by (le)
+            sum(rate(cordiq_ai_email_generation_duration_seconds_bucket[5m])) by (le)
           ) > 5
         for: 5m
         labels:
@@ -347,9 +347,9 @@ groups:
       - alert: HighErrorRate
         expr: |
           (
-            sum(rate(relationhub_ai_email_generation_total{status="error"}[5m]))
+            sum(rate(cordiq_ai_email_generation_total{status="error"}[5m]))
             /
-            sum(rate(relationhub_ai_email_generation_total[5m]))
+            sum(rate(cordiq_ai_email_generation_total[5m]))
           ) * 100 > 5
         for: 5m
         labels:
@@ -362,9 +362,9 @@ groups:
       - alert: LowCacheHitRate
         expr: |
           (
-            sum(rate(relationhub_cache_hits_total[5m]))
+            sum(rate(cordiq_cache_hits_total[5m]))
             /
-            (sum(rate(relationhub_cache_hits_total[5m])) + sum(rate(relationhub_cache_misses_total[5m])))
+            (sum(rate(cordiq_cache_hits_total[5m])) + sum(rate(cordiq_cache_misses_total[5m])))
           ) * 100 < 20
         for: 10m
         labels:
@@ -377,7 +377,7 @@ groups:
       - alert: SlowDatabaseQueries
         expr: |
           histogram_quantile(0.95,
-            sum(rate(relationhub_db_query_duration_seconds_bucket[5m])) by (le, table)
+            sum(rate(cordiq_db_query_duration_seconds_bucket[5m])) by (le, table)
           ) > 0.1
         for: 5m
         labels:
@@ -400,7 +400,7 @@ groups:
    - Alert threshold: 5s (p95)
 
 2. **Request Rate** - Graph
-   - Query: `rate(relationhub_ai_email_generation_total[5m])`
+   - Query: `rate(cordiq_ai_email_generation_total[5m])`
    - Unit: req/s
    - Breakdown by provider and style
 
@@ -410,12 +410,12 @@ groups:
    - Alert threshold: 2%
 
 4. **Token Usage** - Graph
-   - Query: `rate(relationhub_ai_tokens_used_total[5m])`
+   - Query: `rate(cordiq_ai_tokens_used_total[5m])`
    - Unit: tokens/s
    - Breakdown by provider
 
 5. **Provider Distribution** - Pie Chart
-   - Query: `relationhub_ai_provider_usage_total`
+   - Query: `cordiq_ai_provider_usage_total`
    - Shows primary vs fallback usage
 
 ### Cache Performance Dashboard
@@ -431,7 +431,7 @@ groups:
    - Unit: ops/s
 
 3. **Cache Size** - Graph
-   - Query: `relationhub_cache_size_bytes`
+   - Query: `cordiq_cache_size_bytes`
    - Unit: bytes
 
 ### Database Performance Dashboard
@@ -443,23 +443,23 @@ groups:
    - Alert threshold: 100ms
 
 2. **Query Volume** - Graph
-   - Query: `rate(relationhub_db_query_total[5m])`
+   - Query: `rate(cordiq_db_query_total[5m])`
    - Unit: queries/s
    - Breakdown by table
 
 3. **Database Errors** - Graph
-   - Query: `rate(relationhub_db_query_errors_total[5m])`
+   - Query: `rate(cordiq_db_query_errors_total[5m])`
    - Unit: errors/s
 
 ### Business Metrics Dashboard
 
 **Panels:**
 1. **Emails Generated** - Stat
-   - Query: `relationhub_emails_generated_total`
+   - Query: `cordiq_emails_generated_total`
    - Breakdown by style
 
 2. **Contacts Growth** - Graph
-   - Query: `relationhub_contacts_created_total - relationhub_contacts_deleted_total`
+   - Query: `cordiq_contacts_created_total - cordiq_contacts_deleted_total`
    - Unit: contacts
 
 3. **Daily Active Operations** - Graph
@@ -590,7 +590,7 @@ return contact;
 
 ### High Memory Usage
 
-- Review `relationhub_cache_size_bytes` metric
+- Review `cordiq_cache_size_bytes` metric
 - Check histogram bucket configuration
 - Monitor `nodejs_heap_size_used_bytes`
 - Adjust cache TTL if needed

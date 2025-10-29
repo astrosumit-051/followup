@@ -1,6 +1,6 @@
 # Database Migration Guide
 
-> Guide for migrating the RelationHub database to support AI email generation features
+> Guide for migrating the Cordiq database to support AI email generation features
 
 ## Overview
 
@@ -47,20 +47,20 @@ Before running migrations:
 mkdir -p backups
 
 # Backup entire database
-pg_dump -h localhost -U postgres -d relationhub_dev > backups/relationhub_dev_$(date +%Y%m%d_%H%M%S).sql
+pg_dump -h localhost -U postgres -d cordiq_dev > backups/cordiq_dev_$(date +%Y%m%d_%H%M%S).sql
 
 # Verify backup created
 ls -lh backups/
 
 # Expected output:
-# relationhub_dev_20251015_143022.sql  (file size varies)
+# cordiq_dev_20251015_143022.sql  (file size varies)
 ```
 
 #### Option B: Docker PostgreSQL Backup
 
 ```bash
 # If using Docker Compose
-docker exec relationhub-postgres pg_dump -U postgres relationhub_dev > backups/relationhub_dev_$(date +%Y%m%d_%H%M%S).sql
+docker exec cordiq-postgres pg_dump -U postgres cordiq_dev > backups/cordiq_dev_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 ### Step 2: Review Migration Files
@@ -146,7 +146,7 @@ pnpm prisma migrate status
 # Expected: "Database schema is up to date!"
 
 # Verify tables exist
-psql -h localhost -U postgres -d relationhub_dev -c "\dt"
+psql -h localhost -U postgres -d cordiq_dev -c "\dt"
 
 # Expected tables:
 # - emails
@@ -332,7 +332,7 @@ If migration fails or needs to be reverted:
 docker-compose down
 
 # Restore database from backup
-psql -h localhost -U postgres -d relationhub_dev < backups/relationhub_dev_20251015_143022.sql
+psql -h localhost -U postgres -d cordiq_dev < backups/cordiq_dev_20251015_143022.sql
 
 # Restart application
 docker-compose up -d
@@ -342,7 +342,7 @@ docker-compose up -d
 
 ```bash
 # Connect to database
-psql -h localhost -U postgres -d relationhub_dev
+psql -h localhost -U postgres -d cordiq_dev
 
 # Drop tables in reverse order (respects foreign keys)
 DROP TABLE IF EXISTS "conversation_history" CASCADE;
@@ -404,7 +404,7 @@ pnpm prisma migrate reset
 
 ```bash
 # Check table row counts
-psql -h localhost -U postgres -d relationhub_dev <<EOF
+psql -h localhost -U postgres -d cordiq_dev <<EOF
 SELECT 'emails' as table_name, COUNT(*) FROM emails
 UNION ALL
 SELECT 'email_templates', COUNT(*) FROM email_templates
@@ -417,7 +417,7 @@ EOF
 
 ```bash
 # Check table sizes
-psql -h localhost -U postgres -d relationhub_dev <<EOF
+psql -h localhost -U postgres -d cordiq_dev <<EOF
 SELECT
     relname AS table_name,
     pg_size_pretty(pg_total_relation_size(relid)) AS total_size,
@@ -452,7 +452,7 @@ curl -X POST http://localhost:4000/graphql \
 pnpm prisma migrate resolve --applied 20251010000000_add_email_tables
 
 # Option 2: Drop tables and re-run
-psql -h localhost -U postgres -d relationhub_dev -c "DROP TABLE IF EXISTS emails CASCADE;"
+psql -h localhost -U postgres -d cordiq_dev -c "DROP TABLE IF EXISTS emails CASCADE;"
 pnpm prisma migrate deploy
 ```
 
@@ -568,13 +568,13 @@ pnpm prisma db seed
 
 For issues with migrations:
 
-1. Check logs: `docker logs relationhub-api`
+1. Check logs: `docker logs cordiq-api`
 2. Review migration status: `pnpm prisma migrate status`
 3. Consult Prisma docs: https://www.prisma.io/docs
-4. Check database logs: `docker logs relationhub-postgres`
+4. Check database logs: `docker logs cordiq-postgres`
 
 ---
 
 *Last Updated: 2025-10-15*
 *Version: 1.0.0*
-*Applies to: RelationHub AI Email Generation Feature*
+*Applies to: Cordiq AI Email Generation Feature*

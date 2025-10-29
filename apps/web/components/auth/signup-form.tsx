@@ -134,7 +134,7 @@ export function SignupForm() {
           Create your account
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Get started with RelationHub
+          Get started with Cordiq
         </p>
       </div>
 

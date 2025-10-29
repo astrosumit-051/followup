@@ -1,11 +1,11 @@
 # S3 Attachment Storage Setup Guide
 
-> Documentation for configuring AWS S3 for email attachment storage in RelationHub
+> Documentation for configuring AWS S3 for email attachment storage in Cordiq
 > Last Updated: 2025-10-15
 
 ## Overview
 
-RelationHub uses AWS S3 for secure, scalable attachment storage for email composition. This guide covers S3 bucket creation, CORS configuration, IAM permissions, and environment variable setup.
+Cordiq uses AWS S3 for secure, scalable attachment storage for email composition. This guide covers S3 bucket creation, CORS configuration, IAM permissions, and environment variable setup.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ RelationHub uses AWS S3 for secure, scalable attachment storage for email compos
 1. Navigate to [AWS S3 Console](https://s3.console.aws.amazon.com/)
 2. Click **Create bucket**
 3. Configure bucket settings:
-   - **Bucket name**: `relationhub-attachments-{environment}` (e.g., `relationhub-attachments-production`)
+   - **Bucket name**: `cordiq-attachments-{environment}` (e.g., `cordiq-attachments-production`)
    - **AWS Region**: Choose region closest to your users (e.g., `us-east-1`)
    - **Object Ownership**: ACLs disabled (recommended)
    - **Block Public Access**: Keep all public access blocked (recommended for security)
@@ -34,23 +34,23 @@ RelationHub uses AWS S3 for secure, scalable attachment storage for email compos
 # Create bucket
 # Note: us-east-1 doesn't need LocationConstraint, but other regions do
 aws s3api create-bucket \
-  --bucket relationhub-attachments-production \
+  --bucket cordiq-attachments-production \
   --region us-east-2 \
   --create-bucket-configuration LocationConstraint=us-east-2
 
 # For us-east-1, omit LocationConstraint:
 # aws s3api create-bucket \
-#   --bucket relationhub-attachments-production \
+#   --bucket cordiq-attachments-production \
 #   --region us-east-1
 
 # Enable versioning (optional)
 aws s3api put-bucket-versioning \
-  --bucket relationhub-attachments-production \
+  --bucket cordiq-attachments-production \
   --versioning-configuration Status=Enabled
 
 # Enable default encryption
 aws s3api put-bucket-encryption \
-  --bucket relationhub-attachments-production \
+  --bucket cordiq-attachments-production \
   --server-side-encryption-configuration '{
     "Rules": [{
       "ApplyServerSideEncryptionByDefault": {
@@ -105,8 +105,8 @@ aws s3api put-bucket-encryption \
 
 - **AllowedOrigins**: Update with your actual frontend domains
   - Development: `http://localhost:3000`
-  - Staging: `https://staging.relationhub.com`
-  - Production: `https://app.relationhub.com`
+  - Staging: `https://staging.cordiq.com`
+  - Production: `https://app.cordiq.com`
   - **Do NOT use wildcard (`*`) in production** for security reasons
 - **AllowedMethods**: `PUT` is required for presigned URL uploads
 - **AllowedHeaders**: Specific headers required for S3 presigned URL operations (Content-Type, Content-Length, Authorization, x-amz-*)
@@ -116,7 +116,7 @@ aws s3api put-bucket-encryption \
 
 ```bash
 aws s3api put-bucket-cors \
-  --bucket relationhub-attachments-production \
+  --bucket cordiq-attachments-production \
   --cors-configuration file://cors-policy.json
 ```
 
@@ -151,7 +151,7 @@ aws s3api put-bucket-cors \
 
 1. Navigate to [IAM Console](https://console.aws.amazon.com/iam/)
 2. Go to **Users** → **Add users**
-3. **User name**: `relationhub-s3-service`
+3. **User name**: `cordiq-s3-service`
 4. **Access type**: Select **Programmatic access**
 5. Click **Next: Permissions**
 
@@ -175,7 +175,7 @@ aws s3api put-bucket-cors \
         "s3:GetObject",
         "s3:DeleteObject"
       ],
-      "Resource": "arn:aws:s3:::relationhub-attachments-production/*"
+      "Resource": "arn:aws:s3:::cordiq-attachments-production/*"
     },
     {
       "Sid": "AllowBucketListing",
@@ -183,14 +183,14 @@ aws s3api put-bucket-cors \
       "Action": [
         "s3:ListBucket"
       ],
-      "Resource": "arn:aws:s3:::relationhub-attachments-production"
+      "Resource": "arn:aws:s3:::cordiq-attachments-production"
     }
   ]
 }
 ```
 
 4. Click **Review policy**
-5. **Name**: `RelationHubS3AttachmentPolicy`
+5. **Name**: `CordiqS3AttachmentPolicy`
 6. Click **Create policy**
 7. Attach policy to the IAM user
 
@@ -215,7 +215,7 @@ Add the following to your `apps/api/.env` file:
 ```bash
 # AWS S3 Configuration
 AWS_REGION=us-east-1
-S3_BUCKET=relationhub-attachments-production
+S3_BUCKET=cordiq-attachments-production
 AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
@@ -226,7 +226,7 @@ If you need S3 bucket name in frontend for validation:
 
 ```bash
 # apps/web/.env.local
-NEXT_PUBLIC_S3_BUCKET=relationhub-attachments-production
+NEXT_PUBLIC_S3_BUCKET=cordiq-attachments-production
 ```
 
 ### Environment Variable Security
@@ -262,7 +262,7 @@ Automatically delete orphaned attachments older than 30 days to reduce storage c
 
 ```bash
 aws s3api put-bucket-lifecycle-configuration \
-  --bucket relationhub-attachments-production \
+  --bucket cordiq-attachments-production \
   --lifecycle-configuration file://lifecycle-policy.json
 ```
 
@@ -306,13 +306,13 @@ Expected output: **25 tests passing**
 echo "Test attachment" > test-file.txt
 
 # Upload to S3 bucket
-aws s3 cp test-file.txt s3://relationhub-attachments-production/test-user/attachments/test-file.txt
+aws s3 cp test-file.txt s3://cordiq-attachments-production/test-user/attachments/test-file.txt
 
 # Verify upload
-aws s3 ls s3://relationhub-attachments-production/test-user/attachments/
+aws s3 ls s3://cordiq-attachments-production/test-user/attachments/
 
 # Delete test file
-aws s3 rm s3://relationhub-attachments-production/test-user/attachments/test-file.txt
+aws s3 rm s3://cordiq-attachments-production/test-user/attachments/test-file.txt
 ```
 
 ### Test Direct Browser Upload (E2E)
@@ -434,5 +434,5 @@ aws s3 rm s3://relationhub-attachments-production/test-user/attachments/test-fil
 ---
 
 **Last Updated**: 2025-10-15
-**Author**: RelationHub Development Team
+**Author**: Cordiq Development Team
 **Status**: Production Ready

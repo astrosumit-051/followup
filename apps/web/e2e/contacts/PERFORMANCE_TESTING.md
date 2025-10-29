@@ -24,7 +24,7 @@ pnpm dev
 
 This will create:
 
-- A test user: `performance.test@relationhub.com`
+- A test user: `performance.test@cordiq.com`
 - 1000+ contacts with realistic data
 
 ### 2. Frontend Setup
@@ -44,7 +44,7 @@ pnpm dev
 Since Supabase authentication requires:
 
 1. Visit http://localhost:3000/signup
-2. Create an account with email: `performance.test@relationhub.com`
+2. Create an account with email: `performance.test@cordiq.com`
 3. Complete email verification if required
 4. The account should automatically have access to the 1000 seeded contacts
 
@@ -217,7 +217,7 @@ If authentication fails:
 
    ```bash
    # Visit http://localhost:3000/signup
-   # Register with: performance.test@relationhub.com
+   # Register with: performance.test@cordiq.com
    ```
 
 2. **Check Supabase Configuration**

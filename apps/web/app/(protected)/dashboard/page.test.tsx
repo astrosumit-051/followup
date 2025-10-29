@@ -47,7 +47,7 @@ describe("DashboardPage", () => {
 
       expect(screen.getByText("Dashboard")).toBeInTheDocument();
       expect(
-        screen.getByText("Welcome to your RelationHub dashboard!"),
+        screen.getByText("Welcome to your Cordiq dashboard!"),
       ).toBeInTheDocument();
     });
 
@@ -77,7 +77,7 @@ describe("DashboardPage", () => {
       expect(screen.getByText("Getting Started")).toBeInTheDocument();
       expect(
         screen.getByText(
-          "RelationHub helps you manage your professional network with AI-powered features.",
+          "Cordiq helps you manage your professional network with AI-powered features.",
         ),
       ).toBeInTheDocument();
     });
@@ -223,7 +223,7 @@ describe("DashboardPage", () => {
       expect(heading).toHaveClass("text-foreground");
 
       const description = screen.getByText(
-        "Welcome to your RelationHub dashboard!",
+        "Welcome to your Cordiq dashboard!",
       );
       expect(description).toHaveClass("text-muted-foreground");
     });

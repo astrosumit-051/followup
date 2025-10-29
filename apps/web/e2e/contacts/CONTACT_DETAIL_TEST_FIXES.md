@@ -81,7 +81,7 @@ These failures indicate features that need to be implemented in the application.
 
 **Test**: `should display page title in browser tab`
 **Expected**: `/Contact Details/i`
-**Actual**: `"RelationHub"`
+**Actual**: `"Cordiq"`
 **Fix**: Add dynamic title to contact detail page:
 
 ```typescript
@@ -95,7 +95,7 @@ export default function ContactDetailPage() {
     return (
       <>
         <Head>
-          <title>Contact Not Found - RelationHub</title>
+          <title>Contact Not Found - Cordiq</title>
         </Head>
         {/* existing not found UI */}
       </>
@@ -105,7 +105,7 @@ export default function ContactDetailPage() {
   return (
     <>
       <Head>
-        <title>{contact.name} - Contact Details - RelationHub</title>
+        <title>{contact.name} - Contact Details - Cordiq</title>
       </Head>
       {/* existing contact detail UI */}
     </>

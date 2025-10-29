@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 export default function ResetPasswordPage() {
   useEffect(() => {
-    document.title = "Reset Password | RelationHub";
+    document.title = "Reset Password | Cordiq";
   }, []);
 
   return (

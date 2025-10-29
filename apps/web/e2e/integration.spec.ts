@@ -1,7 +1,7 @@
 import { test, expect, Page } from "@playwright/test";
 
 /**
- * Integration Tests for RelationHub
+ * Integration Tests for Cordiq
  *
  * This test suite validates complete user workflows across the application,
  * testing the integration between components, pages, and backend services.

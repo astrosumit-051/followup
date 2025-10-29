@@ -3,7 +3,7 @@
 > Last Updated: 2025-10-06
 > Version: 1.0.0
 
-This document outlines the security measures implemented in RelationHub to protect against common vulnerabilities and attacks.
+This document outlines the security measures implemented in Cordiq to protect against common vulnerabilities and attacks.
 
 ## Security Features
 

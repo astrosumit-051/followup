@@ -12,12 +12,12 @@ const authFile = "playwright/.auth/user.json";
  * 4. All subsequent tests will reuse this authenticated state
  *
  * Required environment variables:
- * - TEST_USER_EMAIL: Email for the test user (e.g., test@relationhub.com)
+ * - TEST_USER_EMAIL: Email for the test user (e.g., test@cordiq.com)
  * - TEST_USER_PASSWORD: Password for the test user
  */
 
 setup("authenticate", async ({ page }) => {
-  const testEmail = process.env.TEST_USER_EMAIL || "test@relationhub.com";
+  const testEmail = process.env.TEST_USER_EMAIL || "test@cordiq.com";
   const testPassword = process.env.TEST_USER_PASSWORD || "TestPassword123!";
 
   // Navigate to login page

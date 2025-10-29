@@ -383,4 +383,4 @@ export async function graphqlRequest<T = any>(...) { }
 ---
 
 **Last Updated**: Current Session
-**Maintained By**: RelationHub Development Team (Claude Code)
+**Maintained By**: Cordiq Development Team (Claude Code)

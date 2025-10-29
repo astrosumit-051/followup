@@ -1,11 +1,11 @@
-# RelationHub GraphQL API Documentation
+# Cordiq GraphQL API Documentation
 
 > Last Updated: 2025-10-08
 > Version: 1.0.0
 
 ## Overview
 
-RelationHub provides a GraphQL API for managing professional contacts, relationships, and networking activities. All API endpoints require authentication via JWT tokens from Supabase.
+Cordiq provides a GraphQL API for managing professional contacts, relationships, and networking activities. All API endpoints require authentication via JWT tokens from Supabase.
 
 ## GraphQL Endpoint
 
@@ -702,6 +702,6 @@ try {
 ## Support
 
 For API issues or questions:
-- GitHub Issues: https://github.com/yourusername/relationhub/issues
+- GitHub Issues: https://github.com/yourusername/cordiq/issues
 - Documentation: See `/docs` folder
 - CLAUDE.md: Project development guide

@@ -1,7 +1,7 @@
 import { test, expect, Page } from "@playwright/test";
 
 /**
- * Email Composition Integration Tests for RelationHub
+ * Email Composition Integration Tests for Cordiq
  *
  * This test suite validates complete email composition workflows including:
  * - Complete composition flow (compose → AI generate → edit → attach → send)

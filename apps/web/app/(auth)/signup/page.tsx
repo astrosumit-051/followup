@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 export default function SignUpPage() {
   useEffect(() => {
-    document.title = "Sign Up | RelationHub";
+    document.title = "Sign Up | Cordiq";
   }, []);
 
   return (

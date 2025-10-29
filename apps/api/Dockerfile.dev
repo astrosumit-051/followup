@@ -16,8 +16,8 @@ COPY apps/api ./apps/api
 RUN pnpm install
 
 # Generate Prisma Client
-RUN pnpm --filter @relationhub/database prisma generate
+RUN pnpm --filter @cordiq/database prisma generate
 
 EXPOSE 3001
 
-CMD ["pnpm", "--filter", "@relationhub/api", "dev"]
+CMD ["pnpm", "--filter", "@cordiq/api", "dev"]

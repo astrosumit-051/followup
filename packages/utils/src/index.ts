@@ -1,4 +1,4 @@
-// Shared utility functions for RelationHub
+// Shared utility functions for Cordiq
 
 /**
  * Format a date to a readable string

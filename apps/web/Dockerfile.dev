@@ -17,4 +17,4 @@ RUN pnpm install
 
 EXPOSE 3000
 
-CMD ["pnpm", "--filter", "@relationhub/web", "dev"]
+CMD ["pnpm", "--filter", "@cordiq/web", "dev"]

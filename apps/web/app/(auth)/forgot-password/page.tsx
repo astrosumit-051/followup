@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 export default function ForgotPasswordPage() {
   useEffect(() => {
-    document.title = "Forgot Password | RelationHub";
+    document.title = "Forgot Password | Cordiq";
   }, []);
 
   return (

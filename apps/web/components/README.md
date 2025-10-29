@@ -2,7 +2,7 @@
 
 > **Last Updated:** October 12, 2025
 > **shadcn/ui Version:** Latest
-> **Purpose:** Comprehensive guide for using shadcn/ui components in RelationHub
+> **Purpose:** Comprehensive guide for using shadcn/ui components in Cordiq
 
 ---
 
@@ -47,7 +47,7 @@
 
 ## Introduction
 
-This guide covers all shadcn/ui components used in RelationHub. shadcn/ui is **not a component library** but a collection of re-usable components that you can copy and paste into your project. Components are built on:
+This guide covers all shadcn/ui components used in Cordiq. shadcn/ui is **not a component library** but a collection of re-usable components that you can copy and paste into your project. Components are built on:
 
 - **Radix UI**: Unstyled, accessible primitives
 - **Tailwind CSS**: Utility-first styling
@@ -1510,4 +1510,4 @@ If you encounter issues or need clarification:
 ---
 
 **Last Updated:** October 12, 2025
-**Maintained by:** RelationHub Development Team
+**Maintained by:** Cordiq Development Team

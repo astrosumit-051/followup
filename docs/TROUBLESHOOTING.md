@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This guide covers common issues you may encounter while using RelationHub's email composition features and their solutions.
+This guide covers common issues you may encounter while using Cordiq's email composition features and their solutions.
 
 ---
 
@@ -82,7 +82,7 @@ This guide covers common issues you may encounter while using RelationHub's emai
 
 **4. If you see "Unverified app" warning:**
 - Click "Advanced" at the bottom of the warning
-- Click "Go to RelationHub (unsafe)"
+- Click "Go to Cordiq (unsafe)"
 - This is normal for apps in testing mode
 - For production, submit for Google verification (takes 1-2 weeks)
 
@@ -107,9 +107,9 @@ This guide covers common issues you may encounter while using RelationHub's emai
 
 **2. Manual revocation (if above doesn't work):**
 - Visit: https://myaccount.google.com/permissions
-- Find "RelationHub" in the list of connected apps
+- Find "Cordiq" in the list of connected apps
 - Click "Remove Access"
-- Go back to RelationHub Settings
+- Go back to Cordiq Settings
 - Click "Connect Gmail" again
 
 **3. Check for token corruption:**
@@ -1027,19 +1027,19 @@ In `apps/api/src/auth/auth.guard.ts`:
 
 In `apps/api/.env`:
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/relationhub_dev?schema=public"
+DATABASE_URL="postgresql://user:password@localhost:5432/cordiq_dev?schema=public"
 ```
 
 Verify:
 - Username and password are correct
-- Database name exists (`relationhub_dev`)
+- Database name exists (`cordiq_dev`)
 - Port 5432 is accessible
 
 **2. Test connection:**
 ```bash
 psql $DATABASE_URL
 # Or
-psql -h localhost -U user -d relationhub_dev
+psql -h localhost -U user -d cordiq_dev
 ```
 
 **3. Check if database is running:**
@@ -1164,7 +1164,7 @@ LOG_LEVEL=debug
 - Browser console errors
 
 **5. Contact support:**
-- Email: support@relationhub.com (if available)
+- Email: support@cordiq.com (if available)
 - GitHub Issues: Create a new issue with:
   - Clear description of problem
   - Steps to reproduce
