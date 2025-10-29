@@ -101,12 +101,20 @@ describe('GmailOAuthService', () => {
       expect(url).toContain('gmail.readonly');
       expect(url).toContain('access_type=offline');
       expect(url).toContain('prompt=consent');
-      expect(url).toContain(`state=${mockUserId}`);
+      // State is a random 64-character hex string, just verify it exists
+      expect(url).toMatch(/state=[a-f0-9]{64}/);
     });
   });
 
   describe('handleCallback', () => {
     it('should exchange auth code for tokens and store encrypted tokens in database', async () => {
+      // First, generate authorization URL to populate stateStore
+      const url = service.getAuthorizationUrl(mockUserId);
+
+      // Extract state from URL
+      const stateMatch = url.match(/state=([a-f0-9]{64})/);
+      const state = stateMatch ? stateMatch[1] : '';
+
       // Mock OAuth2Client.getToken
       const mockGetToken = jest.fn().mockResolvedValue({
         tokens: {
@@ -127,7 +135,7 @@ describe('GmailOAuthService', () => {
 
       mockPrismaService.gmailToken.create.mockResolvedValue(mockGmailToken);
 
-      const result = await service.handleCallback(mockUserId, mockAuthCode);
+      const result = await service.handleCallback(state, mockAuthCode);
 
       expect(mockGetToken).toHaveBeenCalledWith(mockAuthCode);
       expect(mockGetTokenInfo).toHaveBeenCalledWith(mockAccessToken);
@@ -145,6 +153,13 @@ describe('GmailOAuthService', () => {
     });
 
     it('should update existing token if user already has Gmail connected', async () => {
+      // First, generate authorization URL to populate stateStore
+      const url = service.getAuthorizationUrl(mockUserId);
+
+      // Extract state from URL
+      const stateMatch = url.match(/state=([a-f0-9]{64})/);
+      const state = stateMatch ? stateMatch[1] : '';
+
       const mockGetToken = jest.fn().mockResolvedValue({
         tokens: {
           access_token: mockAccessToken,
@@ -164,7 +179,7 @@ describe('GmailOAuthService', () => {
       mockPrismaService.gmailToken.findUnique.mockResolvedValue(mockGmailToken);
       mockPrismaService.gmailToken.update.mockResolvedValue(mockGmailToken);
 
-      const result = await service.handleCallback(mockUserId, mockAuthCode);
+      const result = await service.handleCallback(state, mockAuthCode);
 
       expect(prisma.gmailToken.update).toHaveBeenCalledWith({
         where: { userId: mockUserId },

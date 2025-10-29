@@ -42,13 +42,16 @@ export class GmailController {
    *
    * Handles OAuth2 callback from Google after user grants/denies consent.
    * Exchanges authorization code for access and refresh tokens, encrypts them,
-   * and stores in database.
+   * and stores in database. Then redirects to frontend callback page.
    *
    * Query parameters:
    * @param state - OAuth state parameter for CSRF protection (required)
    * @param code - Authorization code from Google OAuth (required)
+   * @param error - OAuth error code if user denied access (optional)
+   * @param error_description - Human-readable error description (optional)
+   * @param res - Express response object for redirect
    *
-   * @returns Success response with connected email address
+   * @returns 302 redirect to frontend callback page
    * @throws BadRequestException if state is invalid, code is missing, or code exchange fails
    * @throws UnauthorizedException if OAuth tokens are invalid or expired during exchange
    * @throws InternalServerErrorException if token encryption or database storage fails
@@ -58,14 +61,29 @@ export class GmailController {
   async handleCallback(
     @Query('state') state: string,
     @Query('code') code: string,
-  ): Promise<{ success: boolean; message: string; emailAddress: string }> {
-    const gmailToken = await this.gmailOAuthService.handleCallback(state, code);
+    @Query('error') error: string,
+    @Query('error_description') errorDescription: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    // Handle OAuth error (user denied or error occurred)
+    if (error) {
+      const encodedError = encodeURIComponent(errorDescription || error);
+      res.redirect(`/settings/gmail-callback?error=${encodedError}`);
+      return;
+    }
 
-    return {
-      success: true,
-      message: 'Gmail account connected successfully',
-      emailAddress: gmailToken.emailAddress,
-    };
+    try {
+      // Exchange code for tokens and store
+      await this.gmailOAuthService.handleCallback(state, code);
+
+      // Redirect to success callback page
+      res.redirect('/settings/gmail-callback?success=true');
+    } catch (err) {
+      // Redirect to error callback page
+      const errorMessage = err instanceof Error ? err.message : 'Failed to connect Gmail';
+      const encodedError = encodeURIComponent(errorMessage);
+      res.redirect(`/settings/gmail-callback?error=${encodedError}`);
+    }
   }
 
   /**

@@ -7,7 +7,7 @@ describe('EmailSignatureService', () => {
   let service: EmailSignatureService;
   let prisma: PrismaService;
 
-  const mockPrismaService = {
+  const mockPrismaService: any = {
     emailSignature: {
       findUnique: jest.fn(),
       findMany: jest.fn(),
@@ -22,6 +22,11 @@ describe('EmailSignatureService', () => {
       updateMany: jest.fn(),
     },
   };
+
+  // Add $transaction mock separately to avoid circular reference issues
+  mockPrismaService.$transaction = jest.fn(async (callback: any) => {
+    return callback(mockPrismaService);
+  });
 
   const mockUserId = 'user-123';
   const mockSignatureId = 'signature-456';

@@ -355,7 +355,10 @@ export class GmailOAuthService {
     const iv = Buffer.from(ivHex, 'hex');
     const authTag = Buffer.from(authTagHex, 'hex');
 
-    const decipher = createDecipheriv('aes-256-gcm', this.encryptionKey, iv);
+    // Specify auth tag length (16 bytes/128 bits) to prevent authentication forgery attacks
+    const decipher = createDecipheriv('aes-256-gcm', this.encryptionKey, iv, {
+      authTagLength: 16,
+    });
     decipher.setAuthTag(authTag);
 
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
