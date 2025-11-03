@@ -25,25 +25,25 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 ## Tasks
 
-- [ ] **1. Foundation & Configuration** `1-2 hours`
-  - [ ] 1.1 Capture baseline screenshots (all viewports: 360px, 375px, 414px, 768px, 1440px)
-  - [ ] 1.2 Capture baseline of each individual card component
-  - [ ] 1.3 Document current state in manual testing checklist
-  - [ ] 1.4 Set up Tailwind configuration for custom design tokens (if using Option A approach)
-  - [ ] 1.5 Test baseline screenshot script functionality
-  - [ ] 1.6 Commit baseline screenshots to repository
+- [x] **1. Foundation & Configuration** `1-2 hours` ✅ **COMPLETED**
+  - [x] 1.1 Capture baseline screenshots (all viewports: 360px, 375px, 414px, 768px, 1440px)
+  - [x] 1.2 Capture baseline of each individual card component
+  - [x] 1.3 Document current state in manual testing checklist
+  - [x] 1.4 Set up Tailwind configuration for custom design tokens (if using Option A approach)
+  - [x] 1.5 Test baseline screenshot script functionality
+  - [x] 1.6 Commit baseline screenshots to repository
 
-- [ ] **2. Brand Compliance - Background & Colors** `2-3 hours`
-  - [ ] 2.1 Implement brand gradient background (light mode: #F8FBF6 → #E8F0F7 → #FFF9E8)
-  - [ ] 2.2 Implement dark mode gradient background (#1E1E1E → #1A1A1A → #1E1E1E)
-  - [ ] 2.3 Update primary button color to near-black (#0A0A0A) in Quick Add card
-  - [ ] 2.4 Add hover state for primary button (#1A1A1A)
-  - [ ] 2.5 Adjust Quick Add card background (reduce green intensity, use border instead)
-  - [ ] 2.6 Test gradient visibility on desktop and mobile
-  - [ ] 2.7 Test button contrast and readability
-  - [ ] 2.8 Verify no paint performance issues with gradients
-  - [ ] 2.9 Capture post-change screenshots for comparison
-  - [ ] 2.10 Run automated brand compliance checks (background, button colors)
+- [x] **2. Brand Compliance - Background & Colors** `2-3 hours` ✅ **COMPLETED**
+  - [x] 2.1 Implement brand gradient background (light mode: #F8FBF6 → #E8F0F7 → #FFF9E8)
+  - [x] 2.2 Implement dark mode gradient background (#1E1E1E → #1A1A1A → #1E1E1E)
+  - [x] 2.3 Update primary button color to near-black (#0A0A0A) in Quick Add card
+  - [x] 2.4 Add hover state for primary button (#1A1A1A)
+  - [x] 2.5 Adjust Quick Add card background (reduce green intensity, use border instead)
+  - [x] 2.6 Test gradient visibility on desktop and mobile
+  - [x] 2.7 Test button contrast and readability
+  - [x] 2.8 Verify no paint performance issues with gradients
+  - [x] 2.9 Capture post-change screenshots for comparison
+  - [x] 2.10 Run automated brand compliance checks (background, button colors)
 
 - [ ] **3. Card Styling & Typography** `2-3 hours`
   - [ ] 3.1 Update card border radius to 18px (all dashboard cards)
