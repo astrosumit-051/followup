@@ -9,10 +9,18 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '400px',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        card: "18px", // Generous, friendly radius for dashboard cards
+      },
+      boxShadow: {
+        card: "0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)", // Default card shadow with subtle elevation
+        "card-hover": "0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06)", // Enhanced shadow on hover
       },
       colors: {
         background: "hsl(var(--background))",
