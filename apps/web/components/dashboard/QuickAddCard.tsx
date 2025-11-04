@@ -17,9 +17,9 @@ export function QuickAddCard() {
 
   return (
     <>
-      <Card className="bg-white dark:bg-gray-800 border-2 border-green-200 dark:border-green-800">
+      <Card className="bg-white dark:bg-gray-800 border-2 border-green-200 dark:border-green-800 rounded-card shadow-card hover:shadow-card-hover transition-shadow duration-200">
         <CardHeader>
-          <CardTitle className="text-green-900 dark:text-green-100">Quick Add</CardTitle>
+          <CardTitle className="text-base font-semibold text-green-900 dark:text-green-100">Quick Add</CardTitle>
           <CardDescription className="text-green-700 dark:text-green-300">
             Add a new contact to your network
           </CardDescription>

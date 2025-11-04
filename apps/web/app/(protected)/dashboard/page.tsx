@@ -39,12 +39,12 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8FBF6] via-[#E8F0F7] to-[#FFF9E8] dark:bg-gradient-to-br dark:from-[#1E1E1E] dark:via-[#1A1A1A] dark:to-[#1E1E1E]">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+      <header className="bg-white dark:bg-[#1E1E1E] border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Welcome Message */}
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-[#E0E0E0]">
                 Dashboard
               </h1>
               <p className="text-sm text-gray-700 dark:text-gray-300 hidden sm:block">
@@ -59,7 +59,7 @@ export default function DashboardPage() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
                     type="search"
-                    placeholder="Search contacts, emails, todos..."
+                    placeholder="Search contacts..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -97,7 +97,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Unified Responsive Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
           {/* Quick Add - Mobile: position 1, Desktop: top-left */}
           <div className="md:col-span-1">
             <QuickAddCard />
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         <Button
           variant="outline"
           size="icon"
-          className="h-14 w-14 min-h-[56px] min-w-[56px] rounded-full shadow-lg bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="h-14 w-14 min-h-[56px] min-w-[56px] rounded-full shadow-lg bg-white dark:bg-[#1E1E1E] hover:bg-gray-100 dark:hover:bg-[#2A2A2A]"
           onClick={() => window.location.reload()}
           title="Refresh dashboard"
           aria-label="Refresh dashboard"
