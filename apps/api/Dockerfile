@@ -28,11 +28,8 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@8.15.9 --activate
 
 # Copy package files and node_modules from deps
+# Note: types and utils packages don't have their own node_modules (hoisted to root)
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=deps /app/packages/database/node_modules ./packages/database/node_modules
-COPY --from=deps /app/packages/types/node_modules ./packages/types/node_modules
-COPY --from=deps /app/packages/utils/node_modules ./packages/utils/node_modules
 
 # Copy source code
 COPY . .
@@ -57,10 +54,8 @@ RUN corepack enable && corepack prepare pnpm@8.15.9 --activate
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
-# Copy production dependencies
+# Copy production dependencies (hoisted to root in pnpm workspace)
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=deps /app/packages/database/node_modules ./packages/database/node_modules
 
 # Copy built application
 COPY --from=builder /app/apps/api/dist ./apps/api/dist

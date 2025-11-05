@@ -25,9 +25,8 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@8.15.9 --activate
 
-# Copy dependencies
+# Copy dependencies (hoisted to root in pnpm workspace)
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 
 # Copy source code
 COPY . .
