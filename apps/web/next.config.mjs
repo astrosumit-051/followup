@@ -3,6 +3,16 @@ const nextConfig = {
   reactStrictMode: true,
 
   /**
+   * Output Configuration
+   *
+   * Enable standalone output for Docker production builds.
+   * This creates a minimal server build with all dependencies bundled.
+   *
+   * @see https://nextjs.org/docs/advanced-features/output-file-tracing
+   */
+  output: 'standalone',
+
+  /**
    * Security Headers Configuration
    *
    * Implements OWASP recommended security headers:
