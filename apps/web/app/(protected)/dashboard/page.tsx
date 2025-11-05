@@ -8,7 +8,8 @@ import { QuickAddCard } from "@/components/dashboard/QuickAddCard";
 import { SnapshotCard } from "@/components/dashboard/SnapshotCard";
 import { GrowthCard } from "@/components/dashboard/GrowthCard";
 import { NotificationsCard } from "@/components/dashboard/NotificationsCard";
-import { ActivityCard } from "@/components/dashboard/ActivityCard";
+// Temporarily commented out for staging build - missing dependencies (date-fns, react-intersection-observer, scroll-area)
+// import { ActivityCard } from "@/components/dashboard/ActivityCard";
 import { TodoCard } from "@/components/dashboard/TodoCard";
 import { useState } from "react";
 
@@ -118,10 +119,11 @@ export default function DashboardPage() {
             <GrowthCard />
           </div>
 
-          {/* Activity Feed - Mobile: position 5, Desktop: bottom-left spanning 2 columns */}
-          <div className="md:col-span-2 lg:col-span-2">
+          {/* Activity Feed - Temporarily disabled for staging build */}
+          {/* TODO: Re-enable after adding missing dependencies and files */}
+          {/* <div className="md:col-span-2 lg:col-span-2">
             <ActivityCard />
-          </div>
+          </div> */}
 
           {/* Todos - Mobile: position 6, Desktop: bottom-right */}
           <div className="md:col-span-2 lg:col-span-1">
