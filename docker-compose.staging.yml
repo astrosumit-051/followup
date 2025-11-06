@@ -50,6 +50,8 @@ services:
     restart: unless-stopped
     ports:
       - '4001:4000'  # Use different port to avoid conflict with dev
+    env_file:
+      - .env.staging
     environment:
       # Database
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:staging_password@postgres:5432/cordiq_staging?schema=public}
@@ -116,6 +118,8 @@ services:
     restart: unless-stopped
     ports:
       - '3001:3000'  # Use different port to avoid conflict with dev
+    env_file:
+      - .env.staging
     environment:
       - NODE_ENV=staging
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4001}

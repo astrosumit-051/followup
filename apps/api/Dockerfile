@@ -35,9 +35,12 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy source code
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client FIRST (database package needs it)
 WORKDIR /app/packages/database
 RUN pnpm prisma generate
+
+# Build database package (after Prisma client is generated)
+RUN pnpm build
 
 # Build application
 WORKDIR /app
@@ -87,6 +90,13 @@ COPY --from=builder /app/apps/api/dist ./apps/api/dist
 # Copy package files
 COPY --chown=nestjs:nodejs package.json ./
 COPY --chown=nestjs:nodejs apps/api/package.json ./apps/api/
+
+# Copy database package with Prisma schema
+COPY --from=builder /app/packages/database ./packages/database
+
+# Generate Prisma client in final stage (needed for runtime)
+WORKDIR /app
+RUN node_modules/.bin/prisma generate --schema=./packages/database/prisma/schema.prisma
 
 # Switch to non-root user
 USER nestjs
