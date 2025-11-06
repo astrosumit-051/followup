@@ -16,8 +16,9 @@ COPY packages/database/package.json ./packages/database/
 COPY packages/types/package.json ./packages/types/
 COPY packages/utils/package.json ./packages/utils/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile --prod
+# Install ALL dependencies (including dev dependencies needed for NestJS runtime)
+# Note: --prod flag was removed because @nestjs/* packages are needed at runtime
+RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
@@ -42,31 +43,50 @@ RUN pnpm prisma generate
 WORKDIR /app
 RUN pnpm --filter @cordiq/api build
 
-# Stage 3: Runner
-FROM node:22-alpine AS runner
-RUN apk add --no-cache libc6-compat openssl curl
-WORKDIR /app
+# Stage 3: Production Deployment
+FROM node:22-alpine AS deploy
+RUN apk add --no-cache libc6-compat openssl
+WORKDIR /tmp/deploy
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@8.15.9 --activate
+
+# Copy workspace files needed for pnpm deploy
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/database/package.json ./packages/database/
+COPY packages/types/package.json ./packages/types/
+COPY packages/utils/package.json ./packages/utils/
+
+# Copy workspace package source files (needed for deployment)
+COPY --from=builder /app/packages/database ./packages/database
+COPY --from=builder /app/packages/types ./packages/types
+COPY --from=builder /app/packages/utils ./packages/utils
+
+# Use pnpm deploy to create flattened production node_modules
+# This resolves the symlink issue by creating a proper deployment structure
+RUN pnpm install --frozen-lockfile --prod=false
+RUN pnpm deploy --filter=@cordiq/api --prod /prod/api
+
+# Stage 4: Runner
+FROM node:22-alpine AS runner
+RUN apk add --no-cache libc6-compat openssl curl
+WORKDIR /app
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
-# Copy production dependencies (hoisted to root in pnpm workspace)
-COPY --from=deps /app/node_modules ./node_modules
+# Copy deployed node_modules from deploy stage (flattened, no symlinks)
+# This includes all external dependencies AND workspace packages
+COPY --from=deploy /prod/api/node_modules ./node_modules
 
 # Copy built application
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/packages/database ./packages/database
-COPY --from=builder /app/packages/types/dist ./packages/types/dist
-COPY --from=builder /app/packages/utils/dist ./packages/utils/dist
 
 # Copy package files
-COPY --chown=nestjs:nodejs package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=nestjs:nodejs package.json ./
 COPY --chown=nestjs:nodejs apps/api/package.json ./apps/api/
-COPY --chown=nestjs:nodejs packages/database/package.json ./packages/database/
 
 # Switch to non-root user
 USER nestjs
@@ -79,5 +99,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:4000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start application
-WORKDIR /app/apps/api
-CMD ["pnpm", "start:prod"]
+CMD ["node", "apps/api/dist/main.js"]

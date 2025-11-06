@@ -33,6 +33,10 @@ COPY . .
 
 # Build application
 WORKDIR /app/apps/web
+# Set placeholder environment variables for build-time static generation
+# These are only used during the Next.js build process and will be overridden at runtime
+ENV NEXT_PUBLIC_SUPABASE_URL="https://placeholder.supabase.co"
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="placeholder-key-for-build-only"
 RUN pnpm build
 
 # Stage 3: Runner
