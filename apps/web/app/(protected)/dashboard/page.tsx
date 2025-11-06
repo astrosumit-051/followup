@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { QuickAddCard } from "@/components/dashboard/QuickAddCard";
-import { SnapshotCard } from "@/components/dashboard/SnapshotCard";
-import { GrowthCard } from "@/components/dashboard/GrowthCard";
-import { NotificationsCard } from "@/components/dashboard/NotificationsCard";
-import { ActivityCard } from "@/components/dashboard/ActivityCard";
-import { TodoCard } from "@/components/dashboard/TodoCard";
+// Temporarily commented out for staging build - Phase 4 features with missing dependencies
+// import { SnapshotCard } from "@/components/dashboard/SnapshotCard";
+// Will be re-enabled when Phase 4 is implemented (recharts, date-fns, calendar, scroll-area)
+// import { GrowthCard } from "@/components/dashboard/GrowthCard";
+// import { NotificationsCard } from "@/components/dashboard/NotificationsCard";
+// import { ActivityCard } from "@/components/dashboard/ActivityCard";
+// import { TodoCard } from "@/components/dashboard/TodoCard";
+import { ComingSoonCard } from "@/components/dashboard/ComingSoonCard";
 import { useState } from "react";
 
 /**
@@ -103,29 +106,49 @@ export default function DashboardPage() {
             <QuickAddCard />
           </div>
 
-          {/* Snapshot - Mobile: position 2, Desktop: top-center */}
+          {/* Snapshot - Coming Soon (Phase 4) */}
           <div className="md:col-span-1">
-            <SnapshotCard />
+            <ComingSoonCard
+              title="Metrics Snapshot"
+              description="View key metrics like total contacts, emails sent, open rate, and response rate at a glance."
+              icon="trending-up"
+            />
           </div>
 
-          {/* Notifications - Mobile: position 4, Desktop: top-right spanning 2 rows */}
+          {/* Notifications - Coming Soon (Phase 4) */}
           <div className="md:col-span-2 lg:col-span-1 lg:row-span-2 md:order-last lg:order-none">
-            <NotificationsCard />
+            <ComingSoonCard
+              title="Notifications"
+              description="Action items, follow-up reminders, and pending tasks will appear here."
+              icon="bell"
+            />
           </div>
 
-          {/* Growth Chart - Mobile: position 3, Desktop: middle spanning 2 columns */}
+          {/* Growth Chart - Coming Soon (Phase 4) */}
           <div className="md:col-span-2 lg:col-span-2">
-            <GrowthCard />
+            <ComingSoonCard
+              title="Growth Trends"
+              description="Visualize your network growth with interactive charts and analytics."
+              icon="trending-up"
+            />
           </div>
 
-          {/* Activity Feed - Mobile: position 5, Desktop: bottom-left spanning 2 columns */}
+          {/* Activity Feed - Coming Soon (Phase 4) */}
           <div className="md:col-span-2 lg:col-span-2">
-            <ActivityCard />
+            <ComingSoonCard
+              title="Recent Activity"
+              description="Track your recent emails, contacts added, and engagement history."
+              icon="activity"
+            />
           </div>
 
-          {/* Todos - Mobile: position 6, Desktop: bottom-right */}
+          {/* Todos - Coming Soon (Phase 4) */}
           <div className="md:col-span-2 lg:col-span-1">
-            <TodoCard />
+            <ComingSoonCard
+              title="Todo List"
+              description="Manage your networking tasks and reminders in one place."
+              icon="check-square"
+            />
           </div>
         </div>
       </main>

@@ -125,8 +125,6 @@ export function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       {
         name: fullName,
         email: formData.email, // Email is now required
-        notes: formData.notes || undefined,
-        linkedInUrl: formData.linkedInUrl || undefined,
       },
       {
         onSuccess: () => {

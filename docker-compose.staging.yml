@@ -1,0 +1,177 @@
+version: '3.8'
+
+# Staging Environment Docker Compose Configuration
+# This configuration is for testing the production build locally before deploying
+# It uses production Dockerfiles but can connect to staging services
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cordiq-postgres-staging
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-staging_password}
+      POSTGRES_DB: cordiq_staging
+    ports:
+      - '5433:5432'  # Use different port to avoid conflict with dev
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cordiq-staging
+
+  redis:
+    image: redis:7-alpine
+    container_name: cordiq-redis-staging
+    restart: unless-stopped
+    ports:
+      - '6380:6379'  # Use different port to avoid conflict with dev
+    volumes:
+      - redis_staging_data:/data
+    command: redis-server --save 60 1 --loglevel warning --requirepass ${REDIS_PASSWORD:-staging_redis_password}
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-staging_redis_password}', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cordiq-staging
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: cordiq-api-staging
+    restart: unless-stopped
+    ports:
+      - '4001:4000'  # Use different port to avoid conflict with dev
+    environment:
+      # Database
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:staging_password@postgres:5432/cordiq_staging?schema=public}
+
+      # Application
+      - PORT=4000
+      - NODE_ENV=staging
+      - APP_URL=${APP_URL:-http://localhost:4001}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3001}
+
+      # Redis Cache
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-staging_redis_password}@redis:6379
+
+      # Supabase
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+
+      # AI Providers
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+      # AWS S3
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - S3_BUCKET=${S3_BUCKET:-cordiq-attachments-staging}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
+      # Gmail OAuth
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-http://localhost:4001/api/auth/gmail/callback}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+
+      # Security
+      - RATE_LIMIT_TTL=${RATE_LIMIT_TTL:-60}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+
+      # GraphQL
+      - GRAPHQL_PLAYGROUND=${GRAPHQL_PLAYGROUND:-false}
+      - GRAPHQL_INTROSPECTION=${GRAPHQL_INTROSPECTION:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cordiq-staging
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: cordiq-web-staging
+    restart: unless-stopped
+    ports:
+      - '3001:3000'  # Use different port to avoid conflict with dev
+    environment:
+      - NODE_ENV=staging
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4001}
+      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    depends_on:
+      - api
+    networks:
+      - cordiq-staging
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cordiq-prometheus-staging
+    restart: unless-stopped
+    ports:
+      - '9091:9090'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_staging_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - cordiq-staging
+    profiles:
+      - monitoring
+
+  # Optional: Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cordiq-grafana-staging
+    restart: unless-stopped
+    ports:
+      - '3001:3000'
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_staging_data:/var/lib/grafana
+    networks:
+      - cordiq-staging
+    profiles:
+      - monitoring
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:
+  prometheus_staging_data:
+  grafana_staging_data:
+
+networks:
+  cordiq-staging:
+    driver: bridge

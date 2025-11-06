@@ -130,7 +130,7 @@ export function TemplateLibrary({
 
   // Group templates by category
   const templatesByCategory = useMemo(() => {
-    if (!templates) return {};
+    if (!templates) return {} as Record<TemplateCategory, EmailTemplate[]>;
 
     return templates.reduce((acc, template) => {
       const category = (template.category || "general") as TemplateCategory;
